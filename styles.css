@@ -1,0 +1,444 @@
+/*Univerzális*/
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+:root {
+    --primary-blue: #1e3a8a;
+    --secondary-blue: #3b82f6;
+    --background-color: #f8f9fa;
+    --border-outline: #808080;
+    --light-gray: #e3e7ee;
+}
+
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: var(--background-color);
+    color: #333;
+    line-height: 1.6;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+h1 {
+    font-size: clamp(1rem, 3vw, 2rem);
+    margin-bottom: 0.5rem;
+}
+
+p {
+    font-size: clamp(0.875rem, 1.5vw, 1rem);
+}
+
+header {
+    background: white;
+    color: white;
+    padding: 1.5rem 2rem;
+    position: relative;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    display: flex;
+    align-items: center;
+    height: 100px;
+}
+
+.ivk_logo {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    width: 200px;
+    height: auto;
+    z-index: 10;
+}
+
+.header_img {
+    background: white;
+    border: 2px solid white;
+    height: 80%;
+    position: absolute;
+    left: 0;
+    top: 0;
+}
+
+.nav-menu {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    flex: 1;
+}
+
+.nav-menu>h1 {
+    color: var(--primary-blue);
+    font-size: 1.25rem;
+    margin-bottom: 0.5rem;
+}
+
+.nav-menu ul {
+    list-style: none;
+    display: flex;
+    gap: 2rem;
+}
+
+.nav-menu ul li a {
+    color: var(--primary-blue);
+    text-decoration: none;
+    font-weight: bold;
+    transition: color 0.3s ease;
+    border-radius: 10px;
+    padding: 0.5rem 0.5rem;
+    transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+.nav-menu ul li a:hover {
+    color: var(--secondary-blue);
+    background: var(--light-gray);
+}
+
+.nav-menu ul li a.active {
+    color: white;
+    background: var(--primary-blue);
+}
+
+.nav-menu>a.logoutButton {
+    position: absolute;
+    right: 20px;
+    top: 50%;
+    transform: translateY(-50%);
+    background-color: var(--primary-blue);
+    color: white;
+    padding: 0.5rem 1rem;
+    border-radius: 10px;
+    text-decoration: none;
+    font-weight: bold;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    transition: background-color 0.3s ease;
+}
+
+.nav-menu>a.logoutButton:hover {
+    background-color: var(--secondary-blue);
+}
+
+.logout-icon {
+    width: 24px;
+    height: 24px;
+    filter: brightness(0) invert(1);
+}
+
+.hamburger {
+    display: none;
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 10px;
+    z-index: 1001;
+    margin-left: auto;
+    position: relative;
+}
+
+.hamburger-icon {
+    width: 28px;
+    height: 28px;
+    transition: opacity 0.3s ease, transform 0.3s ease;
+}
+
+.hamburger .close-icon {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%) rotate(-90deg);
+    opacity: 0;
+}
+
+.hamburger .menu-icon {
+    opacity: 1;
+    transform: rotate(0deg);
+}
+
+.active-section-name {
+    display: none;
+    font-weight: bold;
+    color: var(--primary-blue);
+    margin-left: auto;
+    font-size: 1.1rem;
+}
+
+@media (max-width: 1100px) {
+    header {
+        justify-content: flex-start;
+    }
+    
+    .hamburger {
+        display: flex;
+    }
+    
+    .active-section-name {
+        display: block;
+        font-size: 1.5rem;
+    }
+    
+    .nav-menu {
+        position: fixed;
+        right: -100%;
+        top: 0;
+        height: 100vh;
+        width: 280px;
+        background-color: white;
+        box-shadow: -2px 0 10px rgba(0, 0, 0, 0.2);
+        transition: right 0.3s ease;
+        z-index: 1000;
+        padding: 80px 20px 80px;
+        flex-direction: column;
+        justify-content: flex-start;
+        overflow-y: auto;
+    }
+    
+    .nav-menu.active {
+        right: 0;
+    }
+    
+    .nav-menu ul {
+        flex-direction: column;
+        gap: 0;
+        width: 100%;
+    }
+    
+    .nav-menu ul li {
+        width: 100%;
+    }
+    
+    .nav-menu ul li a {
+        display: block;
+        padding: 15px 20px;
+        width: 100%;
+        text-align: left;
+        border-radius: 5px;
+    }
+    
+    .nav-menu>a.logoutButton {
+        position: absolute;
+        bottom: 20px;
+        right: 20px;
+        left: auto;
+        top: auto;
+        transform: none;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.5rem;
+        width: auto;
+        height: auto;
+        padding: 0.75rem 1rem;
+    }
+    
+    .hamburger.active .menu-icon {
+        opacity: 0;
+        transform: rotate(90deg);
+    }
+    
+    .hamburger.active .close-icon {
+        opacity: 1;
+        transform: translate(-50%, -50%) rotate(0deg);
+    }
+    
+    body.menu-open::after {
+        content: '';
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0, 0, 0, 0.5);
+        z-index: 999;
+    }
+}
+
+@media (max-width: 800px) {
+    .header_img {
+        display: none;
+    }
+}
+
+main {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+}
+
+section {
+    background: white;
+    padding: 2rem;
+    width: 80%;
+    margin: auto;
+    flex: 1;
+}
+
+.content_container {
+    background: var(--background-color);
+    border-radius: 10px;
+    padding: 1rem;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    border: 2px solid transparent;
+    transition: border 0.3s ease;
+    margin-bottom: 1.5rem;
+    position: relative;
+}
+
+.content_container:hover {
+    border: 2px solid var(--primary-blue);
+}
+
+.container_link {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 1;
+    text-decoration: none;
+}
+
+.content_button {
+    position: absolute;
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    padding: 0.5rem;
+    border-radius: 50%;
+    transition: background-color 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 2;
+}
+
+.content_button:hover {
+    background-color: rgba(30, 58, 138, 0.1);
+}
+
+.content_button img {
+    width: 24px;
+    height: 24px;
+    display: block;
+}
+
+.content_download_button {
+    top: 0.5rem;
+    right: 0.5rem;
+}
+
+.content_delete_button {
+    bottom: 0.5rem;
+    right: 0.5rem;
+}
+
+/*index.php*/
+#index_container {
+    display: flex;
+    flex-direction: column;
+    width: 80vw;
+    max-height: 65vh; 
+    min-height: 0;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    text-align: center;
+    border-radius: 20px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
+}
+
+#index_header {
+    background: linear-gradient(135deg, var(--primary-blue), var(--secondary-blue));
+    color: white;
+    border-radius: 20px 20px 0 0;
+    padding: 1rem;
+    flex: 0 0 20%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+#login, #register {
+    background: white;
+    padding: 1.5rem;
+    border-radius: 0 0 20px 20px;
+    flex: 1;
+    overflow: auto;
+}
+
+@media (min-width: 768px) {
+    #index_container {
+        width: 60vw;
+        max-width: 600px;
+    }
+    #login, #register {
+        padding: 2rem;
+    }
+}
+
+@media (min-width: 1024px) {
+    #index_container {
+        width: 40vw;
+        max-width: 700px;
+    }
+}
+
+#index_container form {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    margin-top: 1rem;
+}
+
+#index_container input {
+    padding: 0.75rem;
+    border: 2px solid var(--border-outline);
+    border-radius: 5px;
+    font-size: 1rem;
+}
+
+#index_container input:focus {
+    border: 2px solid var(--primary-blue);
+    outline: none;
+    box-shadow: 0 0 5px rgba(59, 130, 246, 0.5);
+}
+
+#index_container button {
+    padding: 0.75rem;
+    background-color: var(--primary-blue);
+    color: white;
+    border: none;
+    border-radius: 5px;
+    font-size: 1rem;
+    font-weight: bold;
+    cursor: pointer;
+    transition: background-color 0.3s ease, transform 0.3s ease;
+}
+
+#index_container button:hover {
+    background-color: var(--secondary-blue);
+    transform: translateY(-2px);
+}
+
+#index_container a {
+    color: var(--primary-blue);
+    text-decoration: none;
+    font-size: 0.9rem;
+    margin-top: 0.5rem;
+    text-align: left;
+    width: fit-content;
+}
+
+#index_container a:hover {
+    text-decoration: underline;
+}
+
+/*dashboard.php*/
+
+
