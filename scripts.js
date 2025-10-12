@@ -181,4 +181,73 @@ document.addEventListener('DOMContentLoaded', function() {
 
         switchSection('dashboard_targyak');
     }
+
+    // Modal bezárás
+    const modalCloseButtons = document.querySelectorAll('.modal_close_button');
+    const modals = document.querySelectorAll('.modal');
+    modals.forEach(function(modal) {
+        modal.classList.add('hidden');
+    });
+
+    function closeModal(modal) {
+        modal.classList.add('closing');
+        setTimeout(function() {
+            modal.classList.remove('closing');
+            modal.classList.add('hidden');
+        }, 400);
+    }
+
+    modalCloseButtons.forEach(function(button) {
+        button.addEventListener('click', function() {
+            modals.forEach(function(modal) {
+                if (!modal.classList.contains('hidden')) {
+                    closeModal(modal);
+                }
+            });
+        });
+    });
+
+    modals.forEach(function(modal) {
+        modal.addEventListener('click', function(e) {
+            if (e.target === modal) {
+                closeModal(modal);
+            }
+        });
+    });
+
+    // Saját fájlok modal megnyitása
+    const ownDetailsLinks = document.querySelectorAll('.own_details_link');
+    ownDetailsLinks.forEach(function(link) {
+        link.addEventListener('click', function(e) {
+            e.preventDefault();
+            const ownFileModal = document.querySelector('.own_file_details_modal');
+            if (ownFileModal) {
+                ownFileModal.classList.remove('hidden');
+            }
+        });
+    });
+
+    // Saját teljesítetlen kérelmek modal megnyitása
+    const ownUncompletedRequestsLinks = document.querySelectorAll('.own_uncompleted_requests_link');
+    ownUncompletedRequestsLinks.forEach(function(link) {
+        link.addEventListener('click', function(e) {
+            e.preventDefault();
+            const ownUncompletedRequestsModal = document.querySelector('.own_uncompleted_requests_modal');
+            if (ownUncompletedRequestsModal) {
+                ownUncompletedRequestsModal.classList.remove('hidden');
+            }
+        });
+    });
+
+    // Saját teljesített kérelmek modal megnyitása
+    const ownCompletedRequestsLinks = document.querySelectorAll('.own_completed_requests_link');
+    ownCompletedRequestsLinks.forEach(function(link) {
+        link.addEventListener('click', function(e) {
+            e.preventDefault();
+            const ownCompletedRequestsModal = document.querySelector('.own_completed_requests_modal');
+            if (ownCompletedRequestsModal) {
+                ownCompletedRequestsModal.classList.remove('hidden');
+            }
+        });
+    });
 });

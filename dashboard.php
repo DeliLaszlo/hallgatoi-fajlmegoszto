@@ -38,22 +38,49 @@
         <section id="dashboard_fajlok">
             <h1>Feltöltött fájljaim</h1>
             <!-- Felhasználó fájljai, később PHP-vel generálandó -->
-            <div class="content_container">
-                <a href="#" class="container_link details_link" aria-label="Fájl megnyitása"></a>
-                <button class="content_button content_download_button" aria-label="Letöltés">
+            <div class="content_container own_file_container">
+                <a href="#" class="container_link own_details_link" aria-label="Fájl megnyitása"></a>
+                <button class="button small_button content_download_button" aria-label="Letöltés">
                     <img src="icons/download.svg" alt="Letöltés">
                 </button>
-                <button class="content_button content_delete_button" aria-label="Törlés">
+                <button class="button small_button content_delete_button" aria-label="Törlés">
                     <img src="icons/delete.svg" alt="Törlés">
                 </button>
                 <h2>Fájl címe</h2>
                 <p>Fájl leírása</p>
-                <p>Feltöltés dátuma, tárgy neve </p>
+                <p>Feltöltés dátuma, <span >tárgy neve</span></p>
             </div>
             <!-- Generálandó rész vége -->
         </section>
         <section id="dashboard_kerelemek">
-            <h1>Dummy text 3</h1>
+            <h1>Kérelmeim</h1>
+            <!-- Felhasználó teljesített kérelmei, később PHP-vel generálandó -->
+            <div class="content_container own_completed_request_container">
+                <span class="status_badge status_completed">
+                    <img src="icons/tick.svg" alt="Teljesítve" class="status_icon">
+                    <span class="status_text">Teljesítve</span>
+                </span>
+                <a href="#" class="container_link own_completed_requests_link" aria-label="Kérelem megnyitása"></a>
+                <h2>Kérelem címe</h2>
+                <p>Kérelem leírása</p>
+                <p>Kérelem dátuma, <span>tárgy neve</span></p>
+            </div>
+            <!-- Generálandó rész vége -->
+            <!-- Felhasználó teljesítetlen kérelmei, később PHP-vel generálandó -->
+            <div class="content_container own_uncompleted_request_container">
+                <span class="status_badge status_uncompleted">
+                    <img src="icons/hourglass.svg" alt="Várakozó" class="status_icon">
+                    <span class="status_text">Várakozó</span>
+                </span>
+                <a href="#" class="container_link own_uncompleted_requests_link" aria-label="Kérelem megnyitása"></a>
+                <button class="button small_button content_delete_button" aria-label="Törlés">
+                    <img src="icons/delete.svg" alt="Törlés">
+                </button>
+                <h2>Kérelem címe</h2>
+                <p>Kérelem leírása</p>
+                <p>Kérelem dátuma, <span>tárgy neve</span></p>
+            </div>
+            <!-- Generálandó rész vége -->
         </section>
         <section id="dashboard_chatszobak">
             <h1>Dummy text 4</h1>
@@ -62,10 +89,103 @@
             <h1>Dummy text 5</h1>
         </section>
     </main>
-    <div class="file_details_modal" style="display: none;">
+    <div class="modal own_file_details_modal">
         <div class="modal_content">
-            <!-- Fájl részletei, később PHP-vel generálandó -->
-
+            <button class="button small_button modal_close_button" aria-label="Bezárás">
+                <img src="icons/close.svg" alt="Bezárás">
+            </button>
+            <!-- Saját fájl részletei, adatok később PHP-vel generálandó -->
+            <h2 class="data-file-title">Fájl címe</h2>
+            <hr>
+            <h2>Fájl részletei</h2>
+            <h3>Fájlnév:<span class="data-file-name">fajl_neve.pdf</span></h3>
+            <h3>Tárgy:<span class="data-file-subject">Tárgy neve</span></h3>
+            <h3>Feltöltés dátuma:<span class="data-file-date">2025-01-01</span></h3>
+            <h3>Fájl mérete:<span class="data-file-size">1.5 MB</span></h3>
+            <h3>Letöltések:<span class="data-file-downloads">42</span></h3>
+            <h3>Értékelés:<span class="data-file-rating">4.5 / 5 (20 értékelés)</span></h3>
+            <h3>Leírás:</h3>
+            <p class="data-file-description">Itt van a fájl részletes leírása. Ez a szöveg több soros is lehet, és részletes információkat tartalmazhat a fájlról.</p>
+            <!-- Generálandó rész vége -->
+            <hr>
+            <div class="modal_footer">
+                <button class="button modal_delete_button" aria-label="Fájl törlése">
+                    <img src="icons/delete.svg" alt="Törlés">
+                    <span>Fájl törlése</span>
+                </button>
+                <button class="button modal_download_button" aria-label="Letöltés">
+                    <img src="icons/download.svg" alt="Letöltés">
+                    <span>Letöltés</span>
+                </button>
+                <button class="button modal_edit_button" aria-label="Szerkesztés">
+                    <img src="icons/edit.svg" alt="Szerkesztés">
+                    <span>Szerkesztés</span>
+                </button>
+            </div>
+        </div>
+    </div>
+    <div class="modal own_uncompleted_requests_modal">
+        <div class="modal_content">
+            <button class="button small_button modal_close_button" aria-label="Bezárás">
+                <img src="icons/close.svg" alt="Bezárás">
+            </button>
+            <!-- Saját teljesítetlen kérelem részletei, adatok később PHP-vel generálandó -->
+            <h2 class="data-request-title">Kérelem címe</h2>
+            <hr>
+            <h2>Kérelem részletei</h2>
+            <h3>Tárgy:<span class="data-request-subject">Tárgy neve</span></h3>
+            <h3>Feltöltés dátuma:<span class="data-request-date">2025-01-01</span></h3>
+            <h3>Leírás:</h3>
+            <p class="data-request-description">Itt van a kérelem részletes leírása. Ez a szöveg több soros is lehet, és részletes információkat tartalmazhat a kérelemről.</p>
+            <!-- Generálandó rész vége -->
+            <hr>
+            <div class="modal_footer">
+                <button class="button modal_delete_button" aria-label="Kérelem törlése">
+                    <img src="icons/delete.svg" alt="Törlés">
+                    <span>Kérelem törlése</span>
+                </button>
+                <button class="button modal_edit_button" aria-label="Szerkesztés">
+                    <img src="icons/edit.svg" alt="Szerkesztés">
+                    <span>Szerkesztés</span>
+                </button>
+            </div>
+        </div>
+    </div>
+    <div class="modal own_completed_requests_modal">
+        <div class="modal_content">
+            <button class="button small_button modal_close_button" aria-label="Bezárás">
+                <img src="icons/close.svg" alt="Bezárás">
+            </button>
+            <!-- Saját teljesített kérelem részletei, adatok később PHP-vel generálandó -->
+            <h2 class="data-request-title">Kérelem címe</h2>
+            <hr>
+            <h2>Kérelemhez feltöltött fájl részletei</h2>
+            <h3>Fájl címe:<span class="data-file-title">Fájl címe</span></h3>
+            <h3>Feltöltő:<span class="data-file-uploader">Feltöltő neve</span></h3>
+            <h3>Fájlnév:<span class="data-file-name">fajl_neve.pdf</span></h3>
+            <h3>Tárgy:<span class="data-file-subject">Tárgy neve</span></h3>
+            <h3>Feltöltés dátuma:<span class="data-file-date">2025-01-01</span></h3>
+            <h3>Fájl mérete:<span class="data-file-size">1.5 MB</span></h3>
+            <h3>Letöltések:<span class="data-file-downloads">42</span></h3>
+            <h3>Értékelés:<span class="data-file-rating">4.5 / 5 (20 értékelés)</span></h3>
+            <h3>Leírás:</h3>
+            <p class="data-file-description">Itt van a fájl részletes leírása. Ez a szöveg több soros is lehet, és részletes információkat tartalmazhat a fájlról.</p>
+            <!-- Generálandó rész vége -->
+            <hr>
+            <div class="modal_footer">
+                <button class="button modal_accept_button" aria-label="Kérelem lezárása">
+                    <img src="icons/tick.svg" alt="Elfogadás">
+                    <span>Kérelem lezárása</span>
+                </button>
+                <button class="button modal_download_button" aria-label="Letöltés">
+                    <img src="icons/download.svg" alt="Letöltés">
+                    <span>Letöltés</span>
+                </button>
+                <button class="button modal_reset_button" aria-label="Újraküldés">
+                    <img src="icons/reset.svg" alt="Újraküldés">
+                    <span>Kérelem újraküldés</span>
+                </button>
+            </div>
         </div>
     </div>
 </body>
