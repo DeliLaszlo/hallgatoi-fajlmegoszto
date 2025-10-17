@@ -215,6 +215,34 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     });
 
+    // Szerkesztés modal bezárás
+    const editCloseButtons = document.querySelectorAll('.edit_close_button');
+    const smallModals = document.querySelectorAll('.small_modal');
+    editCloseButtons.forEach(function(button) {
+        button.addEventListener('click', function() {
+            smallModals.forEach(function(modal) {
+                if (!modal.classList.contains('hidden')) {
+                    // Fájl feltöltés visszaállítása
+                    const checkbox = modal.querySelector('#replace_file_checkbox');
+                    const fileUploadSection = modal.querySelector('#file_upload_section');
+                    const fileInput = modal.querySelector('#fileUpload');
+                    
+                    if (checkbox) {
+                        checkbox.checked = false;
+                    }
+                    if (fileUploadSection) {
+                        fileUploadSection.style.display = 'none';
+                    }
+                    if (fileInput) {
+                        fileInput.value = '';
+                    }
+                    
+                    closeModal(modal);
+                }
+            });
+        });
+    });
+
     // Saját fájlok modal megnyitása
     const ownDetailsLinks = document.querySelectorAll('.own_details_link');
     ownDetailsLinks.forEach(function(link) {
@@ -247,6 +275,60 @@ document.addEventListener('DOMContentLoaded', function() {
             const ownCompletedRequestsModal = document.querySelector('.own_completed_requests_modal');
             if (ownCompletedRequestsModal) {
                 ownCompletedRequestsModal.classList.remove('hidden');
+            }
+        });
+    });
+
+    // Fájl szerkesztés modal megnyitása
+    const editFileButtons = document.querySelectorAll('.edit_file_button');
+    editFileButtons.forEach(function(button) {
+        button.addEventListener('click', function(e) {
+            e.preventDefault();
+            const editFileModal = document.querySelector('.edit_file_modal');
+            if (editFileModal) {
+                editFileModal.classList.remove('hidden');
+            }
+        });
+    });
+
+    // Fájl feltöltés szekció megjelenítése/elrejtése
+    const replaceFileCheckbox = document.getElementById('replace_file_checkbox');
+    const fileUploadSection = document.getElementById('file_upload_section');
+    if (replaceFileCheckbox && fileUploadSection) {
+        replaceFileCheckbox.addEventListener('change', function() {
+            if (this.checked) {
+                fileUploadSection.style.display = 'block';
+            } else {
+                fileUploadSection.style.display = 'none';
+                // Clear the file input when hiding
+                const fileInput = document.getElementById('fileUpload');
+                if (fileInput) {
+                    fileInput.value = '';
+                }
+            }
+        });
+    }
+
+    // Kérelem szerkesztés modal megnyitása
+    const editRequestButtons = document.querySelectorAll('.edit_request_button');
+    editRequestButtons.forEach(function(button) {
+        button.addEventListener('click', function(e) {
+            e.preventDefault();
+            const editRequestModal = document.querySelector('.edit_request_modal');
+            if (editRequestModal) {
+                editRequestModal.classList.remove('hidden');
+            }
+        });
+    });
+
+    // Chatszoba szerkesztés modal megnyitása
+    const editChatroomButtons = document.querySelectorAll('.edit_chatroom_button');
+    editChatroomButtons.forEach(function(button) {
+        button.addEventListener('click', function(e) {
+            e.preventDefault();
+            const editChatroomModal = document.querySelector('.edit_chatroom_modal');
+            if (editChatroomModal) {
+                editChatroomModal.classList.remove('hidden');
             }
         });
     });

@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="styles.css">
     <link rel="icon" type="image/x-icon" href="https://munkatars.sze.hu/core/templates/sze2018_bluerev/favicon.ico?v=2">
-    <script type="text/javascript" src="scripts.js"></script>
     <title>Hallgatói fájlmegosztó</title>
 </head>
 <body>
@@ -38,5 +37,6 @@
             </form>
         </div>
     </div>
+    <script type="text/javascript" src="scripts.js"></script>
 </body>
 </html>
