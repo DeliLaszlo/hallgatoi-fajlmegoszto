@@ -100,7 +100,7 @@ document.addEventListener('DOMContentLoaded', function() {
             'nav_fajlok': 'dashboard_fajlok',
             'nav_kerelemek': 'dashboard_kerelemek',
             'nav_chatszobak': 'dashboard_chatszobak',
-            'nav_profil': 'dashboard_profil'
+            'nav_profil': 'dashboard_profile'
         };
 
         const hamburger = document.querySelector('.hamburger');
@@ -332,4 +332,56 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         });
     });
+
+    // Profil szerkesztés
+    const editProfileButton = document.querySelector('.edit_profile_button');
+    const cancelProfileButton = document.querySelector('.cancel_profile_button');
+    const passwordFields = document.getElementById('password_fields');
+    const profileEditButtons = document.getElementById('profile_edit_buttons');
+    const profileInputs = [
+        document.getElementById('profile_username'),
+        document.getElementById('profile_fullname'),
+        document.getElementById('profile_neptun'),
+        document.getElementById('profile_email')
+    ];
+    
+    if (editProfileButton) {
+        editProfileButton.addEventListener('click', function(e) {
+            e.preventDefault();
+            profileInputs.forEach(function(input) {
+                if (input) {
+                    input.removeAttribute('readonly');
+                    input.setAttribute('required', 'required');
+                }
+            });
+            if (passwordFields) {
+                passwordFields.style.display = 'block';
+            }
+            editProfileButton.style.display = 'none';
+            if (profileEditButtons) {
+                profileEditButtons.style.display = 'flex';
+            }
+        });
+    }
+    
+    if (cancelProfileButton) {
+        cancelProfileButton.addEventListener('click', function(e) {
+            e.preventDefault();
+            profileInputs.forEach(function(input) {
+                if (input) {
+                    input.setAttribute('readonly', 'readonly');
+                    input.removeAttribute('required');
+                }
+            });
+            if (passwordFields) {
+                passwordFields.style.display = 'none';
+            }
+            if (profileEditButtons) {
+                profileEditButtons.style.display = 'none';
+            }
+            if (editProfileButton) {
+                editProfileButton.style.display = 'flex';
+            }
+        });
+    }
 });

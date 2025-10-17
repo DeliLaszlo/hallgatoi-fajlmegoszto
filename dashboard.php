@@ -24,7 +24,7 @@
                 <li><a href="#" id="nav_chatszobak">Chatszobáim</a></li>
                 <li><a href="#" id="nav_profil">Profilom</a></li>
             </ul>
-            <a href="#" class="logoutButton">
+            <a href="#" class="logout_button">
                 <img src="icons/logout.svg" alt="Kijelentkezés" class="logout-icon">
                 <span>Kijelentkezés</span>
             </a>
@@ -116,8 +116,46 @@
             </div>
             <!-- Generálandó rész vége -->
         </section>
-        <section id="dashboard_profil">
-            <h1>Dummy text 5</h1>
+        <section id="dashboard_profile">
+            <h1>Profilom</h1>
+            <form id="profile_form">
+                <div id="profile_info">
+                    <!-- Felhasználó profil adatai, később PHP-vel generálandó -->
+                    <h3>Felhasználónév:</h3>
+                    <input type="text" id="profile_username" name="username" value="felhasznalonev" readonly/>
+                    <h3>Teljes név:</h3>
+                    <input type="text" id="profile_fullname" name="fullname" value="Teljes Név" readonly/>
+                    <h3>Neptun kód:</h3>
+                    <input type="text" id="profile_neptun" name="neptun" value="ABC123" readonly/>
+                    <h3>Email:</h3>
+                    <input type="text" id="profile_email" name="email" value="email@example.com" readonly/>
+                    <!-- Generálandó rész vége -->
+                    <div id="password_fields" style="display: none;">
+                        <h3>Jelenlegi jelszó:</h3>
+                        <input type="password" id="profile_current_password" name="current_password"/>
+                        <h3>Új jelszó:</h3>
+                        <input type="password" id="profile_new_password" name="new_password"/>
+                        <h3>Új jelszó megerősítése:</h3>
+                        <input type="password" id="profile_repeat_password" name="repeat_password"/>
+                    </div>
+                    <div id="profile_buttons">
+                        <button type="button" class="large_button edit_profile_button" aria-label="Profil szerkesztése">
+                            <img src="icons/edit.svg" alt="Szerkesztés">
+                            <span>Profil szerkesztése</span>
+                        </button>
+                        <div id="profile_edit_buttons" style="display: none;">
+                            <button type="button" class="large_button cancel_profile_button" aria-label="Mégse">
+                                <img src="icons/close.svg" alt="Mégse">
+                                <span>Mégse</span>
+                            </button>
+                            <button type="submit" class="large_button save_profile_button" aria-label="Mentés">
+                                <img src="icons/save.svg" alt="Mentés">
+                                <span>Mentés</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </form>
         </section>
     </main>
     <div class="modal own_file_details_modal">
