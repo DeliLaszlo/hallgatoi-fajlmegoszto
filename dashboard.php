@@ -16,13 +16,13 @@
             <img src="icons/close.svg" alt="Close" class="hamburger-icon close-icon">
         </button>
         <nav class="nav-menu">
-            <h1>Dashboard</h1>
+            <h1>Irányítópult</h1>
             <ul>
-                <li><a href="#" id="nav_targyak">Tárgyaim</a></li>
-                <li><a href="#" id="nav_fajlok">Feltöltött fájljaim</a></li>
-                <li><a href="#" id="nav_kerelemek">Kérelmeim</a></li>
-                <li><a href="#" id="nav_chatszobak">Chatszobáim</a></li>
-                <li><a href="#" id="nav_profil">Profilom</a></li>
+                <li><a href="#" id="nav_sajat_targyak">Tárgyaim</a></li>
+                <li><a href="#" id="nav_sajat_fajlok">Feltöltött fájljaim</a></li>
+                <li><a href="#" id="nav_sajat_kerelemek">Kérelmeim</a></li>
+                <li><a href="#" id="nav_sajat_chatszobak">Chatszobáim</a></li>
+                <li><a href="#" id="nav_profile">Profilom</a></li>
             </ul>
             <a href="#" class="logout_button">
                 <img src="icons/logout.svg" alt="Kijelentkezés" class="logout-icon">
@@ -32,13 +32,14 @@
     </header>
     <main>
         <section id="dashboard_targyak">
-            <div class="dashboard_section_header">
+            <div class="section_header">
                 <h1>Tárgyaim</h1>
                 <button class="large_button add_subject_button" aria-label="Tárgy hozzáadása">
                     <img src="icons/add.svg" alt="Tárgy hozzáadása">
                     <span class="icon_text">Tárgy felvétele</span>
                 </button>
             </div>
+            <hr>
             <!-- Felhasználó tárgyai, később PHP-vel generálandó -->
             <div class="content_container own_subject_container">
                 <a href="#" class="container_link subject_link" aria-label="Tárgy megnyitása"></a>
@@ -53,6 +54,7 @@
         </section>
         <section id="dashboard_fajlok">
             <h1>Feltöltött fájljaim</h1>
+            <hr>
             <!-- Felhasználó fájljai, később PHP-vel generálandó -->
             <div class="content_container own_file_container">
                 <a href="#" class="container_link own_details_link" aria-label="Fájl megnyitása"></a>
@@ -72,6 +74,7 @@
         </section>
         <section id="dashboard_kerelemek">
             <h1>Kérelmeim</h1>
+            <hr>
             <!-- Felhasználó teljesített kérelmei, később PHP-vel generálandó -->
             <div class="content_container own_completed_request_container">
                 <span class="status_badge status_completed">
@@ -103,6 +106,7 @@
         </section>
         <section id="dashboard_chatszobak">
             <h1>Saját chatszobáim</h1>
+            <hr>
             <!-- Felhasználó saját chatszobái, később PHP-vel generálandó -->
             <div class="content_container own_chatroom_container">
                 <a href="#" class="container_link chatroom_link" aria-label="Chatroom megnyitása"></a>
@@ -120,6 +124,7 @@
             </div>
             <!-- Generálandó rész vége -->
             <h1>Követett chatszobák</h1>
+            <hr>
             <!-- Felhasználó követett chatszobái, később PHP-vel generálandó -->
             <div class="content_container followed_chatroom_container">
                 <a href="#" class="container_link chatroom_link" aria-label="Chatroom megnyitása"></a>
@@ -135,6 +140,7 @@
         </section>
         <section id="dashboard_profile">
             <h1>Profilom</h1>
+            <hr>
             <form id="profile_form">
                 <div id="profile_info">
                     <!-- Felhasználó profil adatai, később PHP-vel generálandó -->
@@ -182,7 +188,7 @@
             </button>
             <h2>Új tárgy felvétele</h2>
             <hr>
-            <div class="search_container">
+            <div class="search_container modal_search_container">
                 <input type="text" id="subject_search_input" placeholder="Tárgy keresése..." aria-label="Tárgy keresése">
                 <button id="subject_search_button" aria-label="Keresés">
                     <img src="icons/search.svg" alt="Keresés">
@@ -315,6 +321,8 @@
             <form id="editFileForm" action="" method="post" enctype="multipart/form-data">
                 <label for="fileTitle">Fájl címe:</label>
                 <input type="text" id="fileTitle" name="file_title" value="Fájl címe" required>
+                <label for="fileDescription">Rövid leírás:</label>
+                <textarea id="fileDescription" name="file_description" required>Fájl leírása</textarea>
                 <div class="checkbox-container">
                     <input type="checkbox" id="replace_file_checkbox" name="replace_file">
                     <label for="replace_file_checkbox">Más fájl feltöltése</label>
@@ -323,8 +331,6 @@
                     <label for="fileUpload">Fájl kiválasztása:</label>
                     <input type="file" id="fileUpload" name="file_upload" accept=".pdf,.doc,.docx,.txt,.jpg,.jpeg,.png">
                 </div>
-                <label for="fileDescription">Rövid leírás:</label>
-                <textarea id="fileDescription" name="file_description" required>Fájl leírása</textarea>
             </form>
             <!-- Generálandó rész vége -->
             <hr>

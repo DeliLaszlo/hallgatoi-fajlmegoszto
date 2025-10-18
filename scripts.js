@@ -1,5 +1,4 @@
 document.addEventListener('DOMContentLoaded', function() {
-    // index.php
     // Bejelentkezés és regisztráció közötti váltás
     const loginDiv = document.getElementById('login');
     const registerDiv = document.getElementById('register');
@@ -91,29 +90,38 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
-    // dashboard.php
-    // Navigáció a szekciók között
-    const dashboardCheck = document.getElementById('nav_targyak');
-    if (dashboardCheck) {
-        const navLinks = {
-            'nav_targyak': 'dashboard_targyak',
-            'nav_fajlok': 'dashboard_fajlok',
-            'nav_kerelemek': 'dashboard_kerelemek',
-            'nav_chatszobak': 'dashboard_chatszobak',
-            'nav_profil': 'dashboard_profile'
-        };
+    // Navbar kezelése
+    const navMenu = document.querySelector('.nav-menu');
+    if (navMenu) {
+        const navLinks = {};
+        const navListItems = navMenu.querySelectorAll('ul li a[id^="nav_"]'); 
+        navListItems.forEach(function(navLink) {
+            const navId = navLink.id;
+            let sectionName = navId.replace(/^nav_sajat_/, '').replace(/^nav_/, '');  
+            let sectionId = null;
+            // Bővítendő új oldal esetén
+            const possiblePrefixes = ['dashboard_', 'subject_', ''];
+            for (let prefix of possiblePrefixes) {
+                const testId = prefix + sectionName;
+                if (document.getElementById(testId)) {
+                    sectionId = testId;
+                    break;
+                }
+            }
+            if (sectionId) {
+                navLinks[navId] = sectionId;
+            }
+        });
 
+        // Hamburger menü kezelés
         const hamburger = document.querySelector('.hamburger');
-        const navMenu = document.querySelector('.nav-menu');
         const activeSectionName = document.querySelector('.active-section-name');
-
-        if (hamburger && navMenu) {
+        if (hamburger) {
             hamburger.addEventListener('click', function() {
                 hamburger.classList.toggle('active');
                 navMenu.classList.toggle('active');
                 document.body.classList.toggle('menu-open');
             });
-
             document.addEventListener('click', function(e) {
                 if (navMenu.classList.contains('active') && 
                     !navMenu.contains(e.target) && 
@@ -124,7 +132,6 @@ document.addEventListener('DOMContentLoaded', function() {
                 }
             });
         }
-
         function updateActiveSectionName(navId) {
             const navLink = document.getElementById(navId);
             if (navLink && activeSectionName) {
@@ -132,6 +139,7 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         }
 
+        // Szekció váltás
         function switchSection(sectionId) {
             Object.values(navLinks).forEach(function(id) {
                 const section = document.getElementById(id);
@@ -161,6 +169,13 @@ document.addEventListener('DOMContentLoaded', function() {
                     updateActiveSectionName(navId);
                 }
             });
+
+            // Fájl keresés törlése szekció váltáskor
+            const fileSearchInput = document.getElementById('file_search_input');
+            if (fileSearchInput) {
+                fileSearchInput.value = '';
+                fileSearchInput.dispatchEvent(new Event('input'));
+            }
         }
 
         Object.keys(navLinks).forEach(function(navId) {
@@ -169,8 +184,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 navLink.addEventListener('click', function(e) {
                     e.preventDefault();
                     switchSection(navLinks[navId]);
-                    
-                    if (hamburger && navMenu) {
+                    if (hamburger) {
                         hamburger.classList.remove('active');
                         navMenu.classList.remove('active');
                         document.body.classList.remove('menu-open');
@@ -179,7 +193,11 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         });
 
-        switchSection('dashboard_targyak');
+        // Kezdeti szekció betöltése
+        const firstSectionId = Object.values(navLinks)[0];
+        if (firstSectionId) {
+            switchSection(firstSectionId);
+        }
     }
 
     // Modal bezárás
@@ -253,12 +271,52 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // Új tárgy felvétele modal megnyitása
     const addSubjectButton = document.querySelector('.add_subject_button');
-    addSubjectButton.addEventListener('click', function(e) {
-        e.preventDefault();
-        const addSubjectModal = document.querySelector('.add_subject_modal');
-        if (addSubjectModal) {
-            addSubjectModal.classList.remove('hidden');
-        }
+    if (addSubjectButton) {
+        addSubjectButton.addEventListener('click', function(e) {
+            e.preventDefault();
+            const addSubjectModal = document.querySelector('.add_subject_modal');
+            if (addSubjectModal) {
+                addSubjectModal.classList.remove('hidden');
+            }
+        });
+    }
+
+    // Fájl feltöltés modal megnyitása
+    const uploadFileButton = document.querySelector('.upload_file_button');
+    if (uploadFileButton) {
+        uploadFileButton.addEventListener('click', function(e) {
+            e.preventDefault();
+            const uploadFileModal = document.querySelector('.upload_file_modal');
+            if (uploadFileModal) {
+                uploadFileModal.classList.remove('hidden');
+            }
+        });
+    }
+
+    // Fájl feltöltés modal bezárása és űrlap visszaállítása
+    const uploadCloseButtons = document.querySelectorAll('.upload_close_button');
+    uploadCloseButtons.forEach(function(button) {
+        button.addEventListener('click', function(e) {
+            e.preventDefault();
+            const uploadFileModal = document.querySelector('.upload_file_modal');
+            if (uploadFileModal && !uploadFileModal.classList.contains('hidden')) {
+                const fileTitle = document.getElementById('file_title');
+                const fileUpload = document.getElementById('file_upload');
+                const fileDescription = document.getElementById('file_description');
+                
+                if (fileTitle) {
+                    fileTitle.value = '';
+                }
+                if (fileUpload) {
+                    fileUpload.value = '';
+                }
+                if (fileDescription) {
+                    fileDescription.value = '';
+                }
+                
+                closeModal(uploadFileModal);
+            }
+        });
     });
 
     // Tárgyfelvétel keresés
@@ -285,7 +343,45 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
-    // Saját fájlok modal megnyitása
+    // Fájl keresés
+    const fileSearchInput = document.getElementById('file_search_input');
+    if (fileSearchInput) {
+        fileSearchInput.addEventListener('input', function() {
+            const searchTerm = this.value.toLowerCase().trim();
+            const fileContainers = document.querySelectorAll('.uploaded_files_container');
+            fileContainers.forEach(function(container) {
+                const fileName = container.querySelector('h2');
+                const fileParagraphs = container.querySelectorAll('p');
+                
+                if (fileName) {
+                    const nameText = fileName.textContent.toLowerCase();
+                    let paragraphText = '';
+                    fileParagraphs.forEach(function(p) {
+                        paragraphText += p.textContent.toLowerCase() + ' ';
+                    });
+                    
+                    if (searchTerm === '' || nameText.includes(searchTerm) || paragraphText.includes(searchTerm)) {
+                        container.style.display = 'block';
+                    } else {
+                        container.style.display = 'none';
+                    }
+                }
+            });
+        });
+    }
+
+    // Fájl részletei modal megnyitása
+    document.addEventListener('click', function(e) {
+    if (e.target.closest('.file_details_link')) {
+        e.preventDefault();
+        const fileDetailsModal = document.querySelector('.file_details_modal');
+        if (fileDetailsModal) {
+            fileDetailsModal.classList.remove('hidden');
+        }
+    }
+    });
+
+    // Saját fájl részletei modal megnyitása
     const ownDetailsLinks = document.querySelectorAll('.own_details_link');
     ownDetailsLinks.forEach(function(link) {
         link.addEventListener('click', function(e) {

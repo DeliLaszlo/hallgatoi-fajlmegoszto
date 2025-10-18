@@ -21,6 +21,7 @@ body {
     color: #333;
     line-height: 1.6;
     min-height: 100vh;
+    min-width: 375px;
     display: flex;
     flex-direction: column;
 }
@@ -38,7 +39,7 @@ p {
 hr {
     border: none;
     border-top: 2px solid var(--light-gray);
-    margin: 1rem 0;
+    margin: 1.5rem 0;
 }
 
 h3 {
@@ -119,9 +120,8 @@ header {
     background: var(--primary-blue);
 }
 
-.nav-menu>a.logout_button {
+.nav-menu>a {
     position: absolute;
-    right: 20px;
     top: 50%;
     transform: translateY(-50%);
     background-color: var(--primary-blue);
@@ -137,14 +137,36 @@ header {
     transition: background-color 0.3s ease;
 }
 
-.nav-menu>a.logout_button:hover {
+.nav-menu>a:hover {
     background-color: var(--secondary-blue);
 }
 
-.logout-icon {
+.nav-menu>a.logout_button {
+    right: 20px;
+}
+
+.nav-menu>a.dashboard_button {
+    left: 20px;
+}
+
+.logout-icon, .dashboard-icon {
     width: 24px;
     height: 24px;
     filter: brightness(0) invert(1);
+}
+
+main {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+}
+
+section {
+    background: white;
+    padding: 2rem;
+    width: 60%;
+    margin: 0 auto;
+    flex: 1;
 }
 
 form {
@@ -209,7 +231,6 @@ textarea:focus {
     padding: 0.25rem;
     background-color: white;
     margin: 0.25rem 0;
-    width: 100%;
 }
 
 .search_container:focus-within {
@@ -233,6 +254,10 @@ textarea:focus {
     border: none;
     background: none;
     box-shadow: none;
+}
+
+.modal_search_container {
+    width: 100%;
 }
 
 .hamburger {
@@ -273,11 +298,17 @@ textarea:focus {
     font-size: 2rem;
 }
 
+@media (max-width: 1350px) {
+    section {
+        width: 80%;
+    }
+}
+
 @media (max-width: 1100px) {
     header {
         justify-content: flex-start;
     }
-    
+
     .hamburger {
         display: flex;
     }
@@ -340,6 +371,21 @@ textarea:focus {
         height: auto;
         padding: 0.75rem 1rem;
     }
+
+    .nav-menu>a.dashboard_button {
+        position: static;
+        transform: none;
+        display: flex;
+        align-items: center;
+        justify-content: flex-start;
+        align-self: flex-start;
+        gap: 0.5rem;
+        width: fit-content;
+        max-width: 100%;
+        padding: 15px 20px;
+        margin-top: 10px;
+        border-radius: 10px;
+    }
     
     .hamburger.active .menu-icon {
         opacity: 0;
@@ -361,6 +407,12 @@ textarea:focus {
         background-color: rgba(0, 0, 0, 0.5);
         z-index: 999;
     }
+
+    .subject_files_header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0;
+    }
 }
 
 @media (max-width: 650px) {
@@ -373,20 +425,6 @@ textarea:focus {
     .header_img {
         height: 30%;
     }
-}
-
-main {
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-}
-
-section {
-    background: white;
-    padding: 2rem;
-    width: 80%;
-    margin: auto;
-    flex: 1;
 }
 
 .content_container {
@@ -446,12 +484,13 @@ section {
     background-color: var(--primary-blue);
     border-radius: 10px;
     padding: 0.75rem 1.5rem;
+    font-size: 1rem;
     display: flex;
     align-items: center;
     gap: 0.5rem;
     transition: background-color 0.3s ease;
     border: transparent;
-    margin: 1rem 0;
+    margin-left: 1rem;
 }
 
 .large_button:hover {
@@ -477,6 +516,42 @@ section {
 .content_delete_button {
     bottom: 0.5rem;
     right: 0.5rem;
+}
+
+.content_rating {
+    position: absolute;
+    top: 4rem;
+    right: 1rem;
+    transform: translateY(-50%);
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.9rem;
+    font-weight: 500;
+    color: #333;
+}
+
+.content_rating img {
+    width: 20px;
+    height: 20px;
+}
+
+.content_downloads {
+    position: absolute;
+    bottom: 0.5rem;
+    right: 1rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.9rem;
+    font-weight: 500;
+    color: #333;
+}
+
+.content_downloads img {
+    width: 18px;
+    height: 18px;
+    opacity: 0.7;
 }
 
 .status_badge {
@@ -514,18 +589,20 @@ section {
 .content_container h2,
 .content_container p {
     max-width: 1500px;
-    width: fit-content;
+    width: 100%;
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+    hyphens: auto;
 }
 
 @media (max-width: 600px) {
     .content_container {
-        padding-right: 60px;
+        padding-right: 65px;
     }
 
     .content_container h2,
     .content_container p {
         max-width: 300px;
-        width: 100%;
     }
 
     .status_badge {
@@ -538,6 +615,42 @@ section {
     }
 
     .icon_text {
+        display: none;
+    }
+
+    .large_button {
+        border-radius: 20px;
+    }
+
+    .content_search_container {
+        max-width: 170px;
+        min-width: 100px;
+        position: relative;
+    }
+
+    .content_search_container input {
+        font-size: 0.875rem;
+        padding: 0.4rem;
+    }
+
+    .content_search_container button {
+        position: absolute;
+        top: 0;
+        right: 0;
+        bottom: 0;
+        background: transparent;
+        border: none;
+        cursor: pointer;
+        padding: 0.4rem;
+    }
+
+    .hideable_text {
+        display: none;
+    }
+}
+
+@media (max-width: 450px) {
+    .content_rating, .content_downloads {
         display: none;
     }
 }
@@ -591,6 +704,7 @@ section {
     overflow-y: auto;
     transform: translateX(100%);
     animation: slideInFromRight 0.4s ease forwards;
+    min-width: 325px;
 }
 
 .small_modal_content {
@@ -628,9 +742,21 @@ section {
     margin-top: 1.5rem;
 }
 
-.modal_close_button, .edit_close_button {
+.modal_close_button, .edit_close_button, .upload_close_button {
     top: 30px;
     right: 30px;
+}
+
+.section_header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1rem;
+}
+
+.section_header_actions {
+    display: flex;
+    gap: 1rem;
 }
 
 /*index.php*/
@@ -640,6 +766,7 @@ section {
     width: 80vw;
     max-height: 80vh; 
     min-height: 0;
+    min-width: 300px;
     position: absolute;
     top: 50%;
     left: 50%;
@@ -731,13 +858,6 @@ section {
 }
 
 /*dashboard.php*/
-.dashboard_section_header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 1rem;
-}
-
 .add_subject_modal .modal_content {
     height: 600px;
     max-height: 90vh;
@@ -832,4 +952,3 @@ section {
         flex-direction: column;
     }
 }
-
