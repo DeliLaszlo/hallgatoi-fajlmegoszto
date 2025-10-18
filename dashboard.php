@@ -9,7 +9,7 @@
 </head>
 <body>
     <header>
-        <img src="https://munkatars.sze.hu/images/Arculat/Kari%20logo/IVK_hun.png" alt="IVK logo" class="ivk_logo header_img" width="8737" height="2665">
+        <img src="icons/IVK_logo.png" alt="IVK logo" class="ivk_logo header_img" width="1920" height="586">
         <span class="active-section-name"></span>
         <button class="hamburger" aria-label="Menu">
             <img src="icons/hamburger_menu.svg" alt="Menu" class="hamburger-icon menu-icon">
@@ -32,7 +32,24 @@
     </header>
     <main>
         <section id="dashboard_targyak">
-            <h1>Dummy text 1</h1>
+            <div class="dashboard_section_header">
+                <h1>Tárgyaim</h1>
+                <button class="large_button add_subject_button" aria-label="Tárgy hozzáadása">
+                    <img src="icons/add.svg" alt="Tárgy hozzáadása">
+                    <span class="icon_text">Tárgy felvétele</span>
+                </button>
+            </div>
+            <!-- Felhasználó tárgyai, később PHP-vel generálandó -->
+            <div class="content_container own_subject_container">
+                <a href="#" class="container_link subject_link" aria-label="Tárgy megnyitása"></a>
+                <button class="button small_button content_delete_button" aria-label="Törlés">
+                    <span class="icon_text">Törlés</span>
+                    <img src="icons/delete.svg" alt="Törlés">
+                </button>
+                <h2>Tárgy neve</h2>
+                <p>Tárgy kódja</p>
+                <p>Fájlok száma, kérelmek száma</p>
+            </div>
         </section>
         <section id="dashboard_fajlok">
             <h1>Feltöltött fájljaim</h1>
@@ -86,7 +103,7 @@
         </section>
         <section id="dashboard_chatszobak">
             <h1>Saját chatszobáim</h1>
-            <!-- Felhasználó sajátchatszobái, később PHP-vel generálandó -->
+            <!-- Felhasználó saját chatszobái, később PHP-vel generálandó -->
             <div class="content_container own_chatroom_container">
                 <a href="#" class="container_link chatroom_link" aria-label="Chatroom megnyitása"></a>
                 <button class="button small_button content_edit_button edit_chatroom_button" aria-label="Szerkesztés">
@@ -158,6 +175,36 @@
             </form>
         </section>
     </main>
+    <div class="modal add_subject_modal">
+        <div class="modal_content">
+            <button class="button small_button modal_close_button" aria-label="Bezárás">
+                <img src="icons/close.svg" alt="Bezárás">
+            </button>
+            <h2>Új tárgy felvétele</h2>
+            <hr>
+            <div class="search_container">
+                <input type="text" id="subject_search_input" placeholder="Tárgy keresése..." aria-label="Tárgy keresése">
+                <button id="subject_search_button" aria-label="Keresés">
+                    <img src="icons/search.svg" alt="Keresés">
+                </button>
+            </div>
+            <hr>
+            <div class="subject_list_container">
+                <!-- Felvehető tárgyak listája, később PHP-vel generálandó -->
+                <div class="content_container available_subject_container">
+                    <div class="subject_details">
+                        <h2>Tárgy neve</h2>
+                        <p>Tárgy kódja</p>
+                    </div>
+                    <button class="button small_button subject_add_button" aria-label="Tárgy felvétele">
+                        <img src="icons/add.svg" alt="Felvétel">
+                        <span class="icon_text">Felvétel</span>
+                    </button>
+                </div>
+                <!-- Generálandó rész vége -->
+            </div>
+        </div>
+    </div>
     <div class="modal own_file_details_modal">
         <div class="modal_content">
             <button class="button small_button modal_close_button" aria-label="Bezárás">

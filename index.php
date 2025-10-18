@@ -8,7 +8,7 @@
     <title>Hallgatói fájlmegosztó</title>
 </head>
 <body>
-    <img src="https://munkatars.sze.hu/images/Arculat/Kari%20logo/IVK_hun.png" alt="IVK logo" class="ivk_logo" width="8737" height="2665">
+    <img src="icons/IVK_logo.png" alt="IVK logo" class="ivk_logo" id="login_ivk_logo" width="1920" height="586">
     <div id="index_container">
         <div id="index_header">
             <h1>Hallgatói Fájlmegosztó</h1>
@@ -25,7 +25,7 @@
         </div>
         <div id="register" style="display: none;">
             <h1>Regisztráció</h1>
-            <form id="registerForm" action="" method="post">
+            <form id="registerForm" action="" method="post"> 
                 <input type="text" id="registerNeptun" name="neptun" placeholder="Neptun kód" required autofocus>
                 <input type="text" id="registerUsername" name="username" placeholder="Felhasználónév" required>
                 <input type="text" id="registerFullname" name="fullname" placeholder="Teljes név" required>

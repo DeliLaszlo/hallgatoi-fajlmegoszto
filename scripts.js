@@ -194,6 +194,14 @@ document.addEventListener('DOMContentLoaded', function() {
         setTimeout(function() {
             modal.classList.remove('closing');
             modal.classList.add('hidden');
+            const searchContainer = modal.querySelector('.search_container');
+            if (searchContainer) {
+                const searchInput = searchContainer.querySelector('input[type="text"]');
+                if (searchInput) {
+                    searchInput.value = '';
+                    searchInput.dispatchEvent(new Event('input'));
+                }
+            }
         }, 400);
     }
 
@@ -242,6 +250,40 @@ document.addEventListener('DOMContentLoaded', function() {
             });
         });
     });
+
+    // Új tárgy felvétele modal megnyitása
+    const addSubjectButton = document.querySelector('.add_subject_button');
+    addSubjectButton.addEventListener('click', function(e) {
+        e.preventDefault();
+        const addSubjectModal = document.querySelector('.add_subject_modal');
+        if (addSubjectModal) {
+            addSubjectModal.classList.remove('hidden');
+        }
+    });
+
+    // Tárgyfelvétel keresés
+    const subjectSearchInput = document.getElementById('subject_search_input');
+    if (subjectSearchInput) {
+        subjectSearchInput.addEventListener('input', function() {
+            const searchTerm = this.value.toLowerCase().trim();
+            const subjectContainers = document.querySelectorAll('.available_subject_container');     
+            subjectContainers.forEach(function(container) {
+                const subjectName = container.querySelector('h2');
+                const subjectCode = container.querySelector('p');
+                
+                if (subjectName && subjectCode) {
+                    const nameText = subjectName.textContent.toLowerCase();
+                    const codeText = subjectCode.textContent.toLowerCase();
+                    
+                    if (searchTerm === '' || nameText.includes(searchTerm) || codeText.includes(searchTerm)) {
+                        container.style.display = 'flex';
+                    } else {
+                        container.style.display = 'none';
+                    }
+                }
+            });
+        });
+    }
 
     // Saját fájlok modal megnyitása
     const ownDetailsLinks = document.querySelectorAll('.own_details_link');

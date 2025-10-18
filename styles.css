@@ -201,6 +201,40 @@ textarea:focus {
     box-shadow: 0 0 5px rgba(59, 130, 246, 0.5);
 }
 
+.search_container {
+    display: flex;
+    align-items: center;
+    border: 2px solid var(--border-outline);
+    border-radius: 5px;
+    padding: 0.25rem;
+    background-color: white;
+    margin: 0.25rem 0;
+    width: 100%;
+}
+
+.search_container:focus-within {
+    border: 2px solid var(--primary-blue);
+    box-shadow: 0 0 5px rgba(59, 130, 246, 0.5);
+}
+
+.search_container button {
+    padding: 0.5rem;
+    cursor: pointer;
+}
+
+.search_container input {
+    flex: 1;
+    padding: 0.5rem;
+    border-radius: 5px;
+    font-size: 1rem;
+}
+
+.search_container input, .search_container input:hover, .search_container button {
+    border: none;
+    background: none;
+    box-shadow: none;
+}
+
 .hamburger {
     display: none;
     background: none;
@@ -599,14 +633,12 @@ section {
     right: 30px;
 }
 
-
-
 /*index.php*/
 #index_container {
     display: flex;
     flex-direction: column;
     width: 80vw;
-    max-height: 70vh; 
+    max-height: 80vh; 
     min-height: 0;
     position: absolute;
     top: 50%;
@@ -692,7 +724,64 @@ section {
     text-decoration: underline;
 }
 
+@media (max-width: 768px) {
+    #login_ivk_logo {
+        width: 150px;
+    }
+}
+
 /*dashboard.php*/
+.dashboard_section_header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1rem;
+}
+
+.add_subject_modal .modal_content {
+    height: 600px;
+    max-height: 90vh;
+}
+
+.subject_list_container {
+    max-height: 400px;
+    overflow-y: auto;
+    padding-right: 0.5rem;
+    margin-top: 1rem;
+}
+
+.available_subject_container {
+    margin-bottom: 1rem;
+    position: relative;
+    padding-right: 175px;
+}
+
+@media (max-width: 600px) {
+    .available_subject_container {
+        padding-right: 75px;
+    }
+}
+
+.subject_add_button {
+    position: absolute;
+    right: 0.5rem;
+    top: 50%;
+    transform: translateY(-50%);
+    background-color: var(--primary-blue);
+}
+
+.subject_add_button:hover {
+    background-color: var(--secondary-blue);
+}
+
+.subject_add_button span {
+    color: white;
+}
+
+.subject_add_button img {
+    filter: brightness(0) invert(1);
+}
+
 #dashboard_profile {
     width: 35%;
 }
@@ -718,6 +807,15 @@ section {
     width: 100%;
 }
 
+#profile_info input[required] {
+    border-color: #951f2f;
+    background-color: rgba(149, 31, 47, 0.1);
+}
+
+#profile_info input[required]:focus {
+    box-shadow: 0 0 5px rgba(149, 31, 47, 0.5);
+}
+
 #profile_info button {
     max-width: 200px;
     margin: 1rem 0 0;
@@ -734,3 +832,4 @@ section {
         flex-direction: column;
     }
 }
+
