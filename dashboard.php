@@ -68,7 +68,7 @@
                 </button>
                 <h2>Fájl címe</h2>
                 <p>Fájl leírása</p>
-                <p>Feltöltés dátuma, <span >tárgy neve</span></p>
+                <p>Feltöltés dátuma, tárgy neve</p>
             </div>
             <!-- Generálandó rész vége -->
         </section>
@@ -84,7 +84,7 @@
                 <a href="#" class="container_link own_completed_requests_link" aria-label="Kérelem megnyitása"></a>
                 <h2>Kérelem címe</h2>
                 <p>Kérelem leírása</p>
-                <p>Létrehozás dátuma, <span>tárgy neve</span></p>
+                <p>Létrehozás dátuma, tárgy neve</p>
             </div>
             <!-- Generálandó rész vége -->
             <!-- Felhasználó teljesítetlen kérelmei, később PHP-vel generálandó -->
@@ -100,7 +100,7 @@
                 </button>
                 <h2>Kérelem címe</h2>
                 <p>Kérelem leírása</p>
-                <p>Létrehozás dátuma, <span>tárgy neve</span></p>
+                <p>Létrehozás dátuma, tárgy neve</p>
             </div>
             <!-- Generálandó rész vége -->
         </section>
@@ -120,7 +120,7 @@
                 </button>
                 <h2>Chatroom címe</h2>
                 <p>Chatroom leírása</p>
-                <p>Létrehozás dátuma, <span>tárgy neve</span>, <span>követők száma</span></p>
+                <p>Létrehozás dátuma, tárgy neve, követők száma</p>
             </div>
             <!-- Generálandó rész vége -->
             <h1>Követett chatszobák</h1>
@@ -134,7 +134,7 @@
                 </button>
                 <h2>Chatroom címe</h2>
                 <p>Chatroom leírása</p>
-                <p>Létrehozás dátuma, <span>tárgy neve</span>, <span>követők száma</span></p>
+                <p>Létrehozás dátuma, tárgy neve, követők száma</p>
             </div>
             <!-- Generálandó rész vége -->
         </section>

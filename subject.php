@@ -71,7 +71,22 @@
             <!-- Generálandó rész vége -->
         </section>
         <section id="subject_kerelemek">
-            <h1>Dummy text 2</h1>
+            <div class="section_header">
+                <h1>Kérelmek</h1>
+                <button class="large_button add_request_button" aria-label="Kérelem hozzáadása">
+                    <img src="icons/add.svg" alt="Kérelem hozzáadása">
+                    <span class="icon_text">Új kérelem</span>
+                </button>
+            </div>
+            <hr>
+            <!-- Tárgy kérelmei, később PHP-vel generálandó -->
+            <div class="content_container request_container">
+                <a href="#" class="container_link upload_file_button" aria-label="Fájl feltöltése"></a>
+                <h2>Kérelem címe</h2>
+                <p>Kérelem leírása</p>
+                <p>Kérelmező, feltöltés dátuma</p>
+            </div>
+            <!-- Generálandó rész vége -->
         </section>
         <section id="subject_chatszobak">
             <h1>Dummy text 3</h1>
@@ -128,6 +143,7 @@
                 <label for="file_upload">Fájl kiválasztása:</label>
                 <input type="file" id="file_upload" name="file_upload" accept=".pdf,.doc,.docx,.txt,.jpg,.jpeg,.png">
             </form>
+            <!-- Generálandó rész vége -->
             <hr>
             <div class="modal_footer">
                 <button class="button upload_close_button" aria-label="Mégse">
@@ -137,6 +153,64 @@
                 <button class="button modal_upload_button" aria-label="Feltöltés">
                     <img src="icons/upload.svg" alt="Feltöltés">
                     <span>Feltöltés</span>
+                </button>
+            </div>
+        </div>
+    </div>
+    <div class="modal small_modal add_request_modal">
+        <div class="modal_content small_modal_content">
+            <button class="button small_button request_close_button" aria-label="Bezárás">
+                <img src="icons/close.svg" alt="Bezárás">
+            </button>
+            <h2>Új kérelem</h2>
+            <hr>
+            <!-- Kérelem feltöltő űrlap, később PHP-val feldolgozandó -->
+            <form id="add_request_form" action="" method="post" enctype="multipart/form-data">
+                <label for="request_title">Kérelem címe:</label>
+                <input type="text" id="request_title" name="request_title" placeholder="Kérelem címe" required>
+                <label for="request_description">Rövid leírás:</label>
+                <textarea id="request_description" name="request_description" placeholder="Kérelem leírása" required></textarea>
+            </form>
+            <!-- Generálandó rész vége -->
+            <hr>
+            <div class="modal_footer">
+                <button class="button request_close_button" aria-label="Mégse">
+                    <img src="icons/close.svg" alt="Mégse">
+                    <span>Mégse</span>
+                </button>
+                <button class="button modal_add_button" aria-label="Feltöltés">
+                    <img src="icons/add.svg" alt="Feltöltés">
+                    <span>Létrehozás</span>
+                </button>
+            </div>
+        </div>
+    </div>
+    <div class="modal small_modal rate_file_modal">
+        <div class="modal_content small_modal_content">
+            <button class="button small_button rate_close_button" aria-label="Bezárás">
+                <img src="icons/close.svg" alt="Bezárás">
+            </button>
+            <h2>Fájl értékelése</h2>
+            <hr>
+            <div class="rating_container">
+                <p>Válassza ki az értékelését:</p>
+                <div class="star_rating">
+                    <img src="icons/star.svg" alt="1 csillag" class="rating_star" data-rating="1">
+                    <img src="icons/star.svg" alt="2 csillag" class="rating_star" data-rating="2">
+                    <img src="icons/star.svg" alt="3 csillag" class="rating_star" data-rating="3">
+                    <img src="icons/star.svg" alt="4 csillag" class="rating_star" data-rating="4">
+                    <img src="icons/star.svg" alt="5 csillag" class="rating_star" data-rating="5">
+                </div>
+            </div>
+            <hr>
+            <div class="modal_footer">
+                <button class="button rate_close_button" aria-label="Mégse">
+                    <img src="icons/close.svg" alt="Mégse">
+                    <span>Mégse</span>
+                </button>
+                <button class="button modal_save_rate_button" aria-label="Értékelés">
+                    <img src="icons/star.svg" alt="Értékelés">
+                    <span>Értékelés</span>
                 </button>
             </div>
         </div>

@@ -742,7 +742,7 @@ textarea:focus {
     margin-top: 1.5rem;
 }
 
-.modal_close_button, .edit_close_button, .upload_close_button {
+.modal_close_button, .edit_close_button, .upload_close_button, .rate_close_button, .request_close_button {
     top: 30px;
     right: 30px;
 }
@@ -951,4 +951,42 @@ textarea:focus {
     #profile_edit_buttons {
         flex-direction: column;
     }
+}
+
+/*subject.php*/
+.rating_container {
+    text-align: center;
+    padding: 1rem 0;
+}
+
+.rating_container p {
+    margin-bottom: 1rem;
+    font-weight: bold;
+}
+
+.star_rating {
+    display: flex;
+    justify-content: center;
+    gap: 0.5rem;
+    margin: 1.5rem 0;
+}
+
+.rating_star {
+    width: 40px;
+    height: 40px;
+    cursor: pointer;
+    filter: grayscale(100%);
+    opacity: 0.3;
+    transition: all 0.2s ease;
+}
+
+.rating_star:hover,
+.rating_star.active {
+    filter: grayscale(0%) brightness(1.2);
+    opacity: 1;
+    transform: scale(1.1);
+}
+
+.rating_star:active {
+    transform: scale(0.95);
 }
