@@ -6,6 +6,7 @@ dashboard.php:
 Tárgyaim fül:
 - Tárgyak megjelenítése, törlés kezelése, ha nincs tárgy akkor szöveg megjelenítése
 - Új tárgy gomb: Tárgyak megjelenítése, felvétel kezelése
+- Tárgyra kattintás átirányít a tárgy oldalára
 Feltöltött fájljaim fül:
 - Fájlok megjelenítése, törlés és letöltés kezelése, ha nincs fájl akkor szöveg megjelenítése
 - Fájl részletek felugró ablakon szerkesztés kezelése
@@ -15,7 +16,7 @@ Kérelmeim fül:
 - Teljesítétt kérelem felugró ablakon letöltés, lezárás, újraküldés kezelése
 Chatszobáim fül:
 - Chatszobák megjelenítése, törlés szerkesztés és unfollow kezelése, ha nincs chatszoba akkor szöveg megjelenítése
-- (Később) Chatszobára kattintás átirányítás a chatszoba oldalára
+- (Később) Chatszobára kattintás átirányít a chatszoba oldalára
 Profilom fül:
 - Adatok megjelenítése
 - Szerkesztés kezelése
@@ -35,7 +36,7 @@ Kérelmek fül:
 Chatszobák fül:
 - Chatszobák megjelenítése, follow/unfollow szerkesztés törlés kezelése, ha nincs chatszoba akkor szöveg megjelenítése
 - Új chatszoba kezelése
-- (Később) Chatszobára kattintás átirányítás a chatszoba oldalára
+- (Később) Chatszobára kattintás átirányít a chatszoba oldalára
 - (Később) Jelentő felület kezelése
 
 (Később) -Chatszobák és admin jogosultságok kezelése
