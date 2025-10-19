@@ -40,6 +40,8 @@
                 </button>
             </div>
             <hr>
+            <!-- Ha nincsenek tárgyak, display none nélkül -->
+            <h2 class="no_content_message" style="display: none;">Még nincsenek felvett tárgyaid.</h2>
             <!-- Felhasználó tárgyai, később PHP-vel generálandó -->
             <div class="content_container own_subject_container">
                 <a href="#" class="container_link subject_link" aria-label="Tárgy megnyitása"></a>
@@ -55,6 +57,8 @@
         <section id="dashboard_fajlok">
             <h1>Feltöltött fájljaim</h1>
             <hr>
+            <!-- Ha nincsenek fájlok, display none nélkül -->
+            <h2 class="no_content_message" style="display: none;">Még nem töltöttél fel fájlokat.</h2>
             <!-- Felhasználó fájljai, később PHP-vel generálandó -->
             <div class="content_container own_file_container">
                 <a href="#" class="container_link own_details_link" aria-label="Fájl megnyitása"></a>
@@ -75,6 +79,8 @@
         <section id="dashboard_kerelemek">
             <h1>Kérelmeim</h1>
             <hr>
+            <!-- Ha nincsenek kérelmek, display none nélkül -->
+            <h2 class="no_content_message" style="display: none;">Még nincsenek kérelmeid.</h2>
             <!-- Felhasználó teljesített kérelmei, később PHP-vel generálandó -->
             <div class="content_container own_completed_request_container">
                 <span class="status_badge status_completed">
@@ -107,6 +113,8 @@
         <section id="dashboard_chatszobak">
             <h1>Saját chatszobáim</h1>
             <hr>
+            <!-- Ha nincsenek saját chatszobák, display none nélkül -->
+            <h2 class="no_content_message" style="display: none;">Még nem hoztál létre chatszobákat.</h2>
             <!-- Felhasználó saját chatszobái, később PHP-vel generálandó -->
             <div class="content_container own_chatroom_container">
                 <a href="#" class="container_link chatroom_link" aria-label="Chatroom megnyitása"></a>
@@ -125,6 +133,8 @@
             <!-- Generálandó rész vége -->
             <h1>Követett chatszobák</h1>
             <hr>
+            <!-- Ha nincsenek követett chatszobák, display none nélkül -->
+            <h2 class="no_content_message" style="display: none;">Még nem követsz chatszobákat.</h2>
             <!-- Felhasználó követett chatszobái, később PHP-vel generálandó -->
             <div class="content_container followed_chatroom_container">
                 <a href="#" class="container_link chatroom_link" aria-label="Chatroom megnyitása"></a>
@@ -331,19 +341,19 @@
                     <label for="fileUpload">Fájl kiválasztása:</label>
                     <input type="file" id="fileUpload" name="file_upload" accept=".pdf,.doc,.docx,.txt,.jpg,.jpeg,.png">
                 </div>
+                <hr>
+                <div class="modal_footer">
+                    <button type="button" class="button edit_close_button" aria-label="Mégse">
+                        <img src="icons/close.svg" alt="Mégse">
+                        <span>Mégse</span>
+                    </button>
+                    <button type="submit" class="button modal_edit_button" aria-label="Mentés">
+                        <img src="icons/save.svg" alt="Mentés">
+                        <span>Mentés</span>
+                    </button>
+                </div>
             </form>
             <!-- Generálandó rész vége -->
-            <hr>
-            <div class="modal_footer">
-                <button class="button edit_close_button" aria-label="Mégse">
-                    <img src="icons/close.svg" alt="Mégse">
-                    <span>Mégse</span>
-                </button>
-                <button class="button modal_edit_button" aria-label="Mentés">
-                    <img src="icons/save.svg" alt="Mentés">
-                    <span>Mentés</span>
-                </button>
-            </div>
         </div>
     </div>
     <div class="modal small_modal edit_request_modal">
@@ -359,19 +369,19 @@
                 <input type="text" id="requestTitle" name="request_title" value="Kérelem címe" required>
                 <label for="requestDescription">Rövid leírás:</label>
                 <textarea id="requestDescription" name="request_description" required>Kérelem leírása</textarea>
+                <hr>
+                <div class="modal_footer">
+                    <button type="button" class="button edit_close_button" aria-label="Mégse">
+                        <img src="icons/close.svg" alt="Mégse">
+                        <span>Mégse</span>
+                    </button>
+                    <button type="submit" class="button modal_edit_button" aria-label="Mentés">
+                        <img src="icons/save.svg" alt="Mentés">
+                        <span>Mentés</span>
+                    </button>
+                </div>
             </form>
             <!-- Generálandó rész vége -->
-            <hr>
-            <div class="modal_footer">
-                <button class="button edit_close_button" aria-label="Mégse">
-                    <img src="icons/close.svg" alt="Mégse">
-                    <span>Mégse</span>
-                </button>
-                <button class="button modal_edit_button" aria-label="Mentés">
-                    <img src="icons/save.svg" alt="Mentés">
-                    <span>Mentés</span>
-                </button>
-            </div>
         </div>
     </div>
     <div class="modal small_modal edit_chatroom_modal">
@@ -387,19 +397,19 @@
                 <input type="text" id="chatroomTitle" name="chatroom_title" value="Chatszoba címe" required>
                 <label for="chatroomDescription">Rövid leírás:</label>
                 <textarea id="chatroomDescription" name="chatroom_description" required>Chatszoba leírása</textarea>
+                <hr>
+                <div class="modal_footer">
+                    <button type="button" class="button edit_close_button" aria-label="Mégse">
+                        <img src="icons/close.svg" alt="Mégse">
+                        <span>Mégse</span>
+                    </button>
+                    <button type="submit" class="button modal_edit_button" aria-label="Mentés">
+                        <img src="icons/save.svg" alt="Mentés">
+                        <span>Mentés</span>
+                    </button>
+                </div>
             </form>
             <!-- Generálandó rész vége -->
-            <hr>
-            <div class="modal_footer">
-                <button class="button edit_close_button" aria-label="Mégse">
-                    <img src="icons/close.svg" alt="Mégse">
-                    <span>Mégse</span>
-                </button>
-                <button class="button modal_edit_button" aria-label="Mentés">
-                    <img src="icons/save.svg" alt="Mentés">
-                    <span>Mentés</span>
-                </button>
-            </div>
         </div>
     </div>
     <script type="text/javascript" src="scripts.js"></script>

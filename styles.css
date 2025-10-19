@@ -427,6 +427,13 @@ textarea:focus {
     }
 }
 
+.no_content_message {
+    text-align: center;
+    color: var(--border-outline);
+    margin-top: 2rem;
+    font-size: 1.25rem;
+}
+
 .content_container {
     background: var(--background-color);
     border-radius: 10px;
@@ -508,12 +515,12 @@ textarea:focus {
     height: 24px;
 }
 
-.content_download_button, .content_edit_button, .content_unfollow_button {
+.content_download_button, .content_upload_button, .content_edit_button, .content_follow_button, .content_unfollow_button {
     top: 0.5rem;
     right: 0.5rem;
 }
 
-.content_delete_button {
+.content_delete_button, .content_report_button {
     bottom: 0.5rem;
     right: 0.5rem;
 }
@@ -705,6 +712,25 @@ textarea:focus {
     transform: translateX(100%);
     animation: slideInFromRight 0.4s ease forwards;
     min-width: 325px;
+    padding-right: calc(2rem + 8px);
+}
+
+.modal_content::-webkit-scrollbar {
+    width: 8px;
+}
+
+.modal_content::-webkit-scrollbar-track {
+    background: transparent;
+    margin: 10px 0;
+}
+
+.modal_content::-webkit-scrollbar-thumb {
+    background: var(--border-outline);
+    border-radius: 4px;
+}
+
+.modal_content::-webkit-scrollbar-thumb:hover {
+    background: var(--primary-blue);
 }
 
 .small_modal_content {
@@ -742,7 +768,15 @@ textarea:focus {
     margin-top: 1.5rem;
 }
 
-.modal_close_button, .edit_close_button, .upload_close_button, .rate_close_button, .request_close_button {
+form hr {
+    margin: 0.5rem 0;
+}
+
+form .modal_footer {
+    margin-top: 0;
+}
+
+.modal_close_button, .edit_close_button, .upload_close_button, .rate_close_button, .request_close_button, .report_close_button, .chatroom_close_button {
     top: 30px;
     right: 30px;
 }
@@ -989,4 +1023,9 @@ textarea:focus {
 
 .rating_star:active {
     transform: scale(0.95);
+}
+
+.report_content_modal p {
+    margin-bottom: 1rem;
+    font-weight: bold;
 }

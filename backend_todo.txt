@@ -1,0 +1,41 @@
+index.php:
+- Bejelentkezés, regisztráció kezelése, bejelentkezés gomb működtetése
+
+dashboard.php:
+- Kijelentkezés gomb működtetése
+Tárgyaim fül:
+- Tárgyak megjelenítése, törlés kezelése, ha nincs tárgy akkor szöveg megjelenítése
+- Új tárgy gomb: Tárgyak megjelenítése, felvétel kezelése
+Feltöltött fájljaim fül:
+- Fájlok megjelenítése, törlés és letöltés kezelése, ha nincs fájl akkor szöveg megjelenítése
+- Fájl részletek felugró ablakon szerkesztés kezelése
+Kérelmeim fül:
+- Kérelmek megjelenítése, törlés kezelése, ha nincs kérelem akkor szöveg megjelenítése
+- Várakozó kérelem felugró ablakon szerkeztés kezelése
+- Teljesítétt kérelem felugró ablakon letöltés, lezárás, újraküldés kezelése
+Chatszobáim fül:
+- Chatszobák megjelenítése, törlés szerkesztés és unfollow kezelése, ha nincs chatszoba akkor szöveg megjelenítése
+- (Később) Chatszobára kattintás átirányítás a chatszoba oldalára
+Profilom fül:
+- Adatok megjelenítése
+- Szerkesztés kezelése
+
+subject.php:
+- Kijelentkezés és irányítópult gomb működtetése
+Feltöltött fájlok fül:
+- Fájlok megjelenítése, letöltés kezelése, ha nincs tárgy akkor szöveg megjelenítése
+- Fájl feltöltés kezelése
+- Fájl részletek felugró ablakon értékelés kezelése
+- Saját fájl részletek felugró ablakon törlés és szerkesztés kezelése
+- (Később) Jelentő felület kezelése
+Kérelmek fül:
+- Kérelmek megjelenítése, feltöltés szerkesztés törlés kezelése, ha nincs kérelem akkor szöveg megjelenítése
+- Új kérelem kezelése
+- (Később) Jelentő felület kezelése
+Chatszobák fül:
+- Chatszobák megjelenítése, follow/unfollow szerkesztés törlés kezelése, ha nincs chatszoba akkor szöveg megjelenítése
+- Új chatszoba kezelése
+- (Később) Chatszobára kattintás átirányítás a chatszoba oldalára
+- (Később) Jelentő felület kezelése
+
+(Később) -Chatszobák és admin jogosultságok kezelése

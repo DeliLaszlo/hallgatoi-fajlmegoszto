@@ -275,11 +275,31 @@ document.addEventListener('DOMContentLoaded', function() {
                 selectedRating = 0;
                 updateStars(0);
             }
+
+            // Jelentés modal visszaállítása
+            if (modal.classList.contains('report_content_modal')) {
+                const reportDescription = modal.querySelector('#report_description');
+                if (reportDescription) {
+                    reportDescription.value = '';
+                }
+            }
+
+            // Chatszoba modal visszaállítása
+            if (modal.classList.contains('add_chatroom_modal')) {
+                const chatroomTitle = modal.querySelector('#chatroom_title');
+                const chatroomDescription = modal.querySelector('#chatroom_description');
+                if (chatroomTitle) {
+                    chatroomTitle.value = '';
+                }
+                if (chatroomDescription) {
+                    chatroomDescription.value = '';
+                }
+            }
         }, 400);
     }
 
     // Modal bezárás gombra kattintáskor
-    const allCloseButtons = document.querySelectorAll('.modal_close_button, .edit_close_button, .upload_close_button, .rate_close_button, .request_close_button');
+    const allCloseButtons = document.querySelectorAll('.modal_close_button, .edit_close_button, .upload_close_button, .rate_close_button, .request_close_button, .report_close_button, .chatroom_close_button');
     allCloseButtons.forEach(function(button) {
         button.addEventListener('click', function(e) {
             e.preventDefault();
@@ -323,6 +343,18 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     });
 
+    // Új chatszoba modal megnyitása
+    const addChatroomButtons = document.querySelectorAll('.add_chatroom_button');
+    addChatroomButtons.forEach(function(button) {
+        button.addEventListener('click', function(e) {
+            e.preventDefault();
+            const addChatroomModal = document.querySelector('.add_chatroom_modal');
+            if (addChatroomModal) {
+                addChatroomModal.classList.remove('hidden');
+            }
+        });
+    });
+
     // Fájl feltöltés modal megnyitása
     const uploadFileButtons = document.querySelectorAll('.upload_file_button');
     uploadFileButtons.forEach(function(button) {
@@ -331,6 +363,18 @@ document.addEventListener('DOMContentLoaded', function() {
             const uploadFileModal = document.querySelector('.upload_file_modal');
             if (uploadFileModal) {
                 uploadFileModal.classList.remove('hidden');
+            }
+        });
+    });
+
+    // Jelentés modal megnyitása
+    const reportButtons = document.querySelectorAll('.report_button');
+    reportButtons.forEach(function(button) {
+        button.addEventListener('click', function(e) {
+            e.preventDefault();
+            const reportModal = document.querySelector('.report_content_modal');
+            if (reportModal) {
+                reportModal.classList.remove('hidden');
             }
         });
     });
@@ -581,4 +625,32 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         });
     }
+
+    // Követés gombok közötti váltás
+    const followButtons = document.querySelectorAll('.content_follow_button');
+    const unfollowButtons = document.querySelectorAll('.content_unfollow_button');
+    followButtons.forEach(function(followButton) {
+        followButton.addEventListener('click', function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            const container = followButton.closest('.content_container');
+            const unfollowButton = container ? container.querySelector('.content_unfollow_button') : null;         
+            if (unfollowButton) {
+                followButton.style.display = 'none';
+                unfollowButton.style.display = 'flex';
+            }
+        });
+    });
+    unfollowButtons.forEach(function(unfollowButton) {
+        unfollowButton.addEventListener('click', function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            const container = unfollowButton.closest('.content_container');
+            const followButton = container ? container.querySelector('.content_follow_button') : null;       
+            if (followButton) {
+                unfollowButton.style.display = 'none';
+                followButton.style.display = 'flex';
+            }
+        });
+    });
 });
