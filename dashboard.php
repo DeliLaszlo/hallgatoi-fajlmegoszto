@@ -23,6 +23,12 @@
                 <li><a href="#" id="nav_sajat_kerelemek">Kérelmeim</a></li>
                 <li><a href="#" id="nav_sajat_chatszobak">Chatszobáim</a></li>
                 <li><a href="#" id="nav_profile">Profilom</a></li>
+                <li>
+                    <button class="dark-mode-toggle" aria-label="Sötét mód váltás">
+                        <img src="icons/darkmode.svg" alt="Sötét mód" class="dark-mode-icon moon-icon">
+                        <img src="icons/lightmode.svg" alt="Világos mód" class="dark-mode-icon sun-icon">
+                    </button>
+                </li>
             </ul>
             <a href="#" class="logout_button">
                 <img src="icons/logout.svg" alt="Kijelentkezés" class="logout-icon">

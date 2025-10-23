@@ -1,4 +1,21 @@
 document.addEventListener('DOMContentLoaded', function() {
+    // Sötét mód váltó
+    const darkModeToggle = document.querySelector('.dark-mode-toggle');
+    if (darkModeToggle) {
+        const savedTheme = localStorage.getItem('theme');
+        if (savedTheme === 'dark') {
+            document.body.classList.add('dark_mode');
+        }
+        darkModeToggle.addEventListener('click', function() {
+            document.body.classList.toggle('dark_mode');
+            if (document.body.classList.contains('dark_mode')) {
+                localStorage.setItem('theme', 'dark');
+            } else {
+                localStorage.setItem('theme', 'light');
+            }
+        });
+    }
+
     // Bejelentkezés és regisztráció közötti váltás
     const loginDiv = document.getElementById('login');
     const registerDiv = document.getElementById('register');

@@ -20,6 +20,12 @@
                 <li><a href="#" id="nav_fajlok">Feltöltött fájlok</a></li>
                 <li><a href="#" id="nav_kerelemek">Kérelmek</a></li>
                 <li><a href="#" id="nav_chatszobak">Chatszobák</a></li>
+                <li>
+                    <button class="dark-mode-toggle" aria-label="Sötét mód váltás">
+                        <img src="icons/darkmode.svg" alt="Sötét mód" class="dark-mode-icon moon-icon">
+                        <img src="icons/lightmode.svg" alt="Világos mód" class="dark-mode-icon sun-icon">
+                    </button>
+                </li>
             </ul>
             <a href="#" class="dashboard_button">
                 <img src="icons/arrowback.svg" alt="Irányítópult" class="dashboard-icon">
