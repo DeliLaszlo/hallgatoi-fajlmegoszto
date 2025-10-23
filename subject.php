@@ -58,13 +58,18 @@
                     <span class="icon_text">Letöltés</span>
                     <img src="icons/download.svg" alt="Letöltés">
                 </button>
-                <div class="content_rating">
-                    <span>4.5 / 5<span class="hideable_text"> (20 értékelés)</span></span>
-                    <img src="icons/star.svg" alt="Értékelés">     
-                </div>
                 <div class="content_downloads">
                     <span>42<span class="hideable_text"> letöltés</span></span>
                     <img src="icons/download.svg" alt="Letöltések">
+                </div>
+                <div class="content_voting voting_container">
+                    <span class="vote_count hideable_text">17</span>
+                    <button class="button small_button content_downvote_button downvote_button" aria-label="Nem tetszik">
+                        <img src="icons/downvote.svg" alt="Nem tetszik">
+                    </button>  
+                    <button class="button small_button content_upvote_button upvote_button" aria-label="Tetszik">
+                        <img src="icons/upvote.svg" alt="Tetszik">
+                    </button>  
                 </div>
                 <h2>Fájl neve</h2>
                 <p>Fájl leírása</p>
@@ -78,13 +83,14 @@
                     <span class="icon_text">Letöltés</span>
                     <img src="icons/download.svg" alt="Letöltés">
                 </button>
-                <div class="content_rating">
-                    <span>4.5 / 5<span class="hideable_text"> (20 értékelés)</span></span>
-                    <img src="icons/star.svg" alt="Értékelés">     
-                </div>
                 <div class="content_downloads">
                     <span>42<span class="hideable_text"> letöltés</span></span>
                     <img src="icons/download.svg" alt="Letöltések">
+                </div>
+                <div class="content_voting voting_container hideable_content">
+                    <span class="vote_count">17</span>
+                    <img class="own_downvote_icon" src="icons/downvote.svg" alt="Nem tetszik">
+                    <img src="icons/upvote.svg" alt="Tetszik">
                 </div>
                 <h2>Fájl neve</h2>
                 <p>Fájl leírása</p>
@@ -199,23 +205,30 @@
             <h3>Feltöltés dátuma:<span class="data-file-date">2025-01-01</span></h3>
             <h3>Fájl mérete:<span class="data-file-size">1.5 MB</span></h3>
             <h3>Letöltések:<span class="data-file-downloads">42</span></h3>
-            <h3>Értékelés:<span class="data-file-rating">4.5 / 5 (20 értékelés)</span></h3>
+            <h3 class="voting_section">
+                <span>Értékelés:</span>
+                <span class="data-file-rating">17</span>
+                <span class="voting_container">
+                    <button class="button modal_downvote_button downvote_button" aria-label="Nem tetszik">
+                        <img src="icons/downvote.svg" alt="Nem tetszik">
+                    </button>  
+                    <button class="button modal_upvote_button upvote_button" aria-label="Tetszik">
+                        <img src="icons/upvote.svg" alt="Tetszik">
+                    </button>  
+                </span>
+            </h3>
             <h3>Leírás:</h3>
             <p class="data-file-description">Itt van a fájl részletes leírása. Ez a szöveg több soros is lehet, és részletes információkat tartalmazhat a fájlról.</p>
             <!-- Generálandó rész vége -->
             <hr>
             <div class="modal_footer">
-                <button class="button modal_rate_button" aria-label="Értékelés">
-                    <img src="icons/star.svg" alt="Értékelés">
-                    <span>Értékelés</span>
+                <button class="button report_button" aria-label="Jelentés">
+                    <img src="icons/report.svg" alt="Jelentés">
+                    <span>Jelentés</span>
                 </button>
                 <button class="button modal_download_button" aria-label="Letöltés">
                     <img src="icons/download.svg" alt="Letöltés">
                     <span>Letöltés</span>
-                </button>
-                <button class="button report_button" aria-label="Jelentés">
-                    <img src="icons/report.svg" alt="Jelentés">
-                    <span>Jelentés</span>
                 </button>
             </div>
         </div>
@@ -306,36 +319,6 @@
             <!-- Generálandó rész vége -->
         </div>
     </div>
-    <div class="modal small_modal rate_file_modal">
-        <div class="modal_content small_modal_content">
-            <button class="button small_button rate_close_button" aria-label="Bezárás">
-                <img src="icons/close.svg" alt="Bezárás">
-            </button>
-            <h2>Fájl értékelése</h2>
-            <hr>
-            <div class="rating_container">
-                <p>Válassza ki az értékelését:</p>
-                <div class="star_rating">
-                    <img src="icons/star.svg" alt="1 csillag" class="rating_star" data-rating="1">
-                    <img src="icons/star.svg" alt="2 csillag" class="rating_star" data-rating="2">
-                    <img src="icons/star.svg" alt="3 csillag" class="rating_star" data-rating="3">
-                    <img src="icons/star.svg" alt="4 csillag" class="rating_star" data-rating="4">
-                    <img src="icons/star.svg" alt="5 csillag" class="rating_star" data-rating="5">
-                </div>
-            </div>
-            <hr>
-            <div class="modal_footer">
-                <button class="button rate_close_button" aria-label="Mégse">
-                    <img src="icons/close.svg" alt="Mégse">
-                    <span>Mégse</span>
-                </button>
-                <button class="button modal_save_rate_button" aria-label="Értékelés">
-                    <img src="icons/star.svg" alt="Értékelés">
-                    <span>Értékelés</span>
-                </button>
-            </div>
-        </div>
-    </div>
     <div class="modal own_file_details_modal">
         <div class="modal_content">
             <button class="button small_button modal_close_button" aria-label="Bezárás">
@@ -350,7 +333,7 @@
             <h3>Feltöltés dátuma:<span class="data-file-date">2025-01-01</span></h3>
             <h3>Fájl mérete:<span class="data-file-size">1.5 MB</span></h3>
             <h3>Letöltések:<span class="data-file-downloads">42</span></h3>
-            <h3>Értékelés:<span class="data-file-rating">4.5 / 5 (20 értékelés)</span></h3>
+            <h3>Értékelés:<span class="data-file-rating">17</span></h3>
             <h3>Leírás:</h3>
             <p class="data-file-description">Itt van a fájl részletes leírása. Ez a szöveg több soros is lehet, és részletes információkat tartalmazhat a fájlról.</p>
             <!-- Generálandó rész vége -->

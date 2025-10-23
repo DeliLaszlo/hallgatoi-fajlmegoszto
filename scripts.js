@@ -270,12 +270,6 @@ document.addEventListener('DOMContentLoaded', function() {
                 }
             }
 
-            // Értékelés modal visszaállítása
-            if (modal.classList.contains('rate_file_modal')) {
-                selectedRating = 0;
-                updateStars(0);
-            }
-
             // Jelentés modal visszaállítása
             if (modal.classList.contains('report_content_modal')) {
                 const reportDescription = modal.querySelector('#report_description');
@@ -299,7 +293,7 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     // Modal bezárás gombra kattintáskor
-    const allCloseButtons = document.querySelectorAll('.modal_close_button, .edit_close_button, .upload_close_button, .rate_close_button, .request_close_button, .report_close_button, .chatroom_close_button');
+    const allCloseButtons = document.querySelectorAll('.modal_close_button, .edit_close_button, .upload_close_button, .request_close_button, .report_close_button, .chatroom_close_button');
     allCloseButtons.forEach(function(button) {
         button.addEventListener('click', function(e) {
             e.preventDefault();
@@ -582,50 +576,6 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
-    // Fájl értékelés modal megnyitása
-    const rateFileButtons = document.querySelectorAll('.modal_rate_button');
-    rateFileButtons.forEach(function(button) {
-        button.addEventListener('click', function(e) {
-            e.preventDefault();
-            const rateFileModal = document.querySelector('.rate_file_modal');
-            if (rateFileModal) {
-                rateFileModal.classList.remove('hidden');
-            }
-        });
-    });
-
-    // Csillag értékelés rendszer
-    const ratingStars = document.querySelectorAll('.rating_star');
-    let selectedRating = 0;
-    if (ratingStars.length > 0) {
-        ratingStars.forEach(function(star, index) {
-            star.addEventListener('click', function() {
-                selectedRating = parseInt(this.getAttribute('data-rating'));
-                updateStars(selectedRating);
-            });
-            star.addEventListener('mouseenter', function() {
-                const hoverRating = parseInt(this.getAttribute('data-rating'));
-                updateStars(hoverRating);
-            });
-        });
-        const starRatingContainer = document.querySelector('.star_rating');
-        if (starRatingContainer) {
-            starRatingContainer.addEventListener('mouseleave', function() {
-                updateStars(selectedRating);
-            });
-        }
-    }
-
-    function updateStars(rating) {
-        ratingStars.forEach(function(star, index) {
-            if (index < rating) {
-                star.classList.add('active');
-            } else {
-                star.classList.remove('active');
-            }
-        });
-    }
-
     // Követés gombok közötti váltás
     const followButtons = document.querySelectorAll('.content_follow_button');
     const unfollowButtons = document.querySelectorAll('.content_unfollow_button');
@@ -650,6 +600,34 @@ document.addEventListener('DOMContentLoaded', function() {
             if (followButton) {
                 unfollowButton.style.display = 'none';
                 followButton.style.display = 'flex';
+            }
+        });
+    });
+
+    // Upvote és downvote kezelés
+    const upvoteButtons = document.querySelectorAll('.upvote_button');
+    const downvoteButtons = document.querySelectorAll('.downvote_button');
+    upvoteButtons.forEach(function(upvoteButton) {
+        upvoteButton.addEventListener('click', function(e) {
+            e.preventDefault();
+            e.stopPropagation();  
+            const container = upvoteButton.closest('.voting_container');
+            const downvoteButton = container ? container.querySelector('.downvote_button') : null;
+            upvoteButton.classList.toggle('active');
+            if (upvoteButton.classList.contains('active') && downvoteButton) {
+                downvoteButton.classList.remove('active');
+            }
+        });
+    });
+    downvoteButtons.forEach(function(downvoteButton) {
+        downvoteButton.addEventListener('click', function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            const container = downvoteButton.closest('.voting_container');
+            const upvoteButton = container ? container.querySelector('.upvote_button') : null;
+            downvoteButton.classList.toggle('active');
+            if (downvoteButton.classList.contains('active') && upvoteButton) {
+                upvoteButton.classList.remove('active');
             }
         });
     });

@@ -227,7 +227,7 @@ textarea:focus {
     display: flex;
     align-items: center;
     border: 2px solid var(--border-outline);
-    border-radius: 5px;
+    border-radius: 20px;
     padding: 0.25rem;
     background-color: white;
     margin: 0.25rem 0;
@@ -525,27 +525,9 @@ textarea:focus {
     right: 0.5rem;
 }
 
-.content_rating {
-    position: absolute;
-    top: 4rem;
-    right: 1rem;
-    transform: translateY(-50%);
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    font-size: 0.9rem;
-    font-weight: 500;
-    color: #333;
-}
-
-.content_rating img {
-    width: 20px;
-    height: 20px;
-}
-
 .content_downloads {
     position: absolute;
-    bottom: 0.5rem;
+    top: 3rem;
     right: 1rem;
     display: flex;
     align-items: center;
@@ -559,6 +541,85 @@ textarea:focus {
     width: 18px;
     height: 18px;
     opacity: 0.7;
+}
+
+.voting_container {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+span.voting_container {
+    display: inline-flex;
+    gap: 5px;
+}
+
+.content_voting {
+    position: absolute;
+    bottom: 1rem;
+    right: 1rem;
+    gap: 0.1rem;
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: #333;
+}
+
+.content_voting .small_button {
+    position: static;
+    padding: 0.4rem;
+    border-radius: 8px;
+    transition: all 0.2s ease;
+}
+
+.content_voting .small_button img {
+    width: 20px;
+    height: 20px;
+    display: block;
+}
+
+.content_downvote_button {
+    position: absolute;
+}
+
+.content_downvote_button img {
+    position: relative;
+    top: 3.5px;
+}
+
+.modal_upvote_button img {
+    position: relative;
+    top: -4px;
+}
+
+.content_voting .vote_count {
+    min-width: 35px;
+    text-align: center;
+    padding: 0 0.25rem;
+}
+
+.content_voting>img {
+    padding: 0.25rem;
+}
+
+.own_downvote_icon {
+    position: relative;
+    top: 5px;
+}
+
+.upvote_button.active img {
+    filter: invert(64%) sepia(23%) saturate(1393%) hue-rotate(72deg) brightness(91%) contrast(85%);
+}
+
+.upvote_button.active:hover {
+    background-color: rgba(76, 175, 80, 0.15);
+}
+
+.downvote_button.active img {
+    filter: invert(29%) sepia(89%) saturate(2592%) hue-rotate(353deg) brightness(95%) contrast(93%);
+}
+
+.downvote_button.active:hover {
+    background-color: rgba(244, 67, 54, 0.15);
 }
 
 .status_badge {
@@ -657,7 +718,7 @@ textarea:focus {
 }
 
 @media (max-width: 450px) {
-    .content_rating, .content_downloads {
+    .content_voting, .content_downloads, .hideable_content {
         display: none;
     }
 }
@@ -761,6 +822,14 @@ textarea:focus {
     grid-template-columns: 175px 1fr;
 }
 
+.modal_content .voting_section {
+    grid-template-columns: 175px 25px 1fr;
+}
+
+.voting_section > span:first-child {
+    font-weight: bold;
+}
+
 .modal_footer {
     display: flex;
     justify-content: center;
@@ -776,7 +845,7 @@ form .modal_footer {
     margin-top: 0;
 }
 
-.modal_close_button, .edit_close_button, .upload_close_button, .rate_close_button, .request_close_button, .report_close_button, .chatroom_close_button {
+.modal_close_button, .edit_close_button, .upload_close_button, .request_close_button, .report_close_button, .chatroom_close_button {
     top: 30px;
     right: 30px;
 }
@@ -988,43 +1057,6 @@ form .modal_footer {
 }
 
 /*subject.php*/
-.rating_container {
-    text-align: center;
-    padding: 1rem 0;
-}
-
-.rating_container p {
-    margin-bottom: 1rem;
-    font-weight: bold;
-}
-
-.star_rating {
-    display: flex;
-    justify-content: center;
-    gap: 0.5rem;
-    margin: 1.5rem 0;
-}
-
-.rating_star {
-    width: 40px;
-    height: 40px;
-    cursor: pointer;
-    filter: grayscale(100%);
-    opacity: 0.3;
-    transition: all 0.2s ease;
-}
-
-.rating_star:hover,
-.rating_star.active {
-    filter: grayscale(0%) brightness(1.2);
-    opacity: 1;
-    transform: scale(1.1);
-}
-
-.rating_star:active {
-    transform: scale(0.95);
-}
-
 .report_content_modal p {
     margin-bottom: 1rem;
     font-weight: bold;

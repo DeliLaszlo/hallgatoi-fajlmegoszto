@@ -53,6 +53,7 @@
                 <p>Tárgy kódja</p>
                 <p>Fájlok száma, kérelmek száma</p>
             </div>
+            <!-- Generálandó rész vége -->
         </section>
         <section id="dashboard_fajlok">
             <h1>Feltöltött fájljaim</h1>
@@ -235,7 +236,7 @@
             <h3>Feltöltés dátuma:<span class="data-file-date">2025-01-01</span></h3>
             <h3>Fájl mérete:<span class="data-file-size">1.5 MB</span></h3>
             <h3>Letöltések:<span class="data-file-downloads">42</span></h3>
-            <h3>Értékelés:<span class="data-file-rating">4.5 / 5 (20 értékelés)</span></h3>
+            <h3>Értékelés:<span class="data-file-rating">17</span></h3>
             <h3>Leírás:</h3>
             <p class="data-file-description">Itt van a fájl részletes leírása. Ez a szöveg több soros is lehet, és részletes információkat tartalmazhat a fájlról.</p>
             <!-- Generálandó rész vége -->
@@ -299,7 +300,18 @@
             <h3>Feltöltés dátuma:<span class="data-file-date">2025-01-01</span></h3>
             <h3>Fájl mérete:<span class="data-file-size">1.5 MB</span></h3>
             <h3>Letöltések:<span class="data-file-downloads">42</span></h3>
-            <h3>Értékelés:<span class="data-file-rating">4.5 / 5 (20 értékelés)</span></h3>
+            <h3 class="voting_section">
+                <span>Értékelés:</span>
+                <span class="data-file-rating">17</span>
+                <span class="voting_container">
+                    <button class="button modal_downvote_button downvote_button" aria-label="Nem tetszik">
+                        <img src="icons/downvote.svg" alt="Nem tetszik">
+                    </button>  
+                    <button class="button modal_upvote_button upvote_button" aria-label="Tetszik">
+                        <img src="icons/upvote.svg" alt="Tetszik">
+                    </button>  
+                </span>
+            </h3>
             <h3>Leírás:</h3>
             <p class="data-file-description">Itt van a fájl részletes leírása. Ez a szöveg több soros is lehet, és részletes információkat tartalmazhat a fájlról.</p>
             <!-- Generálandó rész vége -->
