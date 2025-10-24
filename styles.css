@@ -1253,3 +1253,250 @@ form .modal_footer {
 .dark_mode #index_container input {
     background-color: var(--secondary-color);
 }
+
+/* ===== Chatszobák (frontend-only UI) ===== */
+
+#subject_chatszobak {
+  display: flex;
+  flex-direction: column;
+  /* Töltsük ki a képernyőt a header alatt: */
+  min-height: calc(100vh - 100px);
+}
+
+.chat_layout {
+  display: flex;
+  gap: 1rem;
+  flex: 1;
+}
+
+/* Oldalsáv – beszélgetés lista */
+.chat_sidebar {
+  width: 320px;
+  display: flex;
+  flex-direction: column;
+  gap: .5rem;
+}
+
+.chat_list {
+  overflow: auto;
+  border: 2px solid var(--light-gray);
+  border-radius: 10px;
+  background: #fff;
+}
+
+.chat_list_item {
+  display: grid;
+  grid-template-columns: 40px 1fr;
+  gap: .6rem;
+  padding: .5rem .6rem;
+  cursor: pointer;
+  border-bottom: 1px solid var(--light-gray);
+  transition: background-color .2s ease;
+}
+
+.chat_list_item:last-child {
+  border-bottom: none;
+}
+
+.chat_list_item:hover {
+  background: rgba(30, 58, 138, 0.06); /* primary halvány */
+}
+
+.chat_list_item.active {
+  background: rgba(30, 58, 138, 0.12);
+  border-left: 4px solid var(--primary-color);
+  padding-left: calc(.6rem - 4px);
+}
+
+.chat_avatar {
+  width: 36px;
+  height: 36px;
+  border-radius: 9999px;
+  background: var(--light-gray);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  color: var(--primary-color);
+}
+
+/* Jobb oldal – üzenetek nézet */
+.chat_window {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.chat_header_inline {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: .5rem;
+}
+
+.chat_title {
+  display: flex;
+  align-items: center;
+  gap: .5rem;
+}
+
+.chat_messages {
+  flex: 1;
+  overflow: auto;
+  padding: .75rem;
+  background: #fff;
+  border-radius: 10px;
+  border: 2px solid var(--light-gray);
+}
+
+/* Üzenet sorok + buborékok */
+.chat_row {
+  display: flex;
+  margin-bottom: .5rem;
+}
+
+.chat_row.me { justify-content: flex-end; }
+.chat_row.other { justify-content: flex-start; }
+
+.chat_bubble {
+  max-width: 65%;
+  padding: .6rem .8rem;
+  border-radius: 14px;
+  border: 2px solid var(--light-gray);
+  background: #fff;
+  color: #333;
+}
+
+.chat_meta {
+  font-size: .8rem;
+  opacity: .8;
+  margin-top: .25rem;
+  text-align: right;
+}
+
+/* Küldő sor */
+.chat_input {
+  display: flex;
+  gap: .5rem;
+  align-items: flex-end;
+  margin-top: .5rem;
+}
+
+.chat_input textarea {
+  flex: 1;
+  resize: none;
+  border-radius: 10px;
+  border: 2px solid var(--border-outline);
+  padding: .5rem;
+}
+
+.chat_input textarea:focus {
+  border: 2px solid var(--primary-color);
+  outline: none;
+  box-shadow: 0 0 5px rgba(59, 130, 246, 0.5);
+}
+
+/* Reszponzív */
+@media (max-width: 1100px) {
+  .chat_sidebar { width: 280px; }
+}
+
+@media (max-width: 900px) {
+  .chat_layout { flex-direction: column; }
+  .chat_sidebar { width: 100%; }
+}
+
+@media (max-width: 600px) {
+  .chat_bubble { max-width: 85%; }
+}
+
+
+/* Fix: ensure sent messages are legible in dark mode too */
+.dark_mode /* === Messenger-stílus chatbuborékok finomhangolása === */
+.chat_messages {
+  display: flex;
+  flex-direction: column;
+  gap: .6rem;
+  padding: 1rem;
+  background: var(--background-secondary);
+}
+
+.chat_row {
+  display: flex;
+  align-items: flex-end;
+}
+
+.chat_row.me {
+  justify-content: flex-end;
+}
+
+.chat_row.other {
+  justify-content: flex-start;
+}
+
+/* Mások üzenete */
+.chat_bubble {
+  max-width: 70%;
+  padding: .7rem 1rem;
+  border-radius: 1.2rem;
+  font-size: .95rem;
+  line-height: 1.4;
+  background: #f1f1f1;
+  color: #222;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+}
+
+/* Saját üzenet */
+/* Más üzenetek buborék formája */
+.chat_row.other .chat_bubble {
+  border-radius: 1.2rem 1.2rem 1.2rem 0.2rem;
+}
+
+/* Meta információ */
+.chat_meta {
+  font-size: .75rem;
+  opacity: .7;
+  margin-top: .3rem;
+  text-align: right;
+}
+
+/* Sötét mód kompatibilitás */
+.dark_mode .chat_bubble {
+  background: #2c2c2c;
+  color: #ddd;
+}
+
+.dark_mode /* Képernyőn kisebb buborékok mobilon */
+@media (max-width: 600px) {
+  .chat_bubble { max-width: 85%; }
+}
+
+/* === Chat bubbles (consolidated) === */
+.chat_bubble {
+  max-width: 65%;
+  padding: .6rem .8rem;
+  border-radius: 14px;
+  border: 2px solid var(--light-gray);
+  background: #fff;
+  color: #111;
+}
+
+.chat_bubble.me {
+  background: var(--primary-color);
+  color: #fff;
+  border: 2px solid var(--primary-color);
+  border-radius: 1.2rem 1.2rem 0.2rem 1.2rem;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.dark_mode .chat_bubble {
+  background: #2c2c2c;
+  color: #ddd;
+  border-color: #3a3a3a;
+}
+
+.dark_mode .chat_bubble.me {
+  background: #3b82f6;
+  color: #fff;
+  border-color: #3b82f6;
+}

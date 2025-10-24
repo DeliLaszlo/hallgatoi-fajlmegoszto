@@ -18,9 +18,21 @@ if (isset($_SESSION['last_activity']) && (time() - $_SESSION['last_activity'] > 
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="styles.css?v=1761247878">
     <link rel="icon" type="image/x-icon" href="https://munkatars.sze.hu/core/templates/sze2018_bluerev/favicon.ico?v=2">
     <title>Tárgy címe</title> <!-- PHP-val generált -->
+
+<style>
+/* Scoped fallback to ensure own messages visible even if cache overrides */
+#subject_chatszobak .chat_bubble.me {
+  background: var(--primary-color) !important;
+  color: #fff !important;
+  border-color: var(--primary-color) !important;
+}
+#subject_chatszobak .chat_row.me { justify-content: flex-end; }
+#subject_chatszobak .chat_row.other { justify-content: flex-start; }
+</style>
+
 </head>
 <body>
     <header>
@@ -400,6 +412,6 @@ if (isset($_SESSION['last_activity']) && (time() - $_SESSION['last_activity'] > 
             <!-- Feldolgozandó rész vége -->    
         </div>
     </div>
-    <script type="text/javascript" src="scripts.js"></script>
+    <script type="text/javascript" src="scripts.js?v=2"></script>
 </body>
 </html>
