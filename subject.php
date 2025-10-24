@@ -3,9 +3,21 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="styles.css?v=1761247878">
     <link rel="icon" type="image/x-icon" href="https://munkatars.sze.hu/core/templates/sze2018_bluerev/favicon.ico?v=2">
     <title>Tárgy címe</title> <!-- PHP-val generált -->
+
+<style>
+/* Scoped fallback to ensure own messages visible even if cache overrides */
+#subject_chatszobak .chat_bubble.me {
+  background: var(--primary-color) !important;
+  color: #fff !important;
+  border-color: var(--primary-color) !important;
+}
+#subject_chatszobak .chat_row.me { justify-content: flex-end; }
+#subject_chatszobak .chat_row.other { justify-content: flex-start; }
+</style>
+
 </head>
 <body>
     <header>
@@ -149,53 +161,102 @@
             <!-- Generálandó rész vége -->
         </section>
         <section id="subject_chatszobak">
-            <div class="section_header">
-                <h1>Chatszobák</h1>
-                <button class="large_button add_chatroom_button" aria-label="Chatszoba hozzáadása">
-                    <img src="icons/add.svg" alt="Chatszoba hozzáadása">
-                    <span class="icon_text">Új chatszoba</span>
-                </button>
-            </div>
-            <hr>
-            <!-- Ha nincsenek chatszobák, display none nélkül -->
-            <h2 class="no_content_message" style="display: none;">Még nincsenek chatszobák ehhez a tárgyhoz.</h2>
-            <!-- Tárgy chatszobái, később PHP-vel generálandó -->
-            <div class="content_container chatroom_container">
-                <a href="#" class="container_link chatroom_link" aria-label="Chatszoba megnyitása"></a>
-                <button class="button small_button content_follow_button" aria-label="Követés">
-                    <span class="icon_text">Követés</span>
-                    <img src="icons/follow.svg" alt="Követés">
-                </button>
-                <button class="button small_button content_unfollow_button" aria-label="Követés megszüntetése" style="display: none;">
-                    <span class="icon_text">Követés megszüntetése</span>
-                    <img src="icons/unfollow.svg" alt="Követés megszüntetése">
-                </button>
-                <button class="button small_button content_report_button report_button" aria-label="Chatszoba jelentése">
-                    <span class="icon_text">Jelentés</span>
-                    <img src="icons/report.svg" alt="Chatszoba jelentése">
-                </button>
-                <h2>Chatszoba címe</h2>
-                <p>Chatszoba leírása</p>
-                <p>Létrehozó, követők száma</p>
-            </div>
-            <!-- Generálandó rész vége -->
-            <!-- Felhasználó saját chatszobája esetén, később PHP-vel generálandó -->
-            <div class="content_container chatroom_container">
-                <a href="#" class="container_link chatroom_link" aria-label="Chatroom megnyitása"></a>
-                <button class="button small_button content_edit_button edit_chatroom_button" aria-label="Szerkesztés">
-                    <span class="icon_text">Szerkesztés</span>
-                    <img src="icons/edit.svg" alt="Szerkesztés">
-                </button>
-                <button class="button small_button content_delete_button" aria-label="Törlés">
-                    <span class="icon_text">Törlés</span>
-                    <img src="icons/delete.svg" alt="Törlés">
-                </button>
-                <h2>Chatroom címe</h2>
-                <p>Chatroom leírása</p>
-                <p>Te, követők száma</p>
-            </div>
-            <!-- Generálandó rész vége -->
-        </section>
+  <div class="section_header">
+    <h1>Chatszobák</h1>
+    <div class="section_header_actions">
+      <div class="search_container content_search_container">
+        <input type="search" id="chat_search" placeholder="Keresés a beszélgetésekben" aria-label="Keresés a beszélgetésekben">
+        <button type="button" aria-label="Keresés">
+          <img src="icons/search.svg" alt="Keresés">
+        </button>
+      </div>
+      <button id="chat_invite_btn" class="large_button" type="button">
+        <img src="icons/user-plus.svg" alt="">
+        <span class="icon_text">Meghívás</span>
+      </button>
+      <button id="chat_new_conv" class="large_button" type="button">
+        <img src="icons/plus.svg" alt="">
+        <span class="icon_text">Új beszélgetés</span>
+      </button>
+    </div>
+  </div>
+  <hr>
+
+  <div class="chat_layout">
+    <!-- Oldalsáv: beszélgetések -->
+    <aside class="chat_sidebar">
+      <div id="chat_conv_list" class="chat_list" role="list">
+        <!-- Példasorok – eltávolítható, ha dinamikus lesz -->
+        <div class="chat_list_item active">
+          <div class="chat_avatar">Á</div>
+          <div>
+            <div><strong>Általános</strong></div>
+            <div class="no_content_message" style="font-size:.8rem;">#general</div>
+          </div>
+        </div>
+        <div class="chat_list_item">
+          <div class="chat_avatar">P</div>
+          <div>
+            <div><strong>Projektcsapat</strong></div>
+            <div class="no_content_message" style="font-size:.8rem;">#team</div>
+          </div>
+        </div>
+        <div class="chat_list_item">
+          <div class="chat_avatar">V</div>
+          <div>
+            <div><strong>Vizsga felkészülés</strong></div>
+            <div class="no_content_message" style="font-size:.8rem;">#exam</div>
+          </div>
+        </div>
+      </div>
+
+      <div style="margin-top:.5rem; display:flex; gap:.5rem;">
+        <button id="chat_delete_conv" class="button" type="button"><span>Törlés</span></button>
+        <button id="chat_clear_btn" class="button" type="button"><span>Tisztítás (helyi)</span></button>
+      </div>
+    </aside>
+
+    <!-- Üzenetek nézet -->
+    <section class="chat_window">
+      <div class="chat_header_inline">
+        <div class="chat_title">
+          <div id="chat_room_avatar" class="chat_avatar">Á</div>
+          <h3 id="chat_room_title" style="margin:0;">Általános</h3>
+        </div>
+        <div class="section_header_actions" style="gap:.5rem; align-items:center;">
+          <label class="checkbox-container">
+            <input type="checkbox" id="chat_autoscroll" checked> Auto-scroll
+          </label>
+        </div>
+      </div>
+
+      <div id="chat_messages" class="chat_messages" aria-live="polite">
+        <!-- Minta üzenetek – eltávolítható -->
+        <div class="chat_row other">
+          <div class="chat_bubble">
+            <div>Szia, hogy haladsz a beadandóval?</div>
+            <div class="chat_meta">Anna • 2025-10-23 10:00</div>
+          </div>
+        </div>
+        <div class="chat_row me">
+          <div class="chat_bubble me">
+            <div>Már majdnem kész, ma este befejezem!</div>
+            <div class="chat_meta">Én • 2025-10-23 10:01</div>
+          </div>
+        </div>
+      </div>
+
+      <form id="chat_composer" class="chat_input">
+        <textarea id="chat_text" maxlength="2000" placeholder="Írj üzenetet..." required></textarea>
+        <button class="large_button" type="submit">
+          <img src="icons/send.svg" alt="">
+          <span class="icon_text">Küldés</span>
+        </button>
+      </form>
+    </section>
+  </div>
+</section>
+
     </main>
     <div class="modal file_details_modal">
         <div class="modal_content">
@@ -505,6 +566,6 @@
             <!-- Feldolgozandó rész vége -->    
         </div>
     </div>
-    <script type="text/javascript" src="scripts.js"></script>
+    <script type="text/javascript" src="scripts.js?v=2"></script>
 </body>
 </html>
