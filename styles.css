@@ -1045,7 +1045,7 @@ form .modal_footer {
     max-height: 90vh;
 }
 
-.subject_list_container {
+#subject_list_container {
     max-height: 400px;
     overflow-y: auto;
     padding-right: 0.5rem;
@@ -1228,10 +1228,6 @@ form .modal_footer {
 .dark_mode .small_modal_content input::placeholder, .dark_mode .small_modal_content textarea::placeholder {
     color: var(--text-secondary);
 }
-
-.dark_mode .ivk_logo {
-    display: none;
-} 
 
 .dark_mode #index_container {
     box-shadow: 0 2px 4px var(--secondary-color);

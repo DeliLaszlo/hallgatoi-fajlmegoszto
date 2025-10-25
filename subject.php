@@ -6,18 +6,6 @@
     <link rel="stylesheet" href="styles.css?v=1761247878">
     <link rel="icon" type="image/x-icon" href="https://munkatars.sze.hu/core/templates/sze2018_bluerev/favicon.ico?v=2">
     <title>Tárgy címe</title> <!-- PHP-val generált -->
-
-<style>
-/* Scoped fallback to ensure own messages visible even if cache overrides */
-#subject_chatszobak .chat_bubble.me {
-  background: var(--primary-color) !important;
-  color: #fff !important;
-  border-color: var(--primary-color) !important;
-}
-#subject_chatszobak .chat_row.me { justify-content: flex-end; }
-#subject_chatszobak .chat_row.other { justify-content: flex-start; }
-</style>
-
 </head>
 <body>
     <header>
@@ -67,54 +55,6 @@
                 </div>
             </div>
             <hr>
-            <!-- Ha nincsenek fájlok, display none nélkül -->
-            <h2 class="no_content_message" style="display: none;">Még nincsenek feltöltött fájlok ehhez a tárgyhoz.</h2>
-            <!-- Tárgy fájljai, később PHP-vel generálandó -->
-            <div class="content_container uploaded_files_container">
-                <a href="#" class="container_link file_details_link" aria-label="Fájl részletei"></a>
-                <button class="button small_button content_download_button" aria-label="Letöltés">
-                    <span class="icon_text">Letöltés</span>
-                    <img src="icons/download.svg" alt="Letöltés">
-                </button>
-                <div class="content_downloads">
-                    <span>42<span class="hideable_text"> letöltés</span></span>
-                    <img src="icons/download.svg" alt="Letöltések">
-                </div>
-                <div class="content_voting voting_container">
-                    <span class="vote_count hideable_text">17</span>
-                    <button class="button small_button content_downvote_button downvote_button" aria-label="Nem tetszik">
-                        <img src="icons/downvote.svg" alt="Nem tetszik">
-                    </button>  
-                    <button class="button small_button content_upvote_button upvote_button" aria-label="Tetszik">
-                        <img src="icons/upvote.svg" alt="Tetszik">
-                    </button>  
-                </div>
-                <h2>Fájl neve</h2>
-                <p>Fájl leírása</p>
-                <p>Feltöltő, feltöltés dátuma</p>
-            </div>
-            <!-- Generálandó rész vége -->
-            <!-- Felhasználó saját fájlja esetén, később PHP-vel generálandó -->
-            <div class="content_container uploaded_files_container">
-                <a href="#" class="container_link own_details_link" aria-label="Fájl részletei"></a>
-                <button class="button small_button content_download_button" aria-label="Letöltés">
-                    <span class="icon_text">Letöltés</span>
-                    <img src="icons/download.svg" alt="Letöltés">
-                </button>
-                <div class="content_downloads">
-                    <span>42<span class="hideable_text"> letöltés</span></span>
-                    <img src="icons/download.svg" alt="Letöltések">
-                </div>
-                <div class="content_voting voting_container hideable_content">
-                    <span class="vote_count">17</span>
-                    <img class="own_downvote_icon" src="icons/downvote.svg" alt="Nem tetszik">
-                    <img src="icons/upvote.svg" alt="Tetszik">
-                </div>
-                <h2>Fájl neve</h2>
-                <p>Fájl leírása</p>
-                <p>Te, feltöltés dátuma</p>
-            </div>
-            <!-- Generálandó rész vége -->
         </section>
         <section id="subject_kerelemek">
             <div class="section_header">
@@ -125,138 +65,17 @@
                 </button>
             </div>
             <hr>
-            <!-- Ha nincsenek kérelmek, display none nélkül -->
-            <h2 class="no_content_message" style="display: none;">Még nincsenek kérelmek ehhez a tárgyhoz.</h2>
-            <!-- Tárgy kérelmei, később PHP-vel generálandó -->
-            <div class="content_container request_container">
-                <a href="#" class="container_link upload_file_button" aria-label="Fájl feltöltése"></a>
-                <button class="button small_button content_upload_button upload_file_button" aria-label="Fájl feltöltése">
-                    <span class="icon_text">Fájl feltöltése</span>
-                    <img src="icons/upload.svg" alt="Fájl feltöltése">
-                </button>
-                <button class="button small_button content_report_button report_button" aria-label="Kérelem jelentése">
-                    <span class="icon_text">Jelentés</span>
-                    <img src="icons/report.svg" alt="Kérelem jelentése">
-                </button>
-                <h2>Kérelem címe</h2>
-                <p>Kérelem leírása</p>
-                <p>Kérelmező, feltöltés dátuma</p>
-            </div>
-            <!-- Generálandó rész vége -->
-            <!-- Felhasználó saját kérelme esetén, később PHP-vel generálandó -->
-            <div class="content_container request_container">
-                <a href="#" class="container_link own_uncompleted_requests_link" aria-label="Kérelem megnyitása"></a>
-                <button class="button small_button content_edit_button edit_request_button" aria-label="Szerkesztés">
-                    <span class="icon_text">Szerkesztés</span>
-                    <img src="icons/edit.svg" alt="Szerkesztés">
-                </button>
-                <button class="button small_button content_delete_button" aria-label="Törlés">
-                    <span class="icon_text">Törlés</span>
-                    <img src="icons/delete.svg" alt="Törlés">
-                </button>
-                <h2>Kérelem címe</h2>
-                <p>Kérelem leírása</p>
-                <p>Te, feltöltés dátuma</p>
-            </div>
-            <!-- Generálandó rész vége -->
         </section>
         <section id="subject_chatszobak">
-  <div class="section_header">
-    <h1>Chatszobák</h1>
-    <div class="section_header_actions">
-      <div class="search_container content_search_container">
-        <input type="search" id="chat_search" placeholder="Keresés a beszélgetésekben" aria-label="Keresés a beszélgetésekben">
-        <button type="button" aria-label="Keresés">
-          <img src="icons/search.svg" alt="Keresés">
-        </button>
-      </div>
-      <button id="chat_invite_btn" class="large_button" type="button">
-        <img src="icons/user-plus.svg" alt="">
-        <span class="icon_text">Meghívás</span>
-      </button>
-      <button id="chat_new_conv" class="large_button" type="button">
-        <img src="icons/plus.svg" alt="">
-        <span class="icon_text">Új beszélgetés</span>
-      </button>
-    </div>
-  </div>
-  <hr>
-
-  <div class="chat_layout">
-    <!-- Oldalsáv: beszélgetések -->
-    <aside class="chat_sidebar">
-      <div id="chat_conv_list" class="chat_list" role="list">
-        <!-- Példasorok – eltávolítható, ha dinamikus lesz -->
-        <div class="chat_list_item active">
-          <div class="chat_avatar">Á</div>
-          <div>
-            <div><strong>Általános</strong></div>
-            <div class="no_content_message" style="font-size:.8rem;">#general</div>
-          </div>
-        </div>
-        <div class="chat_list_item">
-          <div class="chat_avatar">P</div>
-          <div>
-            <div><strong>Projektcsapat</strong></div>
-            <div class="no_content_message" style="font-size:.8rem;">#team</div>
-          </div>
-        </div>
-        <div class="chat_list_item">
-          <div class="chat_avatar">V</div>
-          <div>
-            <div><strong>Vizsga felkészülés</strong></div>
-            <div class="no_content_message" style="font-size:.8rem;">#exam</div>
-          </div>
-        </div>
-      </div>
-
-      <div style="margin-top:.5rem; display:flex; gap:.5rem;">
-        <button id="chat_delete_conv" class="button" type="button"><span>Törlés</span></button>
-        <button id="chat_clear_btn" class="button" type="button"><span>Tisztítás (helyi)</span></button>
-      </div>
-    </aside>
-
-    <!-- Üzenetek nézet -->
-    <section class="chat_window">
-      <div class="chat_header_inline">
-        <div class="chat_title">
-          <div id="chat_room_avatar" class="chat_avatar">Á</div>
-          <h3 id="chat_room_title" style="margin:0;">Általános</h3>
-        </div>
-        <div class="section_header_actions" style="gap:.5rem; align-items:center;">
-          <label class="checkbox-container">
-            <input type="checkbox" id="chat_autoscroll" checked> Auto-scroll
-          </label>
-        </div>
-      </div>
-
-      <div id="chat_messages" class="chat_messages" aria-live="polite">
-        <!-- Minta üzenetek – eltávolítható -->
-        <div class="chat_row other">
-          <div class="chat_bubble">
-            <div>Szia, hogy haladsz a beadandóval?</div>
-            <div class="chat_meta">Anna • 2025-10-23 10:00</div>
-          </div>
-        </div>
-        <div class="chat_row me">
-          <div class="chat_bubble me">
-            <div>Már majdnem kész, ma este befejezem!</div>
-            <div class="chat_meta">Én • 2025-10-23 10:01</div>
-          </div>
-        </div>
-      </div>
-
-      <form id="chat_composer" class="chat_input">
-        <textarea id="chat_text" maxlength="2000" placeholder="Írj üzenetet..." required></textarea>
-        <button class="large_button" type="submit">
-          <img src="icons/send.svg" alt="">
-          <span class="icon_text">Küldés</span>
-        </button>
-      </form>
-    </section>
-  </div>
-</section>
-
+            <div class="section_header">
+                <h1>Chatszobák</h1>
+                <button class="large_button add_chatroom_button" aria-label="Chatszoba hozzáadása">
+                    <img src="icons/add.svg" alt="Chatszoba hozzáadása">
+                    <span class="icon_text">Új chatszoba</span>
+                </button>
+            </div>
+            <hr>
+        </section>
     </main>
     <div class="modal file_details_modal">
         <div class="modal_content">
@@ -566,6 +385,6 @@
             <!-- Feldolgozandó rész vége -->    
         </div>
     </div>
-    <script type="text/javascript" src="scripts.js?v=2"></script>
+    <script type="text/javascript" src="scripts.js"></script>
 </body>
 </html>
