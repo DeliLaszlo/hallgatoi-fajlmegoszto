@@ -1466,11 +1466,6 @@ form .modal_footer {
   color: #ddd;
 }
 
-.dark_mode /* Képernyőn kisebb buborékok mobilon */
-@media (max-width: 600px) {
-  .chat_bubble { max-width: 85%; }
-}
-
 /* === Chat bubbles (consolidated) === */
 .chat_bubble {
   max-width: 65%;
