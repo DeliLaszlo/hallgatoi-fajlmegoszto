@@ -2,18 +2,421 @@ document.addEventListener('DOMContentLoaded', function() {
     // Sötét mód váltó
     const darkModeToggle = document.querySelector('.dark-mode-toggle');
     if (darkModeToggle) {
+        function updateLogo(isDarkMode) {
+            const logo = document.querySelector('.ivk_logo');
+            if (logo) {
+                if (isDarkMode) {
+                    logo.src = 'icons/IVK_logo_dark.png';
+                } else {
+                    logo.src = 'icons/IVK_logo.png';
+                }
+            }
+        }
+        
         const savedTheme = localStorage.getItem('theme');
         if (savedTheme === 'dark') {
             document.body.classList.add('dark_mode');
         }
+        updateLogo(document.body.classList.contains('dark_mode'));
+        
         darkModeToggle.addEventListener('click', function() {
             document.body.classList.toggle('dark_mode');
-            if (document.body.classList.contains('dark_mode')) {
+            const isDarkMode = document.body.classList.contains('dark_mode');
+            if (isDarkMode) {
                 localStorage.setItem('theme', 'dark');
             } else {
                 localStorage.setItem('theme', 'light');
             }
+            updateLogo(isDarkMode);
         });
+    }
+
+    // Dashboard tárgyak generálása
+    function generateSubjects() {
+        const subjectCount = 3; // Felhasználó fájlainak száma, PHP-val generált
+        const subjectSection = document.getElementById('dashboard_targyak');
+        if (subjectSection) {
+            if (subjectCount === 0) {
+                subjectSection.insertAdjacentHTML('beforeend', 
+                    '<h2 class="no_content_message">Még nincsenek felvett tárgyaid.</h2>'
+                );
+            } else {
+                for (let i = 0; i < subjectCount; i++) {
+                    subjectSection.insertAdjacentHTML('beforeend', `
+                        <div class="content_container own_subject_container">
+                            <a href="#" class="container_link subject_link" aria-label="Tárgy megnyitása"></a>
+                            <button class="button small_button content_delete_button" aria-label="Törlés">
+                                <span class="icon_text">Törlés</span>
+                                <img src="icons/delete.svg" alt="Törlés">
+                            </button>
+                            <h2>Tárgy neve</h2> <!-- PHP-val generált -->
+                            <p>Tárgy kódja</p> <!-- PHP-val generált -->
+                            <p>Fájlok száma, kérelmek száma</p> <!-- PHP-val generált -->
+                        </div>
+                    `);
+                }
+            }
+        }
+    }
+    if (window.location.pathname.includes('dashboard.php')) {
+        generateSubjects();
+    }
+
+    // Dashboard fájlok generálása
+    function generateFiles() {
+        const fileCount = 3; // Felhasználó fájlainak száma, PHP-val generált
+        const fileSection = document.getElementById('dashboard_fajlok');
+        if (fileSection) {
+            if (fileCount === 0) {
+                fileSection.insertAdjacentHTML('beforeend', 
+                    '<h2 class="no_content_message">Még nem töltöttél fel fájlokat.</h2>'
+                );
+            } else {
+                for (let i = 0; i < fileCount; i++) {
+                    fileSection.insertAdjacentHTML('beforeend', `
+                        <div class="content_container own_file_container">
+                            <a href="#" class="container_link own_details_link" aria-label="Fájl megnyitása"></a>
+                            <button class="button small_button content_download_button" aria-label="Letöltés">
+                                <span class="icon_text">Letöltés</span>
+                                <img src="icons/download.svg" alt="Letöltés">
+                            </button>
+                            <button class="button small_button content_delete_button" aria-label="Törlés">
+                                <span class="icon_text">Törlés</span>
+                                <img src="icons/delete.svg" alt="Törlés">
+                            </button>
+                            <h2>Fájl címe</h2> <!-- PHP-val generált -->
+                            <p>Fájl leírása</p> <!-- PHP-val generált -->
+                            <p>Feltöltés dátuma, tárgy neve</p> <!-- PHP-val generált -->
+                        </div>
+                    `);
+                }
+            }
+        }
+    }
+    if (window.location.pathname.includes('dashboard.php')) {
+        generateFiles();
+    }
+
+    // Dashboard kérelmek generálása
+    function generateRequests() {
+        const requestCount = 3; // Felhasználó kérelemeinek száma, PHP-val generált
+        const requestSection = document.getElementById('dashboard_kerelemek');
+        if (requestSection) {
+            if (requestCount === 0) {
+                requestSection.insertAdjacentHTML('beforeend', 
+                    '<h2 class="no_content_message">Még nincsenek kérelmeid.</h2>'
+                );
+            } else {
+                for (let i = 0; i < requestCount; i++) {
+                    const isCompleted = (i % 2 === 0); // Helyettesítendő PHP-val
+                    if (isCompleted) {
+                        requestSection.insertAdjacentHTML('beforeend', `
+                            <div class="content_container own_completed_request_container">
+                                <span class="status_badge status_completed">
+                                    <span class="icon_text">Teljesítve</span>
+                                    <img src="icons/tick.svg" alt="Teljesítve" class="status_icon">  
+                                </span>
+                                <a href="#" class="container_link own_completed_requests_link" aria-label="Kérelem megnyitása"></a>
+                                <h2>Kérelem címe</h2> <!-- PHP-val generált -->
+                                <p>Kérelem leírása</p> <!-- PHP-val generált -->
+                                <p>Létrehozás dátuma, tárgy neve</p> <!-- PHP-val generált -->
+                            </div>
+                        `);
+                    } else {
+                        requestSection.insertAdjacentHTML('beforeend', `
+                            <div class="content_container own_uncompleted_request_container">
+                                <span class="status_badge status_uncompleted">
+                                    <span class="icon_text">Várakozó</span>
+                                    <img src="icons/hourglass.svg" alt="Várakozó" class="status_icon">
+                                </span>
+                                <a href="#" class="container_link own_uncompleted_requests_link" aria-label="Kérelem megnyitása"></a>
+                                <button class="button small_button content_delete_button" aria-label="Törlés">
+                                    <span class="icon_text">Törlés</span>
+                                    <img src="icons/delete.svg" alt="Törlés">
+                                </button>
+                                <h2>Kérelem címe</h2> <!-- PHP-val generált -->
+                                <p>Kérelem leírása</p> <!-- PHP-val generált -->
+                                <p>Létrehozás dátuma, tárgy neve</p> <!-- PHP-val generált -->
+                            </div>
+                        `);
+                    }
+                }
+            }
+        }
+    }
+    if (window.location.pathname.includes('dashboard.php')) {
+        generateRequests();
+    }
+
+    // Dashboard chatszobák generálása
+    function generateChatrooms() {
+        const ownChatroomCount = 2; // Felhasználó saját chatszobáinak száma, PHP-val generált
+        const followedChatroomCount = 2; // Felhasználó követett chatszobáinak száma, PHP-val generált
+        const chatroomSection = document.getElementById('dashboard_chatszobak');
+        const firstHr = chatroomSection.querySelector('hr');
+        if (chatroomSection) {
+            if (ownChatroomCount === 0) {
+                firstHr.insertAdjacentHTML('afterend', `
+                    '<h2 class="no_content_message">Még nem hoztál létre chatszobát.</h2>'
+                `);
+            } else {
+                for (let i = 0; i < ownChatroomCount; i++) {
+                    firstHr.insertAdjacentHTML('afterend', `
+                        <div class="content_container own_chatroom_container">
+                            <a href="#" class="container_link chatroom_link" aria-label="Chatroom megnyitása"></a>
+                            <button class="button small_button content_edit_button edit_chatroom_button" aria-label="Szerkesztés">
+                                <span class="icon_text">Szerkesztés</span>
+                                <img src="icons/edit.svg" alt="Szerkesztés">
+                            </button>
+                            <button class="button small_button content_delete_button" aria-label="Törlés">
+                                <span class="icon_text">Törlés</span>
+                                <img src="icons/delete.svg" alt="Törlés">
+                            </button>
+                            <h2>Chatroom címe</h2> <!-- PHP-val generált -->
+                            <p>Chatroom leírása</p> <!-- PHP-val generált -->
+                            <p>Létrehozás dátuma, tárgy neve, követők száma</p> <!-- PHP-val generált -->
+                        </div>
+                    `);
+                }
+            }
+            if (followedChatroomCount === 0) {
+                chatroomSection.insertAdjacentHTML('beforeend', `
+                    <h2 class="no_content_message">Még nem követsz chatszobát.</h2>
+                `);
+            } else {
+                for (let i = 0; i < followedChatroomCount; i++) {
+                    chatroomSection.insertAdjacentHTML('beforeend', `
+                        <div class="content_container followed_chatroom_container">
+                            <a href="#" class="container_link chatroom_link" aria-label="Chatroom megnyitása"></a>
+                            <button class="button small_button content_unfollow_button" aria-label="Követés megszüntetése">
+                                <span class="icon_text">Követés megszüntetése</span>
+                                <img src="icons/unfollow.svg" alt="Követés megszüntetése">
+                            </button>
+                            <h2>Chatroom címe</h2> <!-- PHP-val generált -->
+                            <p>Chatroom leírása</p> <!-- PHP-val generált -->
+                            <p>Létrehozás dátuma, tárgy neve, követők száma</p> <!-- PHP-val generált -->
+                        </div>
+                    `);
+                }
+            }
+        }
+    }
+    if (window.location.pathname.includes('dashboard.php')) {
+        generateChatrooms();
+    }
+
+    // Dashboard felvehető tárgyak generálása
+    function generateAvailableSubjects() {
+        const availableSubjectCount = 3; // Felvehető tárgyak száma, PHP-val generált
+        const subjectSection = document.getElementById('subject_list_container');
+        if (subjectSection) {
+            if (availableSubjectCount === 0) {
+                subjectSection.insertAdjacentHTML('beforeend', `
+                    <h2 class="no_content_message">Nincsenek felvehető tárgyak.</h2>
+                `);
+            } else {
+                for (let i = 0; i < availableSubjectCount; i++) {
+                    subjectSection.insertAdjacentHTML('beforeend', `
+                        <div class="content_container available_subject_container">
+                            <div class="subject_details">
+                                <h2>Tárgy neve</h2> <!-- PHP-val generált -->
+                                <p>Tárgy kódja</p> <!-- PHP-val generált -->
+                            </div>
+                            <button class="button small_button subject_add_button" aria-label="Tárgy felvétele">
+                                <img src="icons/add.svg" alt="Felvétel">
+                                <span class="icon_text">Felvétel</span>
+                            </button>
+                        </div>
+                    `);
+                }
+            }
+        }
+    }
+    if (window.location.pathname.includes('dashboard.php')) {
+        generateAvailableSubjects();
+    }
+
+    // Subject fájlok generálása
+    function generateSubjectFiles() {
+        const fileCount = 3; // Feltöltött fájlok száma, PHP-val generált
+        const fileSection = document.getElementById('subject_fajlok');
+        if (fileSection) {
+            if (fileCount === 0) {
+                fileSection.insertAdjacentHTML('beforeend', 
+                    '<h2 class="no_content_message">Még nincsenek feltöltött fájlok ehhez a tárgyhoz.</h2>'
+                );
+            } else {
+                for (let i = 0; i < fileCount; i++) {
+                    const isOwnFile = (i % 2 === 0); // Helyettesítendő PHP-val
+                    if (isOwnFile) {
+                        fileSection.insertAdjacentHTML('beforeend', `
+                            <div class="content_container uploaded_files_container">
+                                <a href="#" class="container_link own_details_link" aria-label="Fájl részletei"></a>
+                                <button class="button small_button content_download_button" aria-label="Letöltés">
+                                    <span class="icon_text">Letöltés</span>
+                                    <img src="icons/download.svg" alt="Letöltés">
+                                </button>
+                                <div class="content_downloads">
+                                    <span>42<span class="hideable_text"> letöltés</span></span> <!-- PHP-val generált -->
+                                    <img src="icons/download.svg" alt="Letöltések">
+                                </div>
+                                <div class="content_voting voting_container hideable_content">
+                                    <span class="vote_count">17</span> <!-- PHP-val generált -->
+                                    <img class="own_downvote_icon" src="icons/downvote.svg" alt="Nem tetszik">
+                                    <img src="icons/upvote.svg" alt="Tetszik">
+                                </div>
+                                <h2>Fájl neve</h2> <!-- PHP-val generált -->
+                                <p>Fájl leírása</p> <!-- PHP-val generált -->
+                                <p>Te, feltöltés dátuma</p> <!-- PHP-val generált -->
+                            </div>
+                        `);
+                    } else {
+                        fileSection.insertAdjacentHTML('beforeend', `
+                            <div class="content_container uploaded_files_container">
+                                <a href="#" class="container_link file_details_link" aria-label="Fájl részletei"></a>
+                                <button class="button small_button content_download_button" aria-label="Letöltés">
+                                    <span class="icon_text">Letöltés</span>
+                                    <img src="icons/download.svg" alt="Letöltés">
+                                </button>
+                                <div class="content_downloads">
+                                    <span>42<span class="hideable_text"> letöltés</span></span> <!-- PHP-val generált -->
+                                    <img src="icons/download.svg" alt="Letöltések">
+                                </div>
+                                <div class="content_voting voting_container">
+                                    <span class="vote_count hideable_text">17</span> <!-- PHP-val generált -->
+                                    <button class="button small_button content_downvote_button downvote_button" aria-label="Nem tetszik">
+                                        <img src="icons/downvote.svg" alt="Nem tetszik">
+                                    </button>  
+                                    <button class="button small_button content_upvote_button upvote_button" aria-label="Tetszik">
+                                        <img src="icons/upvote.svg" alt="Tetszik">
+                                    </button>  
+                                </div>
+                                <h2>Fájl neve</h2> <!-- PHP-val generált -->
+                                <p>Fájl leírása</p> <!-- PHP-val generált -->
+                                <p>Feltöltő, feltöltés dátuma</p> <!-- PHP-val generált -->
+                            </div>
+                        `);
+                    }
+                }
+            }
+        }
+    }
+    if (window.location.pathname.includes('subject.php')) {
+        generateSubjectFiles();
+    }
+
+    // Subject kérelmek generálása
+    function generateSubjectRequests() {
+        const requestCount = 3; // Kérelmek száma, PHP-val generált
+        const requestSection = document.getElementById('subject_kerelemek');
+        if (requestSection) {
+            if (requestCount === 0) {
+                requestSection.insertAdjacentHTML('beforeend',
+                    '<h2 class="no_content_message">Még nincsenek kérelmek ehhez a tárgyhoz.</h2>'
+                );
+            } else {
+                for (let i = 0; i < requestCount; i++) {
+                    const isOwnRequest = (i % 2 === 0); // Helyettesítendő PHP-val
+                    if (isOwnRequest) {
+                        requestSection.insertAdjacentHTML('beforeend', `
+                            <div class="content_container request_container">
+                                <a href="#" class="container_link own_uncompleted_requests_link" aria-label="Kérelem megnyitása"></a>
+                                <button class="button small_button content_edit_button edit_request_button" aria-label="Szerkesztés">
+                                    <span class="icon_text">Szerkesztés</span>
+                                    <img src="icons/edit.svg" alt="Szerkesztés">
+                                </button>
+                                <button class="button small_button content_delete_button" aria-label="Törlés">
+                                    <span class="icon_text">Törlés</span>
+                                    <img src="icons/delete.svg" alt="Törlés">
+                                </button>
+                                <h2>Kérelem címe</h2> <!-- PHP-val generált -->
+                                <p>Kérelem leírása</p> <!-- PHP-val generált --> 
+                                <p>Te, feltöltés dátuma</p> <!-- PHP-val generált -->
+                            </div>
+                        `);
+                    } else {
+                        requestSection.insertAdjacentHTML('beforeend', `
+                            <div class="content_container request_container">
+                                <a href="#" class="container_link upload_file_button" aria-label="Fájl feltöltése"></a>
+                                <button class="button small_button content_upload_button upload_file_button" aria-label="Fájl feltöltése">
+                                    <span class="icon_text">Fájl feltöltése</span>
+                                    <img src="icons/upload.svg" alt="Fájl feltöltése">
+                                </button>
+                                <button class="button small_button content_report_button report_button" aria-label="Kérelem jelentése">
+                                    <span class="icon_text">Jelentés</span>
+                                    <img src="icons/report.svg" alt="Kérelem jelentése">
+                                </button>
+                                <h2>Kérelem címe</h2> <!-- PHP-val generált -->
+                                <p>Kérelem leírása</p> <!-- PHP-val generált -->
+                                <p>Kérelmező, feltöltés dátuma</p> <!-- PHP-val generált -->
+                            </div>
+                        `);
+                    }
+                }
+            }
+        }
+    }
+    if (window.location.pathname.includes('subject.php')) {
+        generateSubjectRequests();
+    }
+
+    // Subject chatszobák generálása
+    function generateSubjectChatrooms() {
+        const chatroomCount = 3; // Chatszobák száma, PHP-val generált
+        const chatroomSection = document.getElementById('subject_chatszobak');
+        if (chatroomSection) {
+            if (chatroomCount === 0) {
+                chatroomSection.insertAdjacentHTML('beforeend',
+                    '<h2 class="no_content_message">Még nincsenek chatszobák ehhez a tárgyhoz.</h2>'
+                );
+            } else {
+                for (let i = 0; i < chatroomCount; i++) {
+                    const isOwnChatroom = (i % 2 === 0); // Helyettesítendő PHP-val
+                    if (isOwnChatroom) {
+                        chatroomSection.insertAdjacentHTML('beforeend', `
+                            <div class="content_container chatroom_container">
+                                <a href="#" class="container_link chatroom_link" aria-label="Chatroom megnyitása"></a>
+                                <button class="button small_button content_edit_button edit_chatroom_button" aria-label="Szerkesztés">
+                                    <span class="icon_text">Szerkesztés</span>
+                                    <img src="icons/edit.svg" alt="Szerkesztés">
+                                </button>
+                                <button class="button small_button content_delete_button" aria-label="Törlés">
+                                    <span class="icon_text">Törlés</span>
+                                    <img src="icons/delete.svg" alt="Törlés">
+                                </button>
+                                <h2>Chatroom címe</h2> <!-- PHP-val generált -->
+                                <p>Chatroom leírása</p> <!-- PHP-val generált -->
+                                <p>Te, követők száma</p> <!-- PHP-val generált -->
+                            </div>
+                        `);
+                    } else {
+                        chatroomSection.insertAdjacentHTML('beforeend', `
+                            <div class="content_container chatroom_container">
+                                <a href="#" class="container_link chatroom_link" aria-label="Chatszoba megnyitása"></a>
+                                <button class="button small_button content_follow_button" aria-label="Követés">
+                                    <span class="icon_text">Követés</span>
+                                    <img src="icons/follow.svg" alt="Követés">
+                                </button>
+                                <button class="button small_button content_unfollow_button" aria-label="Követés megszüntetése" style="display: none;">
+                                    <span class="icon_text">Követés megszüntetése</span>
+                                    <img src="icons/unfollow.svg" alt="Követés megszüntetése">
+                                </button>
+                                <button class="button small_button content_report_button report_button" aria-label="Chatszoba jelentése">
+                                    <span class="icon_text">Jelentés</span>
+                                    <img src="icons/report.svg" alt="Chatszoba jelentése">
+                                </button>
+                                <h2>Chatszoba címe</h2> <!-- PHP-val generált -->
+                                <p>Chatszoba leírása</p> <!-- PHP-val generált -->
+                                <p>Létrehozó, követők száma</p> <!-- PHP-val generált -->
+                            </div>
+                        `);
+                    }
+                }
+            }
+        }
+    }
+    if (window.location.pathname.includes('subject.php')) {
+        generateSubjectChatrooms();
     }
 
     // Bejelentkezés és regisztráció közötti váltás
@@ -225,6 +628,12 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 
     function closeModal(modal) {
+        // Modal tartalom tetejére görgetés
+        const modalContent = modal.querySelector('.modal_content');
+        if (modalContent) {
+            modalContent.scrollTop = 0;
+        }
+        
         modal.classList.add('closing');
         setTimeout(function() {
             modal.classList.remove('closing');

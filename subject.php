@@ -55,54 +55,6 @@
                 </div>
             </div>
             <hr>
-            <!-- Ha nincsenek fájlok, display none nélkül -->
-            <h2 class="no_content_message" style="display: none;">Még nincsenek feltöltött fájlok ehhez a tárgyhoz.</h2>
-            <!-- Tárgy fájljai, később PHP-vel generálandó -->
-            <div class="content_container uploaded_files_container">
-                <a href="#" class="container_link file_details_link" aria-label="Fájl részletei"></a>
-                <button class="button small_button content_download_button" aria-label="Letöltés">
-                    <span class="icon_text">Letöltés</span>
-                    <img src="icons/download.svg" alt="Letöltés">
-                </button>
-                <div class="content_downloads">
-                    <span>42<span class="hideable_text"> letöltés</span></span>
-                    <img src="icons/download.svg" alt="Letöltések">
-                </div>
-                <div class="content_voting voting_container">
-                    <span class="vote_count hideable_text">17</span>
-                    <button class="button small_button content_downvote_button downvote_button" aria-label="Nem tetszik">
-                        <img src="icons/downvote.svg" alt="Nem tetszik">
-                    </button>  
-                    <button class="button small_button content_upvote_button upvote_button" aria-label="Tetszik">
-                        <img src="icons/upvote.svg" alt="Tetszik">
-                    </button>  
-                </div>
-                <h2>Fájl neve</h2>
-                <p>Fájl leírása</p>
-                <p>Feltöltő, feltöltés dátuma</p>
-            </div>
-            <!-- Generálandó rész vége -->
-            <!-- Felhasználó saját fájlja esetén, később PHP-vel generálandó -->
-            <div class="content_container uploaded_files_container">
-                <a href="#" class="container_link own_details_link" aria-label="Fájl részletei"></a>
-                <button class="button small_button content_download_button" aria-label="Letöltés">
-                    <span class="icon_text">Letöltés</span>
-                    <img src="icons/download.svg" alt="Letöltés">
-                </button>
-                <div class="content_downloads">
-                    <span>42<span class="hideable_text"> letöltés</span></span>
-                    <img src="icons/download.svg" alt="Letöltések">
-                </div>
-                <div class="content_voting voting_container hideable_content">
-                    <span class="vote_count">17</span>
-                    <img class="own_downvote_icon" src="icons/downvote.svg" alt="Nem tetszik">
-                    <img src="icons/upvote.svg" alt="Tetszik">
-                </div>
-                <h2>Fájl neve</h2>
-                <p>Fájl leírása</p>
-                <p>Te, feltöltés dátuma</p>
-            </div>
-            <!-- Generálandó rész vége -->
         </section>
         <section id="subject_kerelemek">
             <div class="section_header">
@@ -113,40 +65,6 @@
                 </button>
             </div>
             <hr>
-            <!-- Ha nincsenek kérelmek, display none nélkül -->
-            <h2 class="no_content_message" style="display: none;">Még nincsenek kérelmek ehhez a tárgyhoz.</h2>
-            <!-- Tárgy kérelmei, később PHP-vel generálandó -->
-            <div class="content_container request_container">
-                <a href="#" class="container_link upload_file_button" aria-label="Fájl feltöltése"></a>
-                <button class="button small_button content_upload_button upload_file_button" aria-label="Fájl feltöltése">
-                    <span class="icon_text">Fájl feltöltése</span>
-                    <img src="icons/upload.svg" alt="Fájl feltöltése">
-                </button>
-                <button class="button small_button content_report_button report_button" aria-label="Kérelem jelentése">
-                    <span class="icon_text">Jelentés</span>
-                    <img src="icons/report.svg" alt="Kérelem jelentése">
-                </button>
-                <h2>Kérelem címe</h2>
-                <p>Kérelem leírása</p>
-                <p>Kérelmező, feltöltés dátuma</p>
-            </div>
-            <!-- Generálandó rész vége -->
-            <!-- Felhasználó saját kérelme esetén, később PHP-vel generálandó -->
-            <div class="content_container request_container">
-                <a href="#" class="container_link own_uncompleted_requests_link" aria-label="Kérelem megnyitása"></a>
-                <button class="button small_button content_edit_button edit_request_button" aria-label="Szerkesztés">
-                    <span class="icon_text">Szerkesztés</span>
-                    <img src="icons/edit.svg" alt="Szerkesztés">
-                </button>
-                <button class="button small_button content_delete_button" aria-label="Törlés">
-                    <span class="icon_text">Törlés</span>
-                    <img src="icons/delete.svg" alt="Törlés">
-                </button>
-                <h2>Kérelem címe</h2>
-                <p>Kérelem leírása</p>
-                <p>Te, feltöltés dátuma</p>
-            </div>
-            <!-- Generálandó rész vége -->
         </section>
         <section id="subject_chatszobak">
             <div class="section_header">
@@ -157,44 +75,6 @@
                 </button>
             </div>
             <hr>
-            <!-- Ha nincsenek chatszobák, display none nélkül -->
-            <h2 class="no_content_message" style="display: none;">Még nincsenek chatszobák ehhez a tárgyhoz.</h2>
-            <!-- Tárgy chatszobái, később PHP-vel generálandó -->
-            <div class="content_container chatroom_container">
-                <a href="#" class="container_link chatroom_link" aria-label="Chatszoba megnyitása"></a>
-                <button class="button small_button content_follow_button" aria-label="Követés">
-                    <span class="icon_text">Követés</span>
-                    <img src="icons/follow.svg" alt="Követés">
-                </button>
-                <button class="button small_button content_unfollow_button" aria-label="Követés megszüntetése" style="display: none;">
-                    <span class="icon_text">Követés megszüntetése</span>
-                    <img src="icons/unfollow.svg" alt="Követés megszüntetése">
-                </button>
-                <button class="button small_button content_report_button report_button" aria-label="Chatszoba jelentése">
-                    <span class="icon_text">Jelentés</span>
-                    <img src="icons/report.svg" alt="Chatszoba jelentése">
-                </button>
-                <h2>Chatszoba címe</h2>
-                <p>Chatszoba leírása</p>
-                <p>Létrehozó, követők száma</p>
-            </div>
-            <!-- Generálandó rész vége -->
-            <!-- Felhasználó saját chatszobája esetén, később PHP-vel generálandó -->
-            <div class="content_container chatroom_container">
-                <a href="#" class="container_link chatroom_link" aria-label="Chatroom megnyitása"></a>
-                <button class="button small_button content_edit_button edit_chatroom_button" aria-label="Szerkesztés">
-                    <span class="icon_text">Szerkesztés</span>
-                    <img src="icons/edit.svg" alt="Szerkesztés">
-                </button>
-                <button class="button small_button content_delete_button" aria-label="Törlés">
-                    <span class="icon_text">Törlés</span>
-                    <img src="icons/delete.svg" alt="Törlés">
-                </button>
-                <h2>Chatroom címe</h2>
-                <p>Chatroom leírása</p>
-                <p>Te, követők száma</p>
-            </div>
-            <!-- Generálandó rész vége -->
         </section>
     </main>
     <div class="modal file_details_modal">
