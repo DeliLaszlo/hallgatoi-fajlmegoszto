@@ -32,7 +32,7 @@
                 <input type="email" id="registerEmail" name="email" placeholder="Email" required>
                 <input type="password" id="registerPassword" name="password" placeholder="Jelszó" required>
                 <input type="password" id="registerConfirmPassword" name="confirm_password" placeholder="Jelszó újra" required>
-                <button type="submit">Regisztráció</button>
+                <button type="submit" id="submit" name="submit">Regisztráció</button>
                 <a href="#" id="showLogin">Bejelentkezés</a>
             </form>
         </div>
