@@ -10,7 +10,7 @@ Hallgatói fájlmegosztó projektmunka, SZE 2025/26-1
 <ul>
     <li>A phpmyadmin kezelése:</li>
     <li>XAMPP-ban indítsd el a MySQL és Apache szolgáltatásokat.</li>
-    <li>A kezelőfelület megnyitása: <b>localhost/phpmyadmin</b>.</li>
+    <li>A kezelőfelület megnyitása: <b>localhost/phpmyadmin ezt elég a search bar-ba beírni</b>.</li>
     <li>Importáld az <b>adatbazis.sql</b> fájlt.</li>
     <li>A megfelelő adatbázis lenyitása után a táblákra kattintva tudod azokat módosítani.</li>
     <li>A <b>Szerkezet</b> fülön tudod módosítani a tábla felépítését.</li>
