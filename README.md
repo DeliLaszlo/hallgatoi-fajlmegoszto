@@ -8,7 +8,7 @@ Hallgatói fájlmegosztó projektmunka, SZE 2025/26-1
     <li>Böngészőn belül megnyitni a localhost/hallgatoi-fajlmegoszto/ kezdőoldalt</li>
 </ul>
 <ul>
-    <li>A phpmyadmin kezelése</li>
+    <li>A phpmyadmin kezelése:</li>
     <li>XAMPP-ban indítsd el a MySQL és Apache szolgáltatásokat.</li>
     <li>A kezelőfelület megnyitása: <b>localhost/phpmyadmin</b>.</li>
     <li>Importáld az <b>adatbazis.sql</b> fájlt.</li>
