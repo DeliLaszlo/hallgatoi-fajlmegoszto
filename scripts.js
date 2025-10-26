@@ -425,6 +425,44 @@ document.addEventListener('DOMContentLoaded', function() {
     const showRegisterLink = document.getElementById('showRegister');
     const showLoginLink = document.getElementById('showLogin');
 
+    if (loginDiv && registerDiv) {
+        if (window.location.hash === '#register') {
+            loginDiv.style.display = 'none';
+            registerDiv.style.display = 'block';
+            const neptunInput = document.getElementById('registerNeptun');
+            if (neptunInput) {
+                neptunInput.focus();
+            }
+        } else {
+            loginDiv.style.display = 'block';
+            registerDiv.style.display = 'none';
+            const neptunInput = document.getElementById('loginNeptun');
+            if (neptunInput) {
+                neptunInput.focus();
+            }
+        }
+    }
+
+    window.addEventListener('hashchange', function() {
+        if (loginDiv && registerDiv) {
+            if (window.location.hash === '#register') {
+                loginDiv.style.display = 'none';
+                registerDiv.style.display = 'block';
+                const neptunInput = document.getElementById('registerNeptun');
+                if (neptunInput) {
+                    neptunInput.focus();
+                }
+            } else {
+                loginDiv.style.display = 'block';
+                registerDiv.style.display = 'none';
+                const neptunInput = document.getElementById('loginNeptun');
+                if (neptunInput) {
+                    neptunInput.focus();
+                }
+            }
+        }
+    });
+
     if (showRegisterLink && showLoginLink) {
         showRegisterLink.addEventListener('click', function(e) {
             e.preventDefault();
