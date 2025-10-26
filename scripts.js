@@ -489,7 +489,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const patterns = {
         neptun: /^[A-Z0-9]{6}$/i,
         username: /^[a-zA-Z0-9_]{3,20}$/,
-        fullname: /^[a-zA-ZáéíóöőúüűÁÉÍÓÖŐÚÜŰ\s]{2,50}$/,
+        fullname: /^[a-zA-ZáéíóöőúüűÁÉÍÓÖŐÚÜŰ]+ [a-zA-ZáéíóöőúüűÁÉÍÓÖŐÚÜŰ\s]{1,49}$/,
         email: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
         password: /^(?=.*[A-Z])(?=.*\d).{8,}$/
     };
@@ -521,7 +521,7 @@ document.addEventListener('DOMContentLoaded', function() {
             // Teljes név
             if (!patterns.fullname.test(fullname)) {
                 e.preventDefault();
-                alert('A teljes név 2-50 karakter hosszú lehet, csak betűket és szóközöket tartalmazhat!');
+                alert('A teljes név 2-50 karakter hosszú lehet, csak betűket és legalább 1 szóközt tartalmazhat!');
                 return false;
             }
             
