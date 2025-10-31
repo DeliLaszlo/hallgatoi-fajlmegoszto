@@ -1,5 +1,5 @@
 <?php
-
+session_start();
 $conn = new mysqli("localhost", "root", "", "pm_db_fm_v1");
 
 // Csak akkor fusson, ha a felhasználó tényleg a Submit gombot nyomta meg
@@ -9,8 +9,10 @@ if (isset($_POST['submit'])) {
     $neptun = trim($_POST['neptun']);
     $nick = trim($_POST['username']);
     $password = trim($_POST['password']);
-    $vnev = trim($_POST['Vname']);
-    $knev = trim($_POST['Kname']);
+    $nev = trim($_POST['fullname']);
+    $parts = preg_split('/\s+/', $nev, 2, PREG_SPLIT_NO_EMPTY);
+    $vnev = $parts[0] ?? '';
+    $knev = $parts[1] ?? '';
     $email = trim($_POST['email']);
 
     $neptun = strtolower($neptun);
@@ -22,9 +24,13 @@ if (isset($_POST['submit'])) {
     $result = $conn->query($sql);
     $row = $result->fetch_assoc(); 
     if ($result->num_rows != 0) {
-        if($row['neptun'] == $neptun) {
+        if($row['neptun_k'] == $neptun) {
+            $_SESSION['register_neptun'] = $neptun;
+            $_SESSION['register_nickname'] = $nick;
+            $_SESSION['register_email'] = $email;
+            $_SESSION['register_fullname'] = $nev;
             echo '<script>alert("Ez a neptun kód már foglalt!")
-            window.location.href = "log_reg.php"; 
+            window.location.href = "log_reg.php#register"; 
             </script>'; //index.php
             exit;
         }
@@ -34,8 +40,12 @@ if (isset($_POST['submit'])) {
     $row = $result->fetch_assoc(); 
     if ($result->num_rows != 0) {
         if($row['nickname'] == $nick) {
+            $_SESSION['register_neptun'] = $neptun;
+            $_SESSION['register_nickname'] = $nick;
+            $_SESSION['register_email'] = $email;
+            $_SESSION['register_fullname'] = $nev;
             echo '<script>alert("Ez a felhasználónév már foglalt!")
-            window.location.href = "log_reg.php";
+            window.location.href = "log_reg.php#register";
             </script>'; //index.php
             exit;
         }
@@ -45,8 +55,12 @@ if (isset($_POST['submit'])) {
     $row = $result->fetch_assoc(); 
     if ($result->num_rows != 0) {
         if($row['email'] == $email) {
+            $_SESSION['register_neptun'] = $neptun;
+            $_SESSION['register_nickname'] = $nick;
+            $_SESSION['register_email'] = $email;
+            $_SESSION['register_fullname'] = $nev;
             echo '<script>alert("Ez az email cím már foglalt!")
-            window.location.href = "log_reg.php";
+            window.location.href = "log_reg.php#register";
             </script>'; //index.php
             exit;
         }
@@ -58,8 +72,7 @@ if (isset($_POST['submit'])) {
     // 6️⃣ Lekérdezés futtatása
     $stmt->execute();
 
-    echo "✅ Az adatok sikeresen elmentve az adatbázisba!";
-    echo "<br><a href='log_reg.php'>Vissza az űrlaphoz</a>"; //index.php
+    echo "<script>alert('✅ Sikeres regisztráció!'); window.location.href = 'log_reg.php';</script>";
 
   } catch (PDOException $e) {
     echo "❌ Hiba: " . $e->getMessage();

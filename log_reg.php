@@ -1,3 +1,27 @@
+<?php
+session_start();
+if (isset($_SESSION['login_neptun'])) {
+    $login_data = ['neptun' => $_SESSION['login_neptun']];
+}
+else {
+    $login_data = [];
+}
+
+$register_data = [
+    'neptun'   => $_SESSION['register_neptun']   ?? '',
+    'nickname' => $_SESSION['register_nickname'] ?? '',
+    'fullname' => $_SESSION['register_fullname'] ?? '',
+    'email'    => $_SESSION['register_email']    ?? '',
+];
+
+unset(
+    $_SESSION['login_neptun'],
+    $_SESSION['register_neptun'],
+    $_SESSION['register_nickname'],
+    $_SESSION['register_fullname'],
+    $_SESSION['register_email'],
+)
+?>
 <!DOCTYPE html>
 <html lang="hu">
 <head>
@@ -17,7 +41,7 @@
         <div id="login" >
             <h1>Bejelentkezés</h1>
             <form id="loginForm" action="login.php" method="post">
-                <input type="text" id="loginNeptun" name="neptun" placeholder="Neptun kód" required autofocus>
+                <input type="text" id="loginNeptun" name="neptun" value="<?php echo htmlspecialchars($login_data['neptun'] ?? ''); ?>" placeholder="Neptun kód" required autofocus>
                 <input type="password" id="loginPassword" name="password" placeholder="Jelszó" required>
                 <button type="submit">Bejelentkezés</button>
                 <a href="#" id="showRegister">Regisztráció</a>
@@ -26,10 +50,10 @@
         <div id="register" style="display: none;">
             <h1>Regisztráció</h1>
             <form id="registerForm" action="registration.php" method="post"> 
-                <input type="text" id="registerNeptun" name="neptun" placeholder="Neptun kód" required autofocus>
-                <input type="text" id="registerUsername" name="username" placeholder="Felhasználónév" required>
-                <input type="text" id="registerFullname" name="fullname" placeholder="Teljes név" required>
-                <input type="email" id="registerEmail" name="email" placeholder="Email" required>
+                <input type="text" id="registerNeptun" name="neptun" value="<?php echo htmlspecialchars($register_data['neptun'] ?? ''); ?>" placeholder="Neptun kód" required autofocus>
+                <input type="text" id="registerUsername" name="username" value="<?php echo htmlspecialchars($register_data['nickname'] ?? ''); ?>" placeholder="Felhasználónév" required>
+                <input type="text" id="registerFullname" name="fullname" value="<?php echo htmlspecialchars($register_data['fullname'] ?? ''); ?>" placeholder="Teljes név" required>
+                <input type="email" id="registerEmail" name="email" value="<?php echo htmlspecialchars($register_data['email'] ?? ''); ?>" placeholder="Email" required>
                 <input type="password" id="registerPassword" name="password" placeholder="Jelszó" required>
                 <input type="password" id="registerConfirmPassword" name="confirm_password" placeholder="Jelszó újra" required>
                 <button type="submit" id="submit" name="submit">Regisztráció</button>

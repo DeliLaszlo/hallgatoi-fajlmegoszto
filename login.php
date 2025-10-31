@@ -1,4 +1,5 @@
 <?php
+session_start();
 // Kapcsolódás az adatbázishoz, a root a felhasználó, jelszó alapbol nincs, ez az üres mező, az utolsó adat pedig az adatbázis neve
 $conn = new mysqli("localhost", "root", "", "pm_db_fm_v1");
 
@@ -19,20 +20,24 @@ $row = $result->fetch_assoc();
 
 if ($result->num_rows > 0) {
 } else {
+  $_SESSION['login_neptun'] = $neptun;
   echo '<script>alert("Ez az email cím vagy neptun kód nem szerepel az adatbázisban!")
   window.location.href = "log_reg.php"; 
-  </script>'; //index.php
+  </script>'; 
   exit;
 }
 
 
 if(password_verify($password, $row['password'])) {
-  echo "<br><a href='dashboard.php'>Irány a főoldal</a>";
+  $_SESSION['user_neptun'] = $neptun;
+  $_SESSION['last_activity'] = time();
+  echo '<script>window.location.href = "dashboard.php";</script>';
 }
 else {
-  echo '<script>alert("Téves jelszó!")
+  $_SESSION['login_neptun'] = $neptun;
+  echo '<script>alert("Ez az email cím vagy neptun kód nem szerepel az adatbázisban!")
   window.location.href = "log_reg.php";
-  </script>'; //index.php
+  </script>';
 }
 
 $conn->close();

@@ -1,42 +1,21 @@
-index.php:
-- Bejelentkezés, regisztráció kezelése, bejelentkezés gomb működtetése
+I. Kilistázás:
+1. Dashboard tárgyak, feltöltött fájlok, kérelmek, chatszobák, felvehető tárgyak kilistázása
+2. Dashboard tárgyakra kattintás a helyes tárgy oldalra vezessen
+3. Subject oldalcím felülírása, fájlok, kérelmek, chatszobák kilistázása
 
-dashboard.php:
-- Kijelentkezés gomb működtetése
-Tárgyaim fül:
-- Tárgyak megjelenítése, törlés kezelése, ha nincs tárgy akkor szöveg megjelenítése
-- Új tárgy gomb: Tárgyak megjelenítése, felvétel kezelése
-- Tárgyra kattintás átirányít a tárgy oldalára
-Feltöltött fájljaim fül:
-- Fájlok megjelenítése, törlés és letöltés kezelése, ha nincs fájl akkor szöveg megjelenítése
-- Fájl részletek felugró ablakon szerkesztés kezelése
-Kérelmeim fül:
-- Kérelmek megjelenítése, törlés kezelése, ha nincs kérelem akkor szöveg megjelenítése
-- Várakozó kérelem felugró ablakon szerkeztés kezelése
-- Teljesítétt kérelem felugró ablakon letöltés, lezárás, újraküldés kezelése
-Chatszobáim fül:
-- Chatszobák megjelenítése, törlés szerkesztés és unfollow kezelése, ha nincs chatszoba akkor szöveg megjelenítése
-- (Később) Chatszobára kattintás átirányít a chatszoba oldalára
-Profilom fül:
-- Adatok megjelenítése
-- Szerkesztés kezelése
+II. Gombok:
+1. Dashboard tárgyfelvétel, törlés gombok, letöltés gombok, követés megszüntetés gombok, szerkesztés gombok működtetése
+2. Subject új fájl feltöltés, új kérelem, új chatszoba, letöltés gombok, feltöltés gombok, törlés gombok, szerkesztés gombok, követés gombok működtetése
 
-subject.php:
-- Kijelentkezés és irányítópult gomb működtetése
-Feltöltött fájlok fül:
-- Fájlok megjelenítése, letöltés kezelése, ha nincs tárgy akkor szöveg megjelenítése
-- Fájl feltöltés kezelése
-- Fájl részletek felugró ablakon értékelés kezelése
-- Saját fájl részletek felugró ablakon törlés és szerkesztés kezelése
-- (Később) Jelentő felület kezelése
-Kérelmek fül:
-- Kérelmek megjelenítése, feltöltés szerkesztés törlés kezelése, ha nincs kérelem akkor szöveg megjelenítése
-- Új kérelem kezelése
-- (Később) Jelentő felület kezelése
-Chatszobák fül:
-- Chatszobák megjelenítése, follow/unfollow szerkesztés törlés kezelése, ha nincs chatszoba akkor szöveg megjelenítése
-- Új chatszoba kezelése
-- (Később) Chatszobára kattintás átirányít a chatszoba oldalára
-- (Később) Jelentő felület kezelése
+III. Profil szerkesztés:
+1. Felhasználó adatainak megjelenítése
+2. Adatszerkesztés kezelése
 
-(Később) -Chatszobák és admin jogosultságok kezelése
+IV. Felugró ablakok kezelése:
+1. Dashboard, subject - Fájl részletek megjelenítése, kérelem részletek megjelenítése
+2. Felugró ablakok gombjainak kezelése
+
+V. Később megoldandó dolgok
+- Chatszobák helyes chatszobához irányítsanak át
+- Jelentés gombok működtetése
+- Admin oldal kezelése
