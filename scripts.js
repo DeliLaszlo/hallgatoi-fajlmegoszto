@@ -1096,415 +1096,146 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     });
 
-// Chatszoba -- Work in Progress
+// Chatszoba
 (() => {
-  // Globális hibafigyelő
-  window.addEventListener('error', (e) => {
-    console.warn('[Chat] JS error:', e.message, e.filename, e.lineno, e.colno);
-  });
+    // Csak akkor fut, ha chatszoba oldalon vagyunk
+    const chatroomPage = document.getElementById('chatszobak');
+    if (!chatroomPage) return;
 
-  const Q = (sel, root = document) => root.querySelector(sel);
-  const QA = (sel, root = document) => Array.from(root.querySelectorAll(sel));
-  const root = () => Q('#chatszobak');
-  const els = () => ({
-    convList: Q('#chat_conv_list'),
-    messages: Q('#chat_messages'),
-    text:     Q('#chat_text'),
-    composer: Q('#chat_composer'),
-  });
-
-  if (!root()) return; // nincs chatszoba ezen az oldalon
-
-  // Egyszerű állapot a frontendhez
-  const state = {
-    activeId: '',
-    rooms: {} // id -> { id, title, messages: [{author,text,ts,me}] }
-  };
-
-  const pad = (n) => String(n).padStart(2, '0');
-  const nowStamp = () => {
-    const d = new Date();
-    return `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())} ${pad(d.getHours())}:${pad(d.getMinutes())}`;
-  };
-  const slugify = (name) => (name || 'room')
-    .toLowerCase()
-    .replace(/[áàâä]/g, 'a').replace(/[éèêë]/g, 'e')
-    .replace(/[íìîï]/g, 'i').replace(/[óòôöő]/g, 'o')
-    .replace(/[úùûüű]/g, 'u').replace(/[^a-z0-9]+/g, '-')
-    .replace(/^-+|-+$/g, '') || 'room';
-
-  function scrollToBottom() {
-    const e = els();
-    if (e.messages) {
-      e.messages.scrollTop = e.messages.scrollHeight;
+    // Chatszobák generálása
+    function generateChatrooms() {
+        const chatroomCount = 3; // Felhasználó saját és követett chatszobáinak száma, PHP-val generált
+        const chatConvList = document.getElementById('chat_conv_list');
+        if (chatConvList && chatroomCount > 0) {
+            chatConvList.innerHTML = '';
+            for (let i = 0; i < chatroomCount; i++) {
+                chatConvList.insertAdjacentHTML('beforeend', `
+                    <li><a class="chat_list_item" data-room-id="${i + 1}">Chatszoba ${i + 1}</a></li>
+                `); // TODO: Backend - Chatszoba név és ID PHP-ból
+            }
+        }
     }
-  }
+    generateChatrooms();
 
-  function renderMessages(id) {
-    const e = els();
-    const room = state.rooms[id];
-    if (!e.messages || !room) return;
-    e.messages.innerHTML = '';
-    room.messages.forEach(m => {
-      const row = document.createElement('div');
-      row.className = 'chat_row ' + (m.me ? 'me' : 'other');
-      row.innerHTML = `
-        <div class="chat_bubble ${m.me ? 'me' : ''}">
-          <div>${m.text}</div>
-          <div class="chat_meta">${m.author} • ${m.ts}</div>
-        </div>`;
-      e.messages.appendChild(row);
-    });
-    scrollToBottom();
-  }
+    const chatMessages = document.getElementById('chat_messages');
+    const chatText = document.getElementById('chat_text');
+    const chatComposer = document.getElementById('chat_composer');
+    const chatListItems = document.querySelectorAll('.chat_list_item');
+    let activeChatroomId = null;
 
-  function setActiveRoom(id) {
-    const e = els();
-    state.activeId = id;
-    if (e.convList) {
-      QA('.chat_list_item', e.convList).forEach(li => {
-        li.classList.toggle('active', li.dataset.id === id);
-      });
+    // Kezdeti chatszoba betöltése
+    const urlParams = new URLSearchParams(window.location.search);
+    const roomIdFromUrl = urlParams.get('roomId');
+    // Ha van roomId az URL-ben, próbáljuk meg betölteni azt, különben az első szobát
+    // Példa: chatszoba.php?roomId=2 
+    if (chatListItems.length > 0) {
+        let initialRoom = null;
+        if (roomIdFromUrl) {
+            initialRoom = Array.from(chatListItems).find(item => item.dataset.roomId === roomIdFromUrl);
+        }
+        if (!initialRoom) {
+            initialRoom = chatListItems[0];
+        }    
+        initialRoom.classList.add('active');
+        activeChatroomId = initialRoom.dataset.roomId;
+        
+        // TODO: Backend - Szoba üzeneteinek betöltése
+        
+        // Példa üzenet, törölhető
+        chatMessages.innerHTML = '<div class="chat_row other"><div class="chat_bubble"><div>Üdv a szobában!</div><div class="chat_meta">Rendszer • ' + getCurrentTimestamp() + '</div></div></div>';
     }
-    const room = state.rooms[id];
-    renderMessages(id);
-  }
 
-  // Kezdeti beolvasás a DOM-ból
-  (function bootstrapFromDOM() {
-    const e = els();
-    if (e.convList) {
-      QA('.chat_list_item', e.convList).forEach((li, idx) => {
-        const title = (Q('strong', li)?.textContent || `Szoba ${idx+1}`).trim();
-        const id = (li.dataset.id = (li.dataset.id || (idx === 0 ? 'general' : slugify(title))));
-        if (!state.rooms[id]) state.rooms[id] = { id, title, messages: [] };
-        if (li.classList.contains('active')) state.activeId = id;
-      });
-    }
-    if (!state.activeId) {
-      // ha nincs aktív kijelölés, válaszd az elsőt
-      const first = e.convList ? Q('.chat_list_item', e.convList) : null;
-      state.activeId = first ? (first.dataset.id || 'general') : 'general';
-    }
-    // kezdeti üzenetek a DOM-ból (ha vannak)
-    if (e.messages && state.rooms[state.activeId]) {
-      QA('.chat_row', e.messages).forEach(row => {
-        const me = row.classList.contains('me');
-        const bubble = Q('.chat_bubble', row);
-        const text = (Q('div:not(.chat_meta)', bubble)?.textContent || '').trim();
-        const meta = (Q('.chat_meta', bubble)?.textContent || '').trim();
-        let author = 'Ismeretlen', ts = nowStamp();
-        const m = meta.match(/^(.+)\s+•\s+(.+)$/);
-        if (m) { author = m[1]; ts = m[2]; }
-        state.rooms[state.activeId].messages.push({ author, text, ts, me });
-      });
-    }
-    // első render
-    setActiveRoom(state.activeId);
-  })();
+    // Chatszoba váltás
+    chatListItems.forEach((item) => {
+        item.addEventListener('click', function(e) {
+            e.preventDefault();
+            const selectedRoomId = this.dataset.roomId;
+            if (selectedRoomId === activeChatroomId) return;
+            chatListItems.forEach(li => li.classList.remove('active'));
+            this.classList.add('active');
+            const hamburger = document.querySelector('.hamburger');
+            const navMenu = document.querySelector('.nav-menu');
+            if (hamburger && navMenu) {
+                hamburger.classList.remove('active');
+                navMenu.classList.remove('active');
+                document.body.classList.remove('menu-open');
+            }
+            activeChatroomId = selectedRoomId;
 
-  document.addEventListener('click', (ev) => {
-    if (!root()) return;
-    const e = els();
-    const target = ev.target;
+            // TODO: Backend - Kiválasztott szoba üzeneteinek betöltése
 
-    // Listaelem aktiválása
-    const li = target.closest && target.closest('#chat_conv_list .chat_list_item');
-    if (li && els().convList && els().convList.contains(li)) {
-      ev.preventDefault();
-      setActiveRoom(li.dataset.id);
-      return;
-    }
-  });
-
-  // Üzenetküldés (űrlap submit)
-  function sendMessage() {
-    const e = els();
-    if (!e.text || !state.activeId || !state.rooms[state.activeId]) return;
-    const txt = (e.text.value || '').trim();
-    if (!txt) return;
-    const msg = { author: 'Én', text: txt, ts: nowStamp(), me: true };
-    state.rooms[state.activeId].messages.push(msg);
-
-    if (e.messages) {
-      const row = document.createElement('div');
-      row.className = 'chat_row me';
-      row.innerHTML = `
-        <div class="chat_bubble me">
-          <div>${msg.text}</div>
-          <div class="chat_meta">${msg.author} • ${msg.ts}</div>
-        </div>`;
-      e.messages.appendChild(row);
-    }
-    e.text.value = '';
-    scrollToBottom();
-  }
-
-    document.addEventListener('submit', (ev) => {
-        const form = ev.target;
-        if (!form || !form.matches || !form.matches('#chat_composer')) return;
-        ev.preventDefault();
-        sendMessage();
+            // Példa üzenet, törölhető
+            chatMessages.innerHTML = '<div class="chat_row other"><div class="chat_bubble"><div>Üdv a szobában!</div><div class="chat_meta">Rendszer • ' + getCurrentTimestamp() + '</div></div></div>';
+        });
     });
 
-  // Enter küldéshez
-  const e = els();
-  if (e.text) {
-    e.text.addEventListener('keydown', function(ev) {
-      if (ev.key === 'Enter' && !ev.shiftKey) {
-        ev.preventDefault();
-        sendMessage();
-      }
+    // Üzenet küldése
+    chatComposer.addEventListener('submit', function(e) {
+        e.preventDefault();
+        
+        const messageText = chatText.value.trim();
+        if (!messageText) return;
+
+        // TODO: Backend - Üzenet mentése adatbázisba
+
+        displayMessage(messageText, true);
+        chatText.value = '';
     });
-  }
-})();
 
-});
-
-const AVAILABLE_SUBJECTS_ENDPOINT = 'getAvailableSubjects.php';
-
-// Egyszerű debounce – gépelés közbeni szerverhívás csökkentésére
-function debounce(fn, wait = 300) {
-  let t;
-  return (...args) => { clearTimeout(t); t = setTimeout(() => fn(...args), wait); };
-}
-
-function renderMessage(container, text, cssClass = 'info') {
-  container.innerHTML = '';
-  const p = document.createElement('p');
-  p.className = `message ${cssClass}`;
-  p.textContent = text;
-  container.appendChild(p);
-}
-
-function renderAvailableSubjects(list, container) {
-  container.innerHTML = '';
-  if (!Array.isArray(list) || list.length === 0) {
-    renderMessage(container, 'Nincsenek felvehető tárgyak.', 'empty');
-    return;
-  }
-  const frag = document.createDocumentFragment();
-  list.forEach(it => {
-    const wrap = document.createElement('div');
-    wrap.className = 'available_subject_container';
-
-    const title = document.createElement('h2');
-    title.textContent = it.class_name ?? it.class_code ?? 'Ismeretlen tárgy';
-    wrap.appendChild(title);
-
-    const code = document.createElement('p');
-    code.textContent = it.class_code ?? '';
-    wrap.appendChild(code);
-
-    // Később ide jön a "Felvétel" gomb
-    frag.appendChild(wrap);
-  });
-  container.appendChild(frag);
-}
-
-async function loadAvailableSubjects({ q = '', page = 1, pageSize = 20 } = {}) {
-  const container = document.querySelector('#subject_list_container');
-  if (!container) return;
-
-  renderMessage(container, 'Betöltés…', 'loading');
-
-  const params = new URLSearchParams();
-  if (q && q.trim() !== '') params.set('q', q.trim());
-  params.set('page', String(page));
-  params.set('pageSize', String(pageSize));
-
-  const url = `${AVAILABLE_SUBJECTS_ENDPOINT}?${params.toString()}`;
-
-  try {
-    const res = await fetch(url, { credentials: 'same-origin' }); // session cookie megy
-    if (!res.ok) {
-      if (res.status === 401) {
-        renderMessage(container, 'Bejelentkezés szükséges (lejárt a munkamenet).', 'error');
-        return;
-      }
-      throw new Error('Hiba a betöltés közben');
-    }
-    const payload = await res.json();
-    const list = Array.isArray(payload) ? payload : (payload.data || []);
-    renderAvailableSubjects(list, container);
-  } catch (err) {
-    console.error(err);
-    renderMessage(container, 'Nem sikerült betölteni a tárgyakat.', 'error');
-  }
-}
-
-function attachAvailableSubjectSearch() {
-  const input = document.querySelector('#subject_search_input');
-  if (!input) return;
-  if (input.dataset.bound === '1') return; // ne kössük duplán
-  input.dataset.bound = '1';
-
-  const handler = debounce(() => {
-    loadAvailableSubjects({ q: input.value });
-  }, 300);
-  input.addEventListener('input', handler);
-}
-
-// A TELJES bekötést a DOM betöltése után végezzük:
-document.addEventListener('DOMContentLoaded', () => {
-  // amikor a + Tárgy felvétele gomb megnyitjuk, töltsük be a listát
-  document.querySelectorAll('.add_subject_button').forEach(btn => {
-    btn.addEventListener('click', () => {
-      attachAvailableSubjectSearch();
-      loadAvailableSubjects({ q: '' });
+    // Enter küldéshez
+    chatText.addEventListener('keydown', function(e) {
+        if (e.key === 'Enter' && !e.shiftKey) {
+            e.preventDefault();
+            chatComposer.dispatchEvent(new Event('submit'));
+        }
     });
-  });
-});
 
-// Profilom rész
-
-// Betöltés a backendről és mezők kitöltése
-async function loadProfile() {
-  try {
-    const res = await fetch('profile_get.php', { credentials: 'same-origin' });
-    if (!res.ok) throw new Error(res.status === 401 ? 'UNAUTH' : 'LOAD_ERROR');
-    const { ok, data, error } = await res.json();
-    if (!ok) throw new Error(error?.message || 'LOAD_ERROR');
-
-    const { neptun_k, nickname, fullname, email } = data;
-
-    const $ = sel => document.querySelector(sel);
-    $('#profile_username') && ($('#profile_username').value = nickname || '');
-    $('#profile_fullname') && ($('#profile_fullname').value = fullname || '');
-    $('#profile_neptun') && ($('#profile_neptun').value = neptun_k || '');
-    $('#profile_email') && ($('#profile_email').value = email || '');
-
-  } catch (e) {
-    console.warn('Profile load failed:', e.message);
-  }
-}
-
-// Mentés
-async function saveProfile() {
-  const $ = sel => document.querySelector(sel);
-
-  const payload = {
-    nickname: $('#profile_username')?.value?.trim() || '',
-    fullname: $('#profile_fullname')?.value?.trim() || '',
-    email:    $('#profile_email')?.value?.trim() || '',
-    current_password: $('#profile_current_password')?.value || '',
-    new_password:     $('#profile_new_password')?.value || '',
-    new_password_confirm: $('#profile_new_password_confirm')?.value || ''
-  };
-
-  try {
-    const res = await fetch('profile_update.php', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      credentials: 'same-origin',
-      body: JSON.stringify(payload)
-    });
-    const json = await res.json().catch(() => ({}));
-
-    if (!res.ok || json.ok === false) {
-      const msg = json?.error?.message || (res.status === 401 ? 'UNAUTH' : 'SAVE_ERROR');
-      alert('Hiba a mentés közben: ' + msg);
-      return;
+    // Üzenet megjelenítése
+    function displayMessage(text, isMe = false) {
+        const messageDiv = document.createElement('div');
+        messageDiv.className = `chat_row ${isMe ? 'me' : 'other'}`;
+        messageDiv.innerHTML = `
+            <div class="chat_bubble ${isMe ? 'me' : ''}">
+                <div>${escapeHtml(text)}</div>
+                <div class="chat_meta">${isMe ? 'Én' : 'Felhasználó'} • ${getCurrentTimestamp()}</div>
+            </div>
+        `; // TODO: Backend - Felhasználónév és időbélyeg az adatbázisból
+        chatMessages.appendChild(messageDiv);
+        chatMessages.scrollTop = chatMessages.scrollHeight;
     }
 
-    // Siker – álljunk vissza readonly módba, jelszómezőket ürítsük
-    alert('Profil mentve.');
-    ['#profile_current_password', '#profile_new_password', '#profile_new_password_confirm']
-      .forEach(id => { const el = document.querySelector(id); if (el) el.value = ''; });
-
-    // Vissza readonly
-    const inputs = ['#profile_username','#profile_fullname','#profile_neptun','#profile_email']
-      .map(id => document.querySelector(id))
-      .filter(Boolean);
-    inputs.forEach(input => { input.setAttribute('readonly', 'readonly'); input.removeAttribute('required'); });
-
-    const passwordFields = document.querySelector('#password_fields');
-    if (passwordFields) passwordFields.style.display = 'none';
-
-    const editBtns = document.querySelector('#profile_edit_buttons');
-    const editBtn  = document.querySelector('.edit_profile_button');
-    if (editBtns) editBtns.style.display = 'none';
-    if (editBtn)  editBtn.style.display  = 'inline-block';
-
-  } catch (e) {
-    alert('Váratlan hiba a mentés közben.');
-  }
-}
-
-// Események bekötése a Profil részhez
-document.addEventListener('DOMContentLoaded', () => {
-  // Betöltés
-  loadProfile();
-
-  // Mentés gomb
-  const saveBtn = document.querySelector('#profile_save_button');
-  if (saveBtn) {
-    saveBtn.addEventListener('click', (e) => {
-      e.preventDefault();
-      saveProfile();
-    });
-  }
-});
-async function loadProfile() {
-  try {
-    const res = await fetch('profile_get.php', { credentials: 'same-origin' });
-    if (!res.ok) return;
-    const json = await res.json();
-    if (!json.ok) return;
-
-    const { neptun_k, nickname, fullname, email } = json.data || {};
-    const $ = s => document.querySelector(s);
-    $('#profile_username') && ($('#profile_username').value = nickname || '');
-    $('#profile_fullname') && ($('#profile_fullname').value = fullname || '');
-    $('#profile_neptun') && ($('#profile_neptun').value = neptun_k || '');
-    $('#profile_email') && ($('#profile_email').value = email || '');
-  } catch (_) {}
-}
-
-async function saveProfile() {
-  const $ = s => document.querySelector(s);
-  const payload = {
-    nickname: $('#profile_username')?.value?.trim() || '',
-    fullname: $('#profile_fullname')?.value?.trim() || '',
-    email:    $('#profile_email')?.value?.trim() || '',
-    current_password: $('#profile_current_password')?.value || '',
-    new_password:     $('#profile_new_password')?.value || '',
-    new_password_confirm: $('#profile_new_password_confirm')?.value || ''
-  };
-
-  try {
-    const res = await fetch('profile_update.php', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      credentials: 'same-origin',
-      body: JSON.stringify(payload)
-    });
-    const json = await res.json().catch(() => ({}));
-
-    if (!res.ok || json.ok === false) {
-      alert('Hiba a mentés közben: ' + (json?.error?.message || res.status));
-      return;
+    // Időbélyeg formázása
+    function getCurrentTimestamp() {
+        const now = new Date();
+        return `${now.getFullYear()}-${pad(now.getMonth() + 1)}-${pad(now.getDate())} ${pad(now.getHours())}:${pad(now.getMinutes())}`;
     }
 
-    alert('Profil mentve.'); // <- ezt hiányoltad
+    function pad(num) {
+        return String(num).padStart(2, '0');
+    }
 
-    // mezők vissza readonly módba
-    ['#profile_username','#profile_fullname','#profile_neptun','#profile_email'].forEach(id => {
-      const el = document.querySelector(id);
-      if (el) { el.setAttribute('readonly','readonly'); el.removeAttribute('required'); }
-    });
-    const pw = document.getElementById('password_fields');
-    if (pw) pw.style.display = 'none';
-    const editBtns = document.getElementById('profile_edit_buttons');
-    if (editBtns) editBtns.style.display = 'none';
-    const editBtn = document.querySelector('.edit_profile_button');
-    if (editBtn) editBtn.style.display = 'inline-block';
+    // HTML escape - megakadályozza, hogy rosszindulatú HTML/JavaScript kód fusson le
+    function escapeHtml(text) {
+        const div = document.createElement('div');
+        div.textContent = text;
+        return div.innerHTML;
+    }
 
-    // jelszómezők ürítése
-    ['#profile_current_password','#profile_new_password','#profile_new_password_confirm']
-      .forEach(id => { const el = document.querySelector(id); if (el) el.value = ''; });
+    // Chatszoba keresés
+    const chatroomSearchInput = document.getElementById('chatroom_search_input');
+    if (chatroomSearchInput) {
+        chatroomSearchInput.addEventListener('input', function() {
+            const searchTerm = this.value.toLowerCase().trim();
+            chatListItems.forEach(function(item) {
+                const chatroomName = item.textContent.toLowerCase();
+                if (searchTerm === '' || chatroomName.includes(searchTerm)) {
+                    item.parentElement.style.display = 'block';
+                } else {
+                    item.parentElement.style.display = 'none';
+                }
+            });
+        });
+    }
 
-  } catch {
-    alert('Váratlan hiba a mentés közben.');
-  }
-}
+    // TODO: Backend - Új üzenetek időszakos lekérése (pl. AJAX segítségével)
+})()});

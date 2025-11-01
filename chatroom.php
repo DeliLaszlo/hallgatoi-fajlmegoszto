@@ -19,11 +19,13 @@
     </button>
     <nav class="nav-menu">
       <h1>Chatszobáim</h1>
-      <ul id="chat_conv_list">
-        <li><a class="chat_list_item active">Általános</a></li>
-        <li><a class="chat_list_item">Projekt</a></li>
-        <li><a class="chat_list_item">Vizsga</a></li>
-      </ul>
+      <div class="search_container chatroom_search_container">
+        <input type="text" id="chatroom_search_input" placeholder="Chatszoba keresése..." aria-label="Chatszoba keresése">
+        <button id="chatroom_search_button" aria-label="Keresés">
+          <img src="icons/search.svg" alt="Keresés">
+        </button>
+      </div>
+      <ul id="chat_conv_list"></ul>
       <ul>
         <li>
           <button class="dark-mode-toggle" aria-label="Sötét mód váltás">
@@ -32,7 +34,7 @@
           </button>
         </li>
       </ul>
-      <a href="#" class="go_back_button">
+      <a href="javascript:history.back()" class="go_back_button">
         <img src="icons/arrowback.svg" alt="Irányítópult" class="dashboard-icon">
         <span>Vissza</span>
       </a>
@@ -47,22 +49,7 @@
     <div id="chatszobak">
       <div class="chat_layout">
         <section class="chat_window">
-          <div id="chat_messages" class="chat_messages" aria-live="polite">
-            <!-- Minta üzenetek – eltávolítható -->
-            <div class="chat_row other">
-              <div class="chat_bubble">
-                <div>Szia, hogy haladsz a beadandóval?</div>
-                <div class="chat_meta">Anna • 2025-10-23 10:00</div>
-              </div>
-            </div>
-            <div class="chat_row me">
-              <div class="chat_bubble me">
-                <div>Már majdnem kész, ma este befejezem!</div>
-                <div class="chat_meta">Én • 2025-10-23 10:01</div>
-              </div>
-            </div>
-            <!-- Minta üzenetek vége --> 
-          </div>
+          <div id="chat_messages" class="chat_messages" aria-live="polite"></div>
           <form id="chat_composer" class="chat_input">
             <textarea id="chat_text" maxlength="2000" placeholder="Írj üzenetet..." required></textarea>
             <button class="button small_button send_message_button" type="submit">
@@ -73,7 +60,7 @@
       </div>
     </div>
   </main>
-  <script type="text/javascript" src="scripts.js?v=2"></script>
+  <script type="text/javascript" src="scripts.js"></script>
 </body>
 
 </html>
