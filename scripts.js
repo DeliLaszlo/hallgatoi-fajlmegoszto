@@ -1058,167 +1058,146 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     });
 
-// Chatszoba -- Work in Progress
+// Chatszoba
 (() => {
-  // Globális hibafigyelő
-  window.addEventListener('error', (e) => {
-    console.warn('[Chat] JS error:', e.message, e.filename, e.lineno, e.colno);
-  });
+    // Csak akkor fut, ha chatszoba oldalon vagyunk
+    const chatroomPage = document.getElementById('chatszobak');
+    if (!chatroomPage) return;
 
-  const Q = (sel, root = document) => root.querySelector(sel);
-  const QA = (sel, root = document) => Array.from(root.querySelectorAll(sel));
-  const root = () => Q('#chatszobak');
-  const els = () => ({
-    convList: Q('#chat_conv_list'),
-    messages: Q('#chat_messages'),
-    text:     Q('#chat_text'),
-    composer: Q('#chat_composer'),
-  });
-
-  if (!root()) return; // nincs chatszoba ezen az oldalon
-
-  // Egyszerű állapot a frontendhez
-  const state = {
-    activeId: '',
-    rooms: {} // id -> { id, title, messages: [{author,text,ts,me}] }
-  };
-
-  const pad = (n) => String(n).padStart(2, '0');
-  const nowStamp = () => {
-    const d = new Date();
-    return `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())} ${pad(d.getHours())}:${pad(d.getMinutes())}`;
-  };
-  const slugify = (name) => (name || 'room')
-    .toLowerCase()
-    .replace(/[áàâä]/g, 'a').replace(/[éèêë]/g, 'e')
-    .replace(/[íìîï]/g, 'i').replace(/[óòôöő]/g, 'o')
-    .replace(/[úùûüű]/g, 'u').replace(/[^a-z0-9]+/g, '-')
-    .replace(/^-+|-+$/g, '') || 'room';
-
-  function scrollToBottom() {
-    const e = els();
-    if (e.messages) {
-      e.messages.scrollTop = e.messages.scrollHeight;
+    // Chatszobák generálása
+    function generateChatrooms() {
+        const chatroomCount = 3; // Felhasználó saját és követett chatszobáinak száma, PHP-val generált
+        const chatConvList = document.getElementById('chat_conv_list');
+        if (chatConvList && chatroomCount > 0) {
+            chatConvList.innerHTML = '';
+            for (let i = 0; i < chatroomCount; i++) {
+                chatConvList.insertAdjacentHTML('beforeend', `
+                    <li><a class="chat_list_item" data-room-id="${i + 1}">Chatszoba ${i + 1}</a></li>
+                `); // TODO: Backend - Chatszoba név és ID PHP-ból
+            }
+        }
     }
-  }
+    generateChatrooms();
 
-  function renderMessages(id) {
-    const e = els();
-    const room = state.rooms[id];
-    if (!e.messages || !room) return;
-    e.messages.innerHTML = '';
-    room.messages.forEach(m => {
-      const row = document.createElement('div');
-      row.className = 'chat_row ' + (m.me ? 'me' : 'other');
-      row.innerHTML = `
-        <div class="chat_bubble ${m.me ? 'me' : ''}">
-          <div>${m.text}</div>
-          <div class="chat_meta">${m.author} • ${m.ts}</div>
-        </div>`;
-      e.messages.appendChild(row);
-    });
-    scrollToBottom();
-  }
+    const chatMessages = document.getElementById('chat_messages');
+    const chatText = document.getElementById('chat_text');
+    const chatComposer = document.getElementById('chat_composer');
+    const chatListItems = document.querySelectorAll('.chat_list_item');
+    let activeChatroomId = null;
 
-  function setActiveRoom(id) {
-    const e = els();
-    state.activeId = id;
-    if (e.convList) {
-      QA('.chat_list_item', e.convList).forEach(li => {
-        li.classList.toggle('active', li.dataset.id === id);
-      });
+    // Kezdeti chatszoba betöltése
+    const urlParams = new URLSearchParams(window.location.search);
+    const roomIdFromUrl = urlParams.get('roomId');
+    // Ha van roomId az URL-ben, próbáljuk meg betölteni azt, különben az első szobát
+    // Példa: chatszoba.php?roomId=2 
+    if (chatListItems.length > 0) {
+        let initialRoom = null;
+        if (roomIdFromUrl) {
+            initialRoom = Array.from(chatListItems).find(item => item.dataset.roomId === roomIdFromUrl);
+        }
+        if (!initialRoom) {
+            initialRoom = chatListItems[0];
+        }    
+        initialRoom.classList.add('active');
+        activeChatroomId = initialRoom.dataset.roomId;
+        
+        // TODO: Backend - Szoba üzeneteinek betöltése
+        
+        // Példa üzenet, törölhető
+        chatMessages.innerHTML = '<div class="chat_row other"><div class="chat_bubble"><div>Üdv a szobában!</div><div class="chat_meta">Rendszer • ' + getCurrentTimestamp() + '</div></div></div>';
     }
-    const room = state.rooms[id];
-    renderMessages(id);
-  }
 
-  // Kezdeti beolvasás a DOM-ból
-  (function bootstrapFromDOM() {
-    const e = els();
-    if (e.convList) {
-      QA('.chat_list_item', e.convList).forEach((li, idx) => {
-        const title = (Q('strong', li)?.textContent || `Szoba ${idx+1}`).trim();
-        const id = (li.dataset.id = (li.dataset.id || (idx === 0 ? 'general' : slugify(title))));
-        if (!state.rooms[id]) state.rooms[id] = { id, title, messages: [] };
-        if (li.classList.contains('active')) state.activeId = id;
-      });
-    }
-    if (!state.activeId) {
-      // ha nincs aktív kijelölés, válaszd az elsőt
-      const first = e.convList ? Q('.chat_list_item', e.convList) : null;
-      state.activeId = first ? (first.dataset.id || 'general') : 'general';
-    }
-    // kezdeti üzenetek a DOM-ból (ha vannak)
-    if (e.messages && state.rooms[state.activeId]) {
-      QA('.chat_row', e.messages).forEach(row => {
-        const me = row.classList.contains('me');
-        const bubble = Q('.chat_bubble', row);
-        const text = (Q('div:not(.chat_meta)', bubble)?.textContent || '').trim();
-        const meta = (Q('.chat_meta', bubble)?.textContent || '').trim();
-        let author = 'Ismeretlen', ts = nowStamp();
-        const m = meta.match(/^(.+)\s+•\s+(.+)$/);
-        if (m) { author = m[1]; ts = m[2]; }
-        state.rooms[state.activeId].messages.push({ author, text, ts, me });
-      });
-    }
-    // első render
-    setActiveRoom(state.activeId);
-  })();
+    // Chatszoba váltás
+    chatListItems.forEach((item) => {
+        item.addEventListener('click', function(e) {
+            e.preventDefault();
+            const selectedRoomId = this.dataset.roomId;
+            if (selectedRoomId === activeChatroomId) return;
+            chatListItems.forEach(li => li.classList.remove('active'));
+            this.classList.add('active');
+            const hamburger = document.querySelector('.hamburger');
+            const navMenu = document.querySelector('.nav-menu');
+            if (hamburger && navMenu) {
+                hamburger.classList.remove('active');
+                navMenu.classList.remove('active');
+                document.body.classList.remove('menu-open');
+            }
+            activeChatroomId = selectedRoomId;
 
-  document.addEventListener('click', (ev) => {
-    if (!root()) return;
-    const e = els();
-    const target = ev.target;
+            // TODO: Backend - Kiválasztott szoba üzeneteinek betöltése
 
-    // Listaelem aktiválása
-    const li = target.closest && target.closest('#chat_conv_list .chat_list_item');
-    if (li && els().convList && els().convList.contains(li)) {
-      ev.preventDefault();
-      setActiveRoom(li.dataset.id);
-      return;
-    }
-  });
-
-  // Üzenetküldés (űrlap submit)
-  function sendMessage() {
-    const e = els();
-    if (!e.text || !state.activeId || !state.rooms[state.activeId]) return;
-    const txt = (e.text.value || '').trim();
-    if (!txt) return;
-    const msg = { author: 'Én', text: txt, ts: nowStamp(), me: true };
-    state.rooms[state.activeId].messages.push(msg);
-
-    if (e.messages) {
-      const row = document.createElement('div');
-      row.className = 'chat_row me';
-      row.innerHTML = `
-        <div class="chat_bubble me">
-          <div>${msg.text}</div>
-          <div class="chat_meta">${msg.author} • ${msg.ts}</div>
-        </div>`;
-      e.messages.appendChild(row);
-    }
-    e.text.value = '';
-    scrollToBottom();
-  }
-
-    document.addEventListener('submit', (ev) => {
-        const form = ev.target;
-        if (!form || !form.matches || !form.matches('#chat_composer')) return;
-        ev.preventDefault();
-        sendMessage();
+            // Példa üzenet, törölhető
+            chatMessages.innerHTML = '<div class="chat_row other"><div class="chat_bubble"><div>Üdv a szobában!</div><div class="chat_meta">Rendszer • ' + getCurrentTimestamp() + '</div></div></div>';
+        });
     });
 
-  // Enter küldéshez
-  const e = els();
-  if (e.text) {
-    e.text.addEventListener('keydown', function(ev) {
-      if (ev.key === 'Enter' && !ev.shiftKey) {
-        ev.preventDefault();
-        sendMessage();
-      }
-    });
-  }
-})();
+    // Üzenet küldése
+    chatComposer.addEventListener('submit', function(e) {
+        e.preventDefault();
+        
+        const messageText = chatText.value.trim();
+        if (!messageText) return;
 
-});
+        // TODO: Backend - Üzenet mentése adatbázisba
+
+        displayMessage(messageText, true);
+        chatText.value = '';
+    });
+
+    // Enter küldéshez
+    chatText.addEventListener('keydown', function(e) {
+        if (e.key === 'Enter' && !e.shiftKey) {
+            e.preventDefault();
+            chatComposer.dispatchEvent(new Event('submit'));
+        }
+    });
+
+    // Üzenet megjelenítése
+    function displayMessage(text, isMe = false) {
+        const messageDiv = document.createElement('div');
+        messageDiv.className = `chat_row ${isMe ? 'me' : 'other'}`;
+        messageDiv.innerHTML = `
+            <div class="chat_bubble ${isMe ? 'me' : ''}">
+                <div>${escapeHtml(text)}</div>
+                <div class="chat_meta">${isMe ? 'Én' : 'Felhasználó'} • ${getCurrentTimestamp()}</div>
+            </div>
+        `; // TODO: Backend - Felhasználónév és időbélyeg az adatbázisból
+        chatMessages.appendChild(messageDiv);
+        chatMessages.scrollTop = chatMessages.scrollHeight;
+    }
+
+    // Időbélyeg formázása
+    function getCurrentTimestamp() {
+        const now = new Date();
+        return `${now.getFullYear()}-${pad(now.getMonth() + 1)}-${pad(now.getDate())} ${pad(now.getHours())}:${pad(now.getMinutes())}`;
+    }
+
+    function pad(num) {
+        return String(num).padStart(2, '0');
+    }
+
+    // HTML escape - megakadályozza, hogy rosszindulatú HTML/JavaScript kód fusson le
+    function escapeHtml(text) {
+        const div = document.createElement('div');
+        div.textContent = text;
+        return div.innerHTML;
+    }
+
+    // Chatszoba keresés
+    const chatroomSearchInput = document.getElementById('chatroom_search_input');
+    if (chatroomSearchInput) {
+        chatroomSearchInput.addEventListener('input', function() {
+            const searchTerm = this.value.toLowerCase().trim();
+            chatListItems.forEach(function(item) {
+                const chatroomName = item.textContent.toLowerCase();
+                if (searchTerm === '' || chatroomName.includes(searchTerm)) {
+                    item.parentElement.style.display = 'block';
+                } else {
+                    item.parentElement.style.display = 'none';
+                }
+            });
+        });
+    }
+
+    // TODO: Backend - Új üzenetek időszakos lekérése (pl. AJAX segítségével)
+})()});
