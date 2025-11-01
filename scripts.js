@@ -1125,23 +1125,29 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // Kezdeti chatszoba betöltése
     const urlParams = new URLSearchParams(window.location.search);
-    const roomIdFromUrl = urlParams.get('roomId');
-    // Ha van roomId az URL-ben, próbáljuk meg betölteni azt, különben az első szobát
-    // Példa: chatszoba.php?roomId=2 
-    if (chatListItems.length > 0) {
-        let initialRoom = null;
-        if (roomIdFromUrl) {
-            initialRoom = Array.from(chatListItems).find(item => item.dataset.roomId === roomIdFromUrl);
+    const roomIdFromUrl = urlParams.get('room_id');
+    
+    if (roomIdFromUrl) {
+        const roomInList = Array.from(chatListItems).find(item => item.dataset.roomId === roomIdFromUrl);
+        if (roomInList) {
+            roomInList.classList.add('active');
+            activeChatroomId = roomInList.dataset.roomId;
+        } else {
+            // Ha a felhasználó nem része a szobának
+            // TODO: Backend - Ellenőrizd, hogy a szoba létezik-e
+            
+            activeChatroomId = roomIdFromUrl;
         }
-        if (!initialRoom) {
-            initialRoom = chatListItems[0];
-        }    
-        initialRoom.classList.add('active');
-        activeChatroomId = initialRoom.dataset.roomId;
+        // TODO: Backend - Szoba üzeneteinek betöltése
+        chatMessages.innerHTML = '<div class="chat_row other"><div class="chat_bubble"><div>Üdv a szobában!</div><div class="chat_meta">Rendszer • ' + getCurrentTimestamp() + '</div></div></div>';
+    } 
+    else if (chatListItems.length > 0) {
+        const firstRoom = chatListItems[0];
+        firstRoom.classList.add('active');
+        activeChatroomId = firstRoom.dataset.roomId;
         
         // TODO: Backend - Szoba üzeneteinek betöltése
         
-        // Példa üzenet, törölhető
         chatMessages.innerHTML = '<div class="chat_row other"><div class="chat_bubble"><div>Üdv a szobában!</div><div class="chat_meta">Rendszer • ' + getCurrentTimestamp() + '</div></div></div>';
     }
 
