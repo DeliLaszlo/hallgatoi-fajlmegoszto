@@ -32,30 +32,44 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     // Dashboard tárgyak generálása
-    function generateSubjects() {
-        const subjectCount = 3; // Felhasználó fájlainak száma, PHP-val generált
+    async function generateSubjects() {
         const subjectSection = document.getElementById('dashboard_targyak');
-        if (subjectSection) {
-            if (subjectCount === 0) {
+        if (!subjectSection) return;
+
+        try {
+            const response = await fetch('get_user_subjects.php');
+            
+            if (!response.ok) {
+                throw new Error('Failed to fetch subjects');
+            }
+            
+            const subjects = await response.json();
+            
+            if (subjects.length === 0) {
                 subjectSection.insertAdjacentHTML('beforeend', 
                     '<h2 class="no_content_message">Még nincsenek felvett tárgyaid.</h2>'
                 );
             } else {
-                for (let i = 0; i < subjectCount; i++) {
+                subjects.forEach(subject => {
                     subjectSection.insertAdjacentHTML('beforeend', `
                         <div class="content_container own_subject_container">
-                            <a href="#" class="container_link subject_link" aria-label="Tárgy megnyitása"></a>
+                            <a href="subject.php?class_code=${encodeURIComponent(subject.class_code)}" class="container_link subject_link" aria-label="Tárgy megnyitása"></a>
                             <button class="button small_button content_delete_button" aria-label="Törlés">
                                 <span class="icon_text">Törlés</span>
                                 <img src="icons/delete.svg" alt="Törlés">
                             </button>
-                            <h2>Tárgy neve</h2> <!-- PHP-val generált -->
-                            <p>Tárgy kódja</p> <!-- PHP-val generált -->
-                            <p>Fájlok száma, kérelmek száma</p> <!-- PHP-val generált -->
+                            <h2>${subject.class_name}</h2>
+                            <p>${subject.class_code}</p>
+                            <p>${subject.file_count} fájl, ${subject.request_count} kérelem</p>
                         </div>
                     `);
-                }
+                });
             }
+        } catch (error) {
+            console.error('Error loading subjects:', error);
+            subjectSection.insertAdjacentHTML('beforeend', 
+                '<h2 class="no_content_message">Hiba történt a tárgyak betöltésekor.</h2>'
+            );
         }
     }
     if (window.location.pathname.includes('dashboard.php')) {
