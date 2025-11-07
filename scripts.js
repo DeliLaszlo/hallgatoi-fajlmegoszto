@@ -32,7 +32,7 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     // Dashboard tárgyak generálása
-    /*function generateSubjects() {
+    /*/*function generateSubjects() {
         const subjectCount = 3; // Felhasználó fájlainak száma, PHP-val generált
         const subjectSection = document.getElementById('dashboard_targyak');
         if (subjectSection) {
@@ -1245,3 +1245,251 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // TODO: Backend - Új üzenetek időszakos lekérése (pl. AJAX segítségével)
 })()});
+
+const AVAILABLE_SUBJECTS_ENDPOINT = 'getAvailableSubjects.php';
+
+// Egyszerű debounce – gépelés közbeni szerverhívás csökkentésére
+function debounce(fn, wait = 300) {
+  let t;
+  return (...args) => { clearTimeout(t); t = setTimeout(() => fn(...args), wait); };
+}
+
+function renderMessage(container, text, cssClass = 'info') {
+  container.innerHTML = '';
+  const p = document.createElement('p');
+  p.className = `message ${cssClass}`;
+  p.textContent = text;
+  container.appendChild(p);
+}
+
+function renderAvailableSubjects(list, container) {
+  container.innerHTML = '';
+  if (!Array.isArray(list) || list.length === 0) {
+    renderMessage(container, 'Nincsenek felvehető tárgyak.', 'empty');
+    return;
+  }
+  const frag = document.createDocumentFragment();
+  list.forEach(it => {
+    const wrap = document.createElement('div');
+    wrap.className = 'available_subject_container';
+
+    const title = document.createElement('h2');
+    title.textContent = it.class_name ?? it.class_code ?? 'Ismeretlen tárgy';
+    wrap.appendChild(title);
+
+    const code = document.createElement('p');
+    code.textContent = it.class_code ?? '';
+    wrap.appendChild(code);
+
+    // Később ide jön a "Felvétel" gomb
+    frag.appendChild(wrap);
+  });
+  container.appendChild(frag);
+}
+
+async function loadAvailableSubjects({ q = '', page = 1, pageSize = 20 } = {}) {
+  const container = document.querySelector('#subject_list_container');
+  if (!container) return;
+
+  renderMessage(container, 'Betöltés…', 'loading');
+
+  const params = new URLSearchParams();
+  if (q && q.trim() !== '') params.set('q', q.trim());
+  params.set('page', String(page));
+  params.set('pageSize', String(pageSize));
+
+  const url = `${AVAILABLE_SUBJECTS_ENDPOINT}?${params.toString()}`;
+
+  try {
+    const res = await fetch(url, { credentials: 'same-origin' }); // session cookie megy
+    if (!res.ok) {
+      if (res.status === 401) {
+        renderMessage(container, 'Bejelentkezés szükséges (lejárt a munkamenet).', 'error');
+        return;
+      }
+      throw new Error('Hiba a betöltés közben');
+    }
+    const payload = await res.json();
+    const list = Array.isArray(payload) ? payload : (payload.data || []);
+    renderAvailableSubjects(list, container);
+  } catch (err) {
+    console.error(err);
+    renderMessage(container, 'Nem sikerült betölteni a tárgyakat.', 'error');
+  }
+}
+
+function attachAvailableSubjectSearch() {
+  const input = document.querySelector('#subject_search_input');
+  if (!input) return;
+  if (input.dataset.bound === '1') return; // ne kössük duplán
+  input.dataset.bound = '1';
+
+  const handler = debounce(() => {
+    loadAvailableSubjects({ q: input.value });
+  }, 300);
+  input.addEventListener('input', handler);
+}
+
+// A TELJES bekötést a DOM betöltése után végezzük:
+document.addEventListener('DOMContentLoaded', () => {
+  // amikor a + Tárgy felvétele gomb megnyitjuk, töltsük be a listát
+  document.querySelectorAll('.add_subject_button').forEach(btn => {
+    btn.addEventListener('click', () => {
+      attachAvailableSubjectSearch();
+      loadAvailableSubjects({ q: '' });
+    });
+  });
+});
+
+// Profilom rész
+
+// Betöltés a backendről és mezők kitöltése
+async function loadProfile() {
+  try {
+    const res = await fetch('profile_get.php', { credentials: 'same-origin' });
+    if (!res.ok) throw new Error(res.status === 401 ? 'UNAUTH' : 'LOAD_ERROR');
+    const { ok, data, error } = await res.json();
+    if (!ok) throw new Error(error?.message || 'LOAD_ERROR');
+
+    const { neptun_k, nickname, fullname, email } = data;
+
+    const $ = sel => document.querySelector(sel);
+    $('#profile_username') && ($('#profile_username').value = nickname || '');
+    $('#profile_fullname') && ($('#profile_fullname').value = fullname || '');
+    $('#profile_neptun') && ($('#profile_neptun').value = neptun_k || '');
+    $('#profile_email') && ($('#profile_email').value = email || '');
+
+  } catch (e) {
+    console.warn('Profile load failed:', e.message);
+  }
+}
+
+// Mentés
+async function saveProfile() {
+  const $ = sel => document.querySelector(sel);
+
+  const payload = {
+    nickname: $('#profile_username')?.value?.trim() || '',
+    fullname: $('#profile_fullname')?.value?.trim() || '',
+    email:    $('#profile_email')?.value?.trim() || '',
+    current_password: $('#profile_current_password')?.value || '',
+    new_password:     $('#profile_new_password')?.value || '',
+    new_password_confirm: $('#profile_new_password_confirm')?.value || ''
+  };
+
+  try {
+    const res = await fetch('profile_update.php', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      credentials: 'same-origin',
+      body: JSON.stringify(payload)
+    });
+    const json = await res.json().catch(() => ({}));
+
+    if (!res.ok || json.ok === false) {
+      const msg = json?.error?.message || (res.status === 401 ? 'UNAUTH' : 'SAVE_ERROR');
+      alert('Hiba a mentés közben: ' + msg);
+      return;
+    }
+
+    // Siker – álljunk vissza readonly módba, jelszómezőket ürítsük
+    alert('Profil mentve.');
+    ['#profile_current_password', '#profile_new_password', '#profile_new_password_confirm']
+      .forEach(id => { const el = document.querySelector(id); if (el) el.value = ''; });
+
+    // Vissza readonly
+    const inputs = ['#profile_username','#profile_fullname','#profile_neptun','#profile_email']
+      .map(id => document.querySelector(id))
+      .filter(Boolean);
+    inputs.forEach(input => { input.setAttribute('readonly', 'readonly'); input.removeAttribute('required'); });
+
+    const passwordFields = document.querySelector('#password_fields');
+    if (passwordFields) passwordFields.style.display = 'none';
+
+    const editBtns = document.querySelector('#profile_edit_buttons');
+    const editBtn  = document.querySelector('.edit_profile_button');
+    if (editBtns) editBtns.style.display = 'none';
+    if (editBtn)  editBtn.style.display  = 'inline-block';
+
+  } catch (e) {
+    alert('Váratlan hiba a mentés közben.');
+  }
+}
+
+// Események bekötése a Profil részhez
+document.addEventListener('DOMContentLoaded', () => {
+  // Betöltés
+  loadProfile();
+
+  // Mentés gomb
+  const saveBtn = document.querySelector('#profile_save_button');
+  if (saveBtn) {
+    saveBtn.addEventListener('click', (e) => {
+      e.preventDefault();
+      saveProfile();
+    });
+  }
+});
+async function loadProfile() {
+  try {
+    const res = await fetch('profile_get.php', { credentials: 'same-origin' });
+    if (!res.ok) return;
+    const json = await res.json();
+    if (!json.ok) return;
+
+    const { neptun_k, nickname, fullname, email } = json.data || {};
+    const $ = s => document.querySelector(s);
+    $('#profile_username') && ($('#profile_username').value = nickname || '');
+    $('#profile_fullname') && ($('#profile_fullname').value = fullname || '');
+    $('#profile_neptun') && ($('#profile_neptun').value = neptun_k || '');
+    $('#profile_email') && ($('#profile_email').value = email || '');
+  } catch (_) {}
+}
+
+async function saveProfile() {
+  const $ = s => document.querySelector(s);
+  const payload = {
+    nickname: $('#profile_username')?.value?.trim() || '',
+    fullname: $('#profile_fullname')?.value?.trim() || '',
+    email:    $('#profile_email')?.value?.trim() || '',
+    current_password: $('#profile_current_password')?.value || '',
+    new_password:     $('#profile_new_password')?.value || '',
+    new_password_confirm: $('#profile_new_password_confirm')?.value || ''
+  };
+
+  try {
+    const res = await fetch('profile_update.php', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      credentials: 'same-origin',
+      body: JSON.stringify(payload)
+    });
+    const json = await res.json().catch(() => ({}));
+
+    if (!res.ok || json.ok === false) {
+      alert('Hiba a mentés közben: ' + (json?.error?.message || res.status));
+      return;
+    }
+
+    alert('Profil mentve.'); // <- ezt hiányoltad
+
+    // mezők vissza readonly módba
+    ['#profile_username','#profile_fullname','#profile_neptun','#profile_email'].forEach(id => {
+      const el = document.querySelector(id);
+      if (el) { el.setAttribute('readonly','readonly'); el.removeAttribute('required'); }
+    });
+    const pw = document.getElementById('password_fields');
+    if (pw) pw.style.display = 'none';
+    const editBtns = document.getElementById('profile_edit_buttons');
+    if (editBtns) editBtns.style.display = 'none';
+    const editBtn = document.querySelector('.edit_profile_button');
+    if (editBtn) editBtn.style.display = 'inline-block';
+
+    // jelszómezők ürítése
+    ['#profile_current_password','#profile_new_password','#profile_new_password_confirm']
+      .forEach(id => { const el = document.querySelector(id); if (el) el.value = ''; });
+
+  } catch {
+    alert('Váratlan hiba a mentés közben.');
+  }
+}

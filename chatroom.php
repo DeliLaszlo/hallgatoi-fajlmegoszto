@@ -1,3 +1,18 @@
+<?php
+session_start();
+if (!isset($_SESSION['user_neptun'])) {
+    header("Location: log_reg.php");
+    exit();
+}
+$inactive_limit = 1800; // 30 perc inaktivitás
+if (isset($_SESSION['last_activity']) && (time() - $_SESSION['last_activity'] > $inactive_limit)) {
+    header("Location: logout.php");
+    exit();
+} else {
+    $_SESSION['last_activity'] = time();
+}
+?>
+
 <!DOCTYPE html>
 <html lang="hu">
 
@@ -38,7 +53,7 @@
         <img src="icons/arrowback.svg" alt="Irányítópult" class="dashboard-icon">
         <span>Vissza</span>
       </a>
-      <a href="#" class="logout_button">
+      <a href="logout.php" class="logout_button">
         <img src="icons/logout.svg" alt="Kijelentkezés" class="logout-icon">
         <span>Kijelentkezés</span>
       </a>
