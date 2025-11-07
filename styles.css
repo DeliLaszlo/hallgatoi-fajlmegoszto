@@ -1429,6 +1429,8 @@ form .modal_footer {
   background: #f1f1f1;
   color: #222;
   box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+  word-wrap: break-word;
+  overflow-wrap: break-word;
 }
 
 .chat_bubble.me {
@@ -1437,8 +1439,6 @@ form .modal_footer {
   border: 2px solid var(--primary-color);
   border-radius: 1.2rem 1.2rem 0.2rem 1.2rem;
   box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-  word-wrap: break-word;
-  overflow-wrap: break-word;
 }
 
 .dark_mode .chat_bubble {
