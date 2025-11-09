@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Gép: 127.0.0.1
--- Létrehozás ideje: 2025. Okt 26. 14:44
+-- Létrehozás ideje: 2025. Nov 09. 11:36
 -- Kiszolgáló verziója: 10.4.32-MariaDB
 -- PHP verzió: 8.2.12
 
@@ -96,43 +96,43 @@ CREATE TABLE `class` (
 --
 
 INSERT INTO `class` (`class_code`, `class_name`, `semester`) VALUES
+('DKNB_JTTM054', 'Modern információtechnológia jogi kérdései', NULL),
 ('GKNB_AUTM077', 'Digitális log.rendsz.és kapcsolások informatikusoknak', NULL),
+('GKNB_FKTM045', 'Fizika informatikusoknak', NULL),
+('GKNB_INTM007', 'Vállalati információs rendszerek', NULL),
+('GKNB_INTM008', 'IT-szolgáltatások', NULL),
+('GKNB_INTM025', 'Rendszerüzemeltetés és biztonság', NULL),
+('GKNB_INTM087', 'Ipar 4.0 technológiák', NULL),
+('GKNB_INTM096', 'Szakdolgozati konzultáció 1', NULL),
+('GKNB_INTM097', 'Szakdolgozati konzultáció 2', NULL),
 ('GKNB_INTM110', 'Számítógépgép architektúrák', NULL),
 ('GKNB_INTM111', 'Digitális kompetenciák, önálló képzési stratégia', NULL),
 ('GKNB_INTM112', 'Python alapok informatikusoknak', NULL),
-('GKNB_MSTM001', 'Matematika 1.', NULL),
-('GKNB_MSTM064', 'Diszkrét matematika', NULL),
-('GKNB_MSTM065', 'Algoritmusok és adatstruktúrák', NULL),
-('KGNB_NETM042', 'Közgazdaságtan', NULL),
 ('GKNB_INTM114', 'Programozás', NULL),
 ('GKNB_INTM115', 'Operációs rendszerek', NULL),
 ('GKNB_INTM116', 'Renszer és irányítási alapok', NULL),
 ('GKNB_INTM117', 'Mikroelektromechanikai rendszerek', NULL),
 ('GKNB_INTM118', 'Szoftvertechnológia 1.', NULL),
-('GKNB_MSTM008', 'Matematika 2.', NULL),
-('KGNB_MMTM048', 'Vállalatgazdaságtan', NULL),
 ('GKNB_INTM119', 'Oo programozás', NULL),
 ('GKNB_INTM120', 'Unix, Windows operációs rendszerek', NULL),
 ('GKNB_INTM121', 'Számítógép hálózatok', NULL),
 ('GKNB_INTM122', 'Szoftvertechnológia 2.', NULL),
 ('GKNB_INTM123', 'Adatbáziskezelés 1.', NULL),
-('GKNB_INTM167', 'Szakmai gyakorlat', NULL),
-('GKNB_MSTM011', 'Matematika 3.', NULL),
-('GKNB_FKTM045', 'Fizika informatikusoknak', NULL),
-('GKNB_INTM025', 'Rendszerüzemeltetés és biztonság', NULL),
 ('GKNB_INTM124', 'Mesterséges intelligencia', NULL),
 ('GKNB_INTM125', 'Adatbáziskezelés 2.', NULL),
-('GKNB_MSTM087', 'Bevezetés az adatelemzésbe', NULL),
-('DKNB_JTTM054', 'Modern információtechnológia jogi kérdései', NULL),
-('GKNB_INTM007', 'Vállalati információs rendszerek', NULL),
-('GKNB_INTM087', 'Ipar 4.0 technológiák', NULL),
 ('GKNB_INTM126', 'Projektmunka', NULL),
 ('GKNB_INTM128', 'Modellezés és optimalizálás gyak.ban', NULL),
-('GKNB_INTM096', 'Szakdolgozati konzultáció 1', NULL),
 ('GKNB_INTM129', 'Modern szofterfejlesztési eszközök', NULL),
+('GKNB_INTM167', 'Szakmai gyakorlat', NULL),
+('GKNB_MSTM001', 'Matematika 1.', NULL),
+('GKNB_MSTM008', 'Matematika 2.', NULL),
+('GKNB_MSTM011', 'Matematika 3.', NULL),
+('GKNB_MSTM064', 'Diszkrét matematika', NULL),
+('GKNB_MSTM065', 'Algoritmusok és adatstruktúrák', NULL),
+('GKNB_MSTM087', 'Bevezetés az adatelemzésbe', NULL),
 ('GKNB_TATM038', 'Virtualizációs technológiák', NULL),
-('GKNB_INTM008', 'IT-szolgáltatások', NULL),
-('GKNB_INTM097', 'Szakdolgozati konzultáció 2', NULL);
+('KGNB_MMTM048', 'Vállalatgazdaságtan', NULL),
+('KGNB_NETM042', 'Közgazdaságtan', NULL);
 
 -- --------------------------------------------------------
 
@@ -151,6 +151,21 @@ CREATE TABLE `message` (
 -- --------------------------------------------------------
 
 --
+-- Tábla szerkezet ehhez a táblához `report`
+--
+
+CREATE TABLE `report` (
+  `report_id` int(5) NOT NULL,
+  `reported_neptun` varchar(6) NOT NULL,
+  `reported_type` varchar(10) NOT NULL,
+  `reported_table` varchar(25) NOT NULL,
+  `reported_id` int(5) NOT NULL,
+  `description` varchar(255) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+-- --------------------------------------------------------
+
+--
 -- Tábla szerkezet ehhez a táblához `request`
 --
 
@@ -158,7 +173,8 @@ CREATE TABLE `request` (
   `request_id` int(5) NOT NULL,
   `neptun_k` varchar(6) CHARACTER SET utf8 COLLATE utf8_hungarian_ci NOT NULL,
   `class_code` varchar(50) CHARACTER SET utf8 COLLATE utf8_hungarian_ci NOT NULL,
-  `status` varchar(1) CHARACTER SET utf8mb4 COLLATE utf8mb4_hungarian_ci NOT NULL
+  `class_name` varchar(100) CHARACTER SET utf8 COLLATE utf8_hungarian_ci NOT NULL,
+  `description` varchar(255) CHARACTER SET utf8 COLLATE utf8_hungarian_ci NOT NULL COMMENT 'Melyik anyag/óra tartalmát kéri a felhasználó'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- --------------------------------------------------------
@@ -179,12 +195,24 @@ CREATE TABLE `room_access` (
 --
 
 CREATE TABLE `upload` (
-  `up_id` bigint(20) NOT NULL,
+  `up_id` int(7) NOT NULL,
   `class_code` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_hungarian_ci NOT NULL,
   `neptun` varchar(6) CHARACTER SET utf8 COLLATE utf8_hungarian_ci NOT NULL,
   `path_to_file` varchar(255) CHARACTER SET utf8 COLLATE utf8_hungarian_ci NOT NULL,
   `comment` varchar(255) CHARACTER SET utf8 COLLATE utf8_hungarian_ci NOT NULL,
   `rating` int(11) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Tábla szerkezet ehhez a táblához `upload_request`
+--
+
+CREATE TABLE `upload_request` (
+  `request_id` int(5) NOT NULL,
+  `upload_id` int(7) NOT NULL,
+  `status` varchar(1) CHARACTER SET utf8 COLLATE utf8_hungarian_ci NOT NULL COMMENT 'F->függőben lévő, T->teljesített,  U->újraküldött '
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- --------------------------------------------------------
@@ -207,10 +235,7 @@ CREATE TABLE `user` (
 --
 
 INSERT INTO `user` (`neptun_k`, `nickname`, `password`, `vnev`, `knev`, `email`) VALUES
-('asd123', 'teszt', '$2y$10$jAbOZefHgUgUCB4F0bdQgevBtkGsbENuVliNLBrIJPBEpu3kDJi9S', 'Proba', 'Lajos', 'asd123@gmail.com'),
-('asdfgh', 'Sziszaat2', '$2y$10$3ryidioXBJjGgtzAeRdXUukKsk0MjBgzvuCHYBWcuzEDQcR8hiBMi', 'Szigetvari', 'Szabolcs', 'szabolcsszigetvari@gmail.com'),
-('iokfp4', 'Sziszaat', '$2y$10$pJ0lGl7jSmgJ/66N8ALaie4Kh0qsE1R56Wh.mwKwkz0fT4jckImma', 'Szigetvari', 'Szabolcs', 'szabolcsszigetvari2003@gmail.com'),
-('qwertz', 'Sziszaat3', '$2y$10$y0GckphQ0SRWlIyasu4URuQCaVJ3DuDMvH4yjk7ctdbvPX7uXjbe.', 'Szigetvari', 'Szabolcs', 'szgii@gmail.com');
+('asd123', 'teszt', '$2y$10$jAbOZefHgUgUCB4F0bdQgevBtkGsbENuVliNLBrIJPBEpu3kDJi9S', 'Proba', 'Lajos', 'asd123@gmail.com');
 
 -- --------------------------------------------------------
 
@@ -221,7 +246,7 @@ INSERT INTO `user` (`neptun_k`, `nickname`, `password`, `vnev`, `knev`, `email`)
 CREATE TABLE `user_classes` (
   `class_code` varchar(50) CHARACTER SET utf8 COLLATE utf8_hungarian_ci NOT NULL,
   `neptun` varchar(6) CHARACTER SET utf8 COLLATE utf8_hungarian_ci NOT NULL,
-  `allapot` tinyint(4) NOT NULL
+  `allapot` tinyint(4) NOT NULL COMMENT 'F->felvett, T->teljesitett, E->elegtelenre teljesített, U->újra felvett'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
@@ -235,10 +260,34 @@ ALTER TABLE `chatroom`
   ADD PRIMARY KEY (`room_id`);
 
 --
+-- A tábla indexei `class`
+--
+ALTER TABLE `class`
+  ADD PRIMARY KEY (`class_code`);
+
+--
+-- A tábla indexei `message`
+--
+ALTER TABLE `message`
+  ADD PRIMARY KEY (`msg_id`);
+
+--
+-- A tábla indexei `report`
+--
+ALTER TABLE `report`
+  ADD PRIMARY KEY (`report_id`);
+
+--
 -- A tábla indexei `request`
 --
 ALTER TABLE `request`
   ADD PRIMARY KEY (`request_id`);
+
+--
+-- A tábla indexei `upload`
+--
+ALTER TABLE `upload`
+  ADD PRIMARY KEY (`up_id`);
 
 --
 -- A tábla indexei `user`
