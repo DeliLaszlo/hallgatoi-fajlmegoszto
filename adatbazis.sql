@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Gép: 127.0.0.1
--- Létrehozás ideje: 2025. Nov 09. 11:36
+-- Létrehozás ideje: 2025. Nov 12. 15:34
 -- Kiszolgáló verziója: 10.4.32-MariaDB
 -- PHP verzió: 8.2.12
 
@@ -163,6 +163,13 @@ CREATE TABLE `report` (
   `description` varchar(255) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
+--
+-- A tábla adatainak kiíratása `report`
+--
+
+INSERT INTO `report` (`report_id`, `reported_neptun`, `reported_type`, `reported_table`, `reported_id`, `description`) VALUES
+(10001, 'asd123', 'Feltöltés', 'upload', 1000001, 'Téves elnevezés. Nem uml, hanem folyamat diagram szerepel a feltöltésben');
+
 -- --------------------------------------------------------
 
 --
@@ -177,6 +184,14 @@ CREATE TABLE `request` (
   `description` varchar(255) CHARACTER SET utf8 COLLATE utf8_hungarian_ci NOT NULL COMMENT 'Melyik anyag/óra tartalmát kéri a felhasználó'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
+--
+-- A tábla adatainak kiíratása `request`
+--
+
+INSERT INTO `request` (`request_id`, `neptun_k`, `class_code`, `class_name`, `description`) VALUES
+(10001, 'asd123', 'GKNB_INTM118', 'Szoftvertechnológia 1.', '\"uml diagrammok elemei\"'),
+(10002, 'asd123', 'GKNB_INTM115', 'Operációs rendszerek', 'Az elso zh-ban szereplő anyagok');
+
 -- --------------------------------------------------------
 
 --
@@ -185,8 +200,17 @@ CREATE TABLE `request` (
 
 CREATE TABLE `room_access` (
   `neptun` varchar(6) CHARACTER SET utf8 COLLATE utf8_hungarian_ci NOT NULL,
-  `room_id` int(5) NOT NULL
+  `room_id` int(5) NOT NULL,
+  `active` tinyint(1) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- A tábla adatainak kiíratása `room_access`
+--
+
+INSERT INTO `room_access` (`neptun`, `room_id`, `active`) VALUES
+('asd123', 10013, 1),
+('asd123', 10010, 0);
 
 -- --------------------------------------------------------
 
@@ -198,10 +222,19 @@ CREATE TABLE `upload` (
   `up_id` int(7) NOT NULL,
   `class_code` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_hungarian_ci NOT NULL,
   `neptun` varchar(6) CHARACTER SET utf8 COLLATE utf8_hungarian_ci NOT NULL,
+  `file_name` varchar(60) CHARACTER SET utf8 COLLATE utf8_hungarian_ci NOT NULL,
   `path_to_file` varchar(255) CHARACTER SET utf8 COLLATE utf8_hungarian_ci NOT NULL,
   `comment` varchar(255) CHARACTER SET utf8 COLLATE utf8_hungarian_ci NOT NULL,
   `rating` int(11) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- A tábla adatainak kiíratása `upload`
+--
+
+INSERT INTO `upload` (`up_id`, `class_code`, `neptun`, `file_name`, `path_to_file`, `comment`, `rating`) VALUES
+(1000001, 'GKNB_INTM118', 'asd123', 'uml.pdf', 'Projektmunka\\xampp\\htdocs\\project\\files', 'Az uml diagramokban hasznáható elemek és azok szerepe', 0),
+(1000002, 'GKNB_INTM115', 'asd123', 'elso_op_zh.txt', 'Projektmunka\\xampp\\htdocs\\project\\files', 'Az elso zh-ban előforduló kérdések és válaszaik', 0);
 
 -- --------------------------------------------------------
 
@@ -214,6 +247,14 @@ CREATE TABLE `upload_request` (
   `upload_id` int(7) NOT NULL,
   `status` varchar(1) CHARACTER SET utf8 COLLATE utf8_hungarian_ci NOT NULL COMMENT 'F->függőben lévő, T->teljesített,  U->újraküldött '
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- A tábla adatainak kiíratása `upload_request`
+--
+
+INSERT INTO `upload_request` (`request_id`, `upload_id`, `status`) VALUES
+(10001, 1000001, 'T'),
+(10002, 1000002, 'F');
 
 -- --------------------------------------------------------
 
@@ -246,8 +287,16 @@ INSERT INTO `user` (`neptun_k`, `nickname`, `password`, `vnev`, `knev`, `email`)
 CREATE TABLE `user_classes` (
   `class_code` varchar(50) CHARACTER SET utf8 COLLATE utf8_hungarian_ci NOT NULL,
   `neptun` varchar(6) CHARACTER SET utf8 COLLATE utf8_hungarian_ci NOT NULL,
-  `allapot` tinyint(4) NOT NULL COMMENT 'F->felvett, T->teljesitett, E->elegtelenre teljesített, U->újra felvett'
+  `allapot` varchar(1) CHARACTER SET utf8 COLLATE utf8_hungarian_ci NOT NULL COMMENT 'F->felvett, T->teljesitett, E->elegtelenre teljesített, U->újra felvett'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- A tábla adatainak kiíratása `user_classes`
+--
+
+INSERT INTO `user_classes` (`class_code`, `neptun`, `allapot`) VALUES
+('GKNB_INTM118', 'asd123', 'F'),
+('GKNB_INTM115', 'asd123', 'T');
 
 --
 -- Indexek a kiírt táblákhoz
