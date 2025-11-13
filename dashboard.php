@@ -81,12 +81,12 @@ if (isset($_SESSION['last_activity']) && (time() - $_SESSION['last_activity'] > 
             <form id="profile_form">
                 <div id="profile_info">
                     <!-- Felhasználó profil adatai, később PHP-vel generálandó -->
+                    <h3>Neptun kód:</h3>
+                    <input type="text" id="profile_neptun" name="neptun" value="ABC123" readonly/>
                     <h3>Felhasználónév:</h3>
                     <input type="text" id="profile_username" name="username" value="felhasznalonev" readonly/>
                     <h3>Teljes név:</h3>
                     <input type="text" id="profile_fullname" name="fullname" value="Teljes Név" readonly/>
-                    <h3>Neptun kód:</h3>
-                    <input type="text" id="profile_neptun" name="neptun" value="ABC123" readonly/>
                     <h3>Email:</h3>
                     <input type="text" id="profile_email" name="email" value="email@example.com" readonly/>
                     <!-- Generálandó rész vége -->

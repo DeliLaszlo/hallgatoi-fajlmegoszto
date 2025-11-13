@@ -937,6 +937,39 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     });
 
+    // Profil adatok betöltése
+    async function loadProfileData() {
+        try {
+            const response = await fetch('profile_get.php', {
+                method: 'GET',
+                credentials: 'same-origin'
+            });
+            
+            if (!response.ok) {
+                throw new Error('Nem sikerült betölteni a profil adatokat');
+            }
+            
+            const data = await response.json();
+            const neptunInput = document.getElementById('profile_neptun');
+            const usernameInput = document.getElementById('profile_username');
+            const fullnameInput = document.getElementById('profile_fullname');
+            const emailInput = document.getElementById('profile_email');
+            
+            if (neptunInput) neptunInput.value = data.neptun || '';
+            if (usernameInput) usernameInput.value = data.nickname || '';
+            if (fullnameInput) fullnameInput.value = data.full_name || '';
+            if (emailInput) emailInput.value = data.email || '';
+            
+        } catch (error) {
+            console.error('Hiba a profil betöltése közben:', error);
+        }
+    }
+    
+    // Csak a dashboard.php oldalon töltődik be a profil adat
+    if (window.location.pathname.includes('dashboard.php')) {
+        loadProfileData();
+    }
+
     // Profil szerkesztés
     const editProfileButton = document.querySelector('.edit_profile_button');
     const cancelProfileButton = document.querySelector('.cancel_profile_button');
@@ -985,6 +1018,130 @@ document.addEventListener('DOMContentLoaded', function() {
             }
             if (editProfileButton) {
                 editProfileButton.style.display = 'flex';
+            }
+            // Kezdeti adatok visszaállítása
+            loadProfileData();
+        });
+    }
+
+    // Profil frissítés
+    const profileForm = document.getElementById('profile_form');
+    if (profileForm) {
+        profileForm.addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const usernameInput = document.getElementById('profile_username');
+            const fullnameInput = document.getElementById('profile_fullname');
+            const emailInput = document.getElementById('profile_email');
+            const currentPasswordInput = document.getElementById('profile_current_password');
+            const newPasswordInput = document.getElementById('profile_new_password');
+            const repeatPasswordInput = document.getElementById('profile_repeat_password');
+            
+            const username = usernameInput?.value.trim() || '';
+            const fullname = fullnameInput?.value.trim() || '';
+            const email = emailInput?.value.trim() || '';
+            const currentPassword = currentPasswordInput?.value || '';
+            const newPassword = newPasswordInput?.value || '';
+            const repeatPassword = repeatPasswordInput?.value || '';
+            
+            // Érvényesítési minták
+            const patterns = {
+                username: /^[a-zA-Z0-9_]{3,20}$/,
+                fullname: /^[a-zA-ZáéíóöőúüűÁÉÍÓÖŐÚÜŰ]+ [a-zA-ZáéíóöőúüűÁÉÍÓÖŐÚÜŰ\s]{1,49}$/,
+                email: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
+                password: /^(?=.*[A-Z])(?=.*\d).{8,}$/
+            };
+            
+            if (!patterns.username.test(username)) {
+                alert('Érvénytelen felhasználónév! 3-20 karakter, csak betűk, számok és aláhúzás.');
+                return;
+            }
+            
+            if (!patterns.fullname.test(fullname)) {
+                alert('Érvénytelen név! Vezetéknév és legalább egy keresztnév szükséges.');
+                return;
+            }
+            
+            if (!patterns.email.test(email)) {
+                alert('Érvénytelen email cím!');
+                return;
+            }
+            
+            if (currentPassword || newPassword || repeatPassword) {
+                if (!currentPassword) {
+                    alert('Add meg a jelenlegi jelszavadat!');
+                    return;
+                }
+                
+                if (!newPassword) {
+                    alert('Add meg az új jelszavadat!');
+                    return;
+                }
+                
+                if (!patterns.password.test(newPassword)) {
+                    alert('Az új jelszó legalább 8 karakter hosszú legyen, tartalmazzon nagybetűt és számot!');
+                    return;
+                }
+                
+                if (newPassword !== repeatPassword) {
+                    alert('Az új jelszavak nem egyeznek!');
+                    return;
+                }
+            }
+            
+            // Küldendő adatok előkészítése
+            const data = {
+                username: username,
+                fullname: fullname,
+                email: email,
+                current_password: currentPassword,
+                new_password: newPassword
+            };
+            
+            try {
+                const response = await fetch('profile_update.php', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    credentials: 'same-origin',
+                    body: JSON.stringify(data)
+                });
+                
+                const result = await response.json();
+                
+                if (result.success) {
+                    alert(result.message || 'Profil sikeresen frissítve!');
+                    profileInputs.forEach(function(input) {
+                        if (input) {
+                            input.setAttribute('readonly', 'readonly');
+                            input.removeAttribute('required');
+                        }
+                    });
+                    
+                    if (passwordFields) {
+                        passwordFields.style.display = 'none';
+                        if (currentPasswordInput) currentPasswordInput.value = '';
+                        if (newPasswordInput) newPasswordInput.value = '';
+                        if (repeatPasswordInput) repeatPasswordInput.value = '';
+                    }
+                    
+                    if (profileEditButtons) {
+                        profileEditButtons.style.display = 'none';
+                    }
+                    
+                    if (editProfileButton) {
+                        editProfileButton.style.display = 'flex';
+                    }
+                    
+                    // Profiladatok újratöltése
+                    loadProfileData();
+                } else {
+                    alert(result.error || 'Hiba történt a profil frissítése során!');
+                }
+            } catch (error) {
+                console.error('Hiba a profil frissítése közben:', error);
+                alert('Hiba történt a profil frissítése során!');
             }
         });
     }
@@ -1340,156 +1497,3 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   });
 });
-
-// Profilom rész
-
-// Betöltés a backendről és mezők kitöltése
-async function loadProfile() {
-  try {
-    const res = await fetch('profile_get.php', { credentials: 'same-origin' });
-    if (!res.ok) throw new Error(res.status === 401 ? 'UNAUTH' : 'LOAD_ERROR');
-    const { ok, data, error } = await res.json();
-    if (!ok) throw new Error(error?.message || 'LOAD_ERROR');
-
-    const { neptun_k, nickname, fullname, email } = data;
-
-    const $ = sel => document.querySelector(sel);
-    $('#profile_username') && ($('#profile_username').value = nickname || '');
-    $('#profile_fullname') && ($('#profile_fullname').value = fullname || '');
-    $('#profile_neptun') && ($('#profile_neptun').value = neptun_k || '');
-    $('#profile_email') && ($('#profile_email').value = email || '');
-
-  } catch (e) {
-    console.warn('Profile load failed:', e.message);
-  }
-}
-
-// Mentés
-async function saveProfile() {
-  const $ = sel => document.querySelector(sel);
-
-  const payload = {
-    nickname: $('#profile_username')?.value?.trim() || '',
-    fullname: $('#profile_fullname')?.value?.trim() || '',
-    email:    $('#profile_email')?.value?.trim() || '',
-    current_password: $('#profile_current_password')?.value || '',
-    new_password:     $('#profile_new_password')?.value || '',
-    new_password_confirm: $('#profile_new_password_confirm')?.value || ''
-  };
-
-  try {
-    const res = await fetch('profile_update.php', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      credentials: 'same-origin',
-      body: JSON.stringify(payload)
-    });
-    const json = await res.json().catch(() => ({}));
-
-    if (!res.ok || json.ok === false) {
-      const msg = json?.error?.message || (res.status === 401 ? 'UNAUTH' : 'SAVE_ERROR');
-      alert('Hiba a mentés közben: ' + msg);
-      return;
-    }
-
-    // Siker – álljunk vissza readonly módba, jelszómezőket ürítsük
-    alert('Profil mentve.');
-    ['#profile_current_password', '#profile_new_password', '#profile_new_password_confirm']
-      .forEach(id => { const el = document.querySelector(id); if (el) el.value = ''; });
-
-    // Vissza readonly
-    const inputs = ['#profile_username','#profile_fullname','#profile_neptun','#profile_email']
-      .map(id => document.querySelector(id))
-      .filter(Boolean);
-    inputs.forEach(input => { input.setAttribute('readonly', 'readonly'); input.removeAttribute('required'); });
-
-    const passwordFields = document.querySelector('#password_fields');
-    if (passwordFields) passwordFields.style.display = 'none';
-
-    const editBtns = document.querySelector('#profile_edit_buttons');
-    const editBtn  = document.querySelector('.edit_profile_button');
-    if (editBtns) editBtns.style.display = 'none';
-    if (editBtn)  editBtn.style.display  = 'inline-block';
-
-  } catch (e) {
-    alert('Váratlan hiba a mentés közben.');
-  }
-}
-
-// Események bekötése a Profil részhez
-document.addEventListener('DOMContentLoaded', () => {
-  // Betöltés
-  loadProfile();
-
-  // Mentés gomb
-  const saveBtn = document.querySelector('#profile_save_button');
-  if (saveBtn) {
-    saveBtn.addEventListener('click', (e) => {
-      e.preventDefault();
-      saveProfile();
-    });
-  }
-});
-async function loadProfile() {
-  try {
-    const res = await fetch('profile_get.php', { credentials: 'same-origin' });
-    if (!res.ok) return;
-    const json = await res.json();
-    if (!json.ok) return;
-
-    const { neptun_k, nickname, fullname, email } = json.data || {};
-    const $ = s => document.querySelector(s);
-    $('#profile_username') && ($('#profile_username').value = nickname || '');
-    $('#profile_fullname') && ($('#profile_fullname').value = fullname || '');
-    $('#profile_neptun') && ($('#profile_neptun').value = neptun_k || '');
-    $('#profile_email') && ($('#profile_email').value = email || '');
-  } catch (_) {}
-}
-
-async function saveProfile() {
-  const $ = s => document.querySelector(s);
-  const payload = {
-    nickname: $('#profile_username')?.value?.trim() || '',
-    fullname: $('#profile_fullname')?.value?.trim() || '',
-    email:    $('#profile_email')?.value?.trim() || '',
-    current_password: $('#profile_current_password')?.value || '',
-    new_password:     $('#profile_new_password')?.value || '',
-    new_password_confirm: $('#profile_new_password_confirm')?.value || ''
-  };
-
-  try {
-    const res = await fetch('profile_update.php', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      credentials: 'same-origin',
-      body: JSON.stringify(payload)
-    });
-    const json = await res.json().catch(() => ({}));
-
-    if (!res.ok || json.ok === false) {
-      alert('Hiba a mentés közben: ' + (json?.error?.message || res.status));
-      return;
-    }
-
-    alert('Profil mentve.'); // <- ezt hiányoltad
-
-    // mezők vissza readonly módba
-    ['#profile_username','#profile_fullname','#profile_neptun','#profile_email'].forEach(id => {
-      const el = document.querySelector(id);
-      if (el) { el.setAttribute('readonly','readonly'); el.removeAttribute('required'); }
-    });
-    const pw = document.getElementById('password_fields');
-    if (pw) pw.style.display = 'none';
-    const editBtns = document.getElementById('profile_edit_buttons');
-    if (editBtns) editBtns.style.display = 'none';
-    const editBtn = document.querySelector('.edit_profile_button');
-    if (editBtn) editBtn.style.display = 'inline-block';
-
-    // jelszómezők ürítése
-    ['#profile_current_password','#profile_new_password','#profile_new_password_confirm']
-      .forEach(id => { const el = document.querySelector(id); if (el) el.value = ''; });
-
-  } catch {
-    alert('Váratlan hiba a mentés közben.');
-  }
-}
