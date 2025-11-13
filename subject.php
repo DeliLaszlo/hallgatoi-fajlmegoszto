@@ -11,6 +11,33 @@ if (isset($_SESSION['last_activity']) && (time() - $_SESSION['last_activity'] > 
 } else {
     $_SESSION['last_activity'] = time();
 }
+
+// Tárgy nevének lekérése
+// Ha az URL-ben nincs class_code paraméter, visszairányítás az irányítópultra
+if (!isset($_GET['class_code']) || empty($_GET['class_code'])) {
+    header("Location: dashboard.php");
+    exit();
+}
+$class_code = $_GET['class_code'];
+$conn = new mysqli("localhost", "root", "", "pm_db_fm_v1");
+if ($conn->connect_error) {
+    die("Kapcsolódási hiba: " . $conn->connect_error);
+}
+$stmt = $conn->prepare("SELECT class_name FROM class WHERE class_code = ?");
+$stmt->bind_param("s", $class_code);
+$stmt->execute();
+$result = $stmt->get_result();
+if ($result->num_rows === 0) {
+    // Ha nincs ilyen tárgy, visszairányítás az irányítópultra
+    $stmt->close();
+    $conn->close();
+    header("Location: dashboard.php");
+    exit();
+}
+$row = $result->fetch_assoc();
+$class_name = $row['class_name'];
+$stmt->close();
+$conn->close();
 ?>
 
 <!DOCTYPE html>
@@ -20,7 +47,7 @@ if (isset($_SESSION['last_activity']) && (time() - $_SESSION['last_activity'] > 
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="styles.css?v=1761247878">
     <link rel="icon" type="image/x-icon" href="https://munkatars.sze.hu/core/templates/sze2018_bluerev/favicon.ico?v=2">
-    <title>Tárgy címe</title> <!-- PHP-val generált -->
+    <title><?php echo htmlspecialchars($class_name); ?></title>
 </head>
 <body>
     <header>
@@ -30,7 +57,7 @@ if (isset($_SESSION['last_activity']) && (time() - $_SESSION['last_activity'] > 
             <img src="icons/close.svg" alt="Close" class="hamburger-icon close-icon">
         </button>
         <nav class="nav-menu">
-            <h1>Tárgy címe</h1> <!-- PHP-val generált -->
+            <h1><?php echo htmlspecialchars($class_name); ?></h1>
             <ul>
                 <li><a href="#" id="nav_fajlok">Feltöltött fájlok</a></li>
                 <li><a href="#" id="nav_kerelemek">Kérelmek</a></li>
