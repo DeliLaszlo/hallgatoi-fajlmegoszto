@@ -51,7 +51,7 @@ if (isset($_SESSION['last_activity']) && (time() - $_SESSION['last_activity'] > 
                     </button>
                 </li>
             </ul>
-            <a href="logout.php" class="logout_button">
+            <a href="php/logout.php" class="logout_button">
                 <img src="icons/logout.svg" alt="Kijelentkezés" class="logout-icon">
                 <span>Kijelentkezés</span>
             </a>

@@ -12,6 +12,8 @@ if (isset($_SESSION['last_activity']) && (time() - $_SESSION['last_activity'] > 
     $_SESSION['last_activity'] = time();
 }
 
+require_once __DIR__ . '/config.php';
+
 // Tárgy nevének lekérése
 // Ha az URL-ben nincs class_code paraméter, visszairányítás az irányítópultra
 if (!isset($_GET['class_code']) || empty($_GET['class_code'])) {
@@ -19,7 +21,7 @@ if (!isset($_GET['class_code']) || empty($_GET['class_code'])) {
     exit();
 }
 $class_code = $_GET['class_code'];
-$conn = new mysqli("localhost", "root", "", "pm_db_fm_v1");
+$conn = getMysqliConnection();
 if ($conn->connect_error) {
     die("Kapcsolódási hiba: " . $conn->connect_error);
 }
@@ -79,7 +81,7 @@ $conn->close();
                 <img src="icons/arrowback.svg" alt="Irányítópult" class="dashboard-icon">
                 <span>Irányítópult</span>
             </a>
-            <a href="logout.php" class="logout_button">
+            <a href="php/logout.php" class="logout_button">
                 <img src="icons/logout.svg" alt="Kijelentkezés" class="logout-icon">
                 <span>Kijelentkezés</span>
             </a>

@@ -40,7 +40,7 @@ unset(
         </div>
         <div id="login" >
             <h1>Bejelentkezés</h1>
-            <form id="loginForm" action="login.php" method="post">
+            <form id="loginForm" action="php/login.php" method="post">
                 <input type="text" id="loginNeptun" name="neptun" value="<?php echo htmlspecialchars($login_data['neptun'] ?? ''); ?>" placeholder="Neptun kód" required autofocus>
                 <input type="password" id="loginPassword" name="password" placeholder="Jelszó" required>
                 <button type="submit">Bejelentkezés</button>
@@ -49,7 +49,7 @@ unset(
         </div>
         <div id="register" style="display: none;">
             <h1>Regisztráció</h1>
-            <form id="registerForm" action="registration.php" method="post"> 
+            <form id="registerForm" action="php/registration.php" method="post"> 
                 <input type="text" id="registerNeptun" name="neptun" value="<?php echo htmlspecialchars($register_data['neptun'] ?? ''); ?>" placeholder="Neptun kód" required autofocus>
                 <input type="text" id="registerUsername" name="username" value="<?php echo htmlspecialchars($register_data['nickname'] ?? ''); ?>" placeholder="Felhasználónév" required>
                 <input type="text" id="registerFullname" name="fullname" value="<?php echo htmlspecialchars($register_data['fullname'] ?? ''); ?>" placeholder="Teljes név" required>

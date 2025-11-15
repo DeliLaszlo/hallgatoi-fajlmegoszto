@@ -42,7 +42,7 @@
             <img src="icons/arrowback.svg" alt="Irányítópult" class="dashboard-icon">
             <span>Irányítópult</span>
         </a>
-        <a href="logout.php" class="logout_button">
+        <a href="php/logout.php" class="logout_button">
             <img src="icons/logout.svg" alt="Kijelentkezés" class="logout-icon">
             <span>Kijelentkezés</span>
         </a>

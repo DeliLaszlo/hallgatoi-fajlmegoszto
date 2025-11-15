@@ -2,6 +2,6 @@
 session_start();
 session_unset();
 session_destroy();
-header("Location: log_reg.php");
+header("Location: ../log_reg.php");
 exit();
 ?>

@@ -986,7 +986,7 @@ document.addEventListener('DOMContentLoaded', function() {
     // Profil adatok betöltése
     async function loadProfileData() {
         try {
-            const response = await fetch('profile_get.php', {
+            const response = await fetch('php/profile_get.php', {
                 method: 'GET',
                 credentials: 'same-origin'
             });
@@ -1145,7 +1145,7 @@ document.addEventListener('DOMContentLoaded', function() {
             };
             
             try {
-                const response = await fetch('profile_update.php', {
+                const response = await fetch('php/profile_update.php', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json'
@@ -1449,7 +1449,7 @@ document.addEventListener('DOMContentLoaded', function() {
     // TODO: Backend - Új üzenetek időszakos lekérése (pl. AJAX segítségével)
 })()});
 
-const AVAILABLE_SUBJECTS_ENDPOINT = 'getAvailableSubjects.php';
+const AVAILABLE_SUBJECTS_ENDPOINT = 'php/getAvailableSubjects.php';
 
 // Egyszerű debounce – gépelés közbeni szerverhívás csökkentésére
 function debounce(fn, wait = 300) {
