@@ -1,72 +1,51 @@
 <?php
-declare(strict_types=1);
 session_start();
+header('Content-Type: application/json');
 
-header('Content-Type: application/json; charset=utf-8');
-ini_set('display_errors', '0');
-ini_set('html_errors', '0');
-ini_set('log_errors', '1');
-
-set_exception_handler(function (Throwable $e) {
-    http_response_code(500);
-    echo json_encode(['ok' => false, 'error' => ['code' => 'EXCEPTION', 'message' => $e->getMessage()]], JSON_UNESCAPED_UNICODE);
-    exit;
-});
-set_error_handler(function ($severity, $message, $file, $line) {
-    http_response_code(500);
-    echo json_encode(['ok' => false, 'error' => ['code' => 'ERROR', 'message' => "$message in $file:$line"]], JSON_UNESCAPED_UNICODE);
-    exit;
-});
-
-// --- AUTH (a te kulcsoddal) ---
-$me = $_SESSION['user_neptun'] ?? null;
-if ($me === null) {
+// Felhasználó bejelentkezés ellenőrzése
+if (!isset($_SESSION['user_neptun'])) {
     http_response_code(401);
-    echo json_encode([]);
-    exit;
+    echo json_encode(['error' => 'Nincs jogosultság']);
+    exit();
 }
 
-// --- DB ---
+$neptun = $_SESSION['user_neptun'];
 require_once __DIR__ . '/../config.php';
-$pdo = db(); // PDO: ERRMODE_EXCEPTION legyen
+$conn = getMysqliConnection();
 
-// --- Paraméterek ---
-$q        = isset($_GET['q']) ? trim((string)$_GET['q']) : '';
-$page     = max(1, (int)($_GET['page'] ?? 1));
-$pageSize = min(50, max(1, (int)($_GET['pageSize'] ?? 20)));
-$offset   = ($page - 1) * $pageSize;
-
-// --- WHERE + PARAMS ---
-$where  = 'WHERE 1=1';
-$params = [':me' => $me];
-
-if ($q !== '') {
-    $where .= ' AND (c.class_code LIKE :q OR c.class_name LIKE :q)';
-    $params[':q'] = "%{$q}%";
+if ($conn->connect_error) {
+    http_response_code(500);
+    echo json_encode(['error' => 'Nem sikerült csatlakozni az adatbázishoz']);
+    exit();
 }
+$conn->set_charset("utf8");
 
-// LIMIT/OFFSET: ne bindoljuk, csak szigorúan intté castolva illesszük be (MySQL miatt)
-$pageSize = (int)$pageSize;
-$offset   = (int)$offset;
+// Felvehető tárgyak lekérdezése
+$sql = "SELECT c.class_code, c.class_name, c.semester
+        FROM class c
+        WHERE c.class_code NOT IN (
+            SELECT uc.class_code 
+            FROM user_classes uc 
+            WHERE uc.neptun = ?
+        )
+        ORDER BY c.class_name";
 
-// Ha NEM használjátok az allapot = 1-et, TÖRÖLD azt a sort!
-$sql = "
-  SELECT c.class_code, c.class_name
-  FROM class c
-  LEFT JOIN user_classes uc
-    ON uc.class_code = c.class_code
-   AND uc.neptun     = :me
-   AND uc.allapot    = 1       -- <<< HA NEM HASZNÁLJÁTOK, TÖRÖLD EZT A SORT!
-  $where
-  AND uc.neptun IS NULL
-  ORDER BY c.class_name ASC
-  LIMIT $pageSize OFFSET $offset
-";
-
-$stmt = $pdo->prepare($sql);
-foreach ($params as $k => $v) {
-    $stmt->bindValue($k, $v, is_int($v) ? PDO::PARAM_INT : PDO::PARAM_STR);
-}
+$stmt = $conn->prepare($sql);
+$stmt->bind_param("s", $neptun);
 $stmt->execute();
+$result = $stmt->get_result();
 
-echo json_encode($stmt->fetchAll(PDO::FETCH_ASSOC), JSON_UNESCAPED_UNICODE);
+$subjects = array();
+while ($row = $result->fetch_assoc()) {
+    $subjects[] = array(
+        'class_code' => $row['class_code'],
+        'class_name' => $row['class_name'],
+        'semester' => $row['semester']
+    );
+}
+
+$stmt->close();
+$conn->close();
+
+echo json_encode($subjects);
+?>

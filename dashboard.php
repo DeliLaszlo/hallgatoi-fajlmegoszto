@@ -59,14 +59,23 @@ if (isset($_SESSION['last_activity']) && (time() - $_SESSION['last_activity'] > 
     </header>
     <main>
         <section id="dashboard_targyak">
-            <div class="section_header">
+            <div class="section_header subject_header">
                 <h1>Tárgyaim</h1>
-                <button class="large_button add_subject_button" aria-label="Tárgy hozzáadása">
-                    <img src="icons/add.svg" alt="Tárgy hozzáadása">
-                    <span class="icon_text">Tárgy felvétele</span>
-                </button>
+                <div class="section_header_actions">
+                    <div class="search_container content_search_container">
+                        <input type="text" id="dashboard_subject_search" class="subject_search_input" placeholder="Tárgy keresése..." aria-label="Tárgy keresése">
+                        <button class="subject_search_button" aria-label="Keresés">
+                            <img src="icons/search.svg" alt="Keresés">
+                        </button>
+                    </div>
+                    <button class="large_button add_subject_button" aria-label="Tárgy hozzáadása">
+                        <img src="icons/add.svg" alt="Tárgy hozzáadása">
+                        <span class="icon_text">Tárgy felvétele</span>
+                    </button>
+                </div> 
             </div>
             <hr>
+            <div id="user_subjects"></div>
         </section>
         <section id="dashboard_fajlok">
             <h1>Feltöltött fájljaim</h1>

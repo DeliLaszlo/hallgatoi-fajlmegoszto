@@ -267,6 +267,7 @@ textarea:focus {
     padding: 0.25rem;
     background-color: var(--text-secondary);
     margin: 0.25rem 0;
+    overflow: hidden;
 }
 
 .search_container:focus-within {
@@ -284,6 +285,8 @@ textarea:focus {
     padding: 0.5rem;
     border-radius: 5px;
     font-size: 1rem;
+    overflow: hidden;
+    max-width: 80%;
 }
 
 .search_container input, .search_container input:hover, .search_container button {
@@ -603,16 +606,19 @@ textarea:focus {
         z-index: 999;
     }
 
-    .subject_files_header {
+    .section_header {
         flex-direction: column;
         align-items: flex-start;
-        gap: 0;
+        gap: 0rem;
     }
 }
 
 @media (max-width: 650px) {
     .header_img {
         height: 40%;
+    }
+    .own_subject_container h2 {
+        font-size: 1rem;
     }
 }
 
@@ -828,14 +834,19 @@ textarea:focus {
         padding: 0.4rem;
     }
 
-    .hideable_text {
-        display: none;
+    .hideable_text, .hideable_content {
+        display: none !important;
+    }
+
+    .content_downloads {
+        bottom: -1rem;
+        right: 1rem;
     }
 }
 
 @media (max-width: 450px) {
-    .content_voting, .content_downloads, .hideable_content {
-        display: none;
+    .content_voting, .content_downloads {
+        display: none !important;
     }
 }
 
@@ -1172,6 +1183,7 @@ form .modal_footer {
     margin-bottom: 1rem;
     position: relative;
     padding-right: 175px;
+    font-size: 0.75rem;
 }
 
 @media (max-width: 600px) {

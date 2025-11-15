@@ -1,96 +1,79 @@
 <?php
-declare(strict_types=1);
 session_start();
-header('Content-Type: application/json; charset=utf-8');
+header('Content-Type: application/json');
 
-// Itt egységesítsd a session kulcsot a loginban használtal:
-$me = $_SESSION['neptun'] ?? $_SESSION['neptun_k'] ?? null;
-if ($me === null) {
-    // A jelenlegi JS egy TÖMBÖT vár vissza → küldj vissza üres tömböt 401 mellett,
-    // hogy ne dőljön el a forEach (vagy lásd a JS-javítást lentebb).
+// Felhasználó bejelentkezés ellenőrzése
+if (!isset($_SESSION['user_neptun'])) {
     http_response_code(401);
-    echo json_encode([]); 
-    exit;
+    echo json_encode(['error' => 'Nincs jogosultság']);
+    exit();
 }
 
-// ... PDO csatlakozás ...
-// SELECT c.class_code, c.class_name
-// FROM user_classes uc JOIN class c ON c.class_code = uc.class_code
-// WHERE uc.neptun = :me AND (uc.allapot = 1 OR allapot feltétel nélkül)
-// ORDER BY c.class_name ASC
-// echo json_encode($rows, JSON_UNESCAPED_UNICODE);
-
-
-// -- Auth check --------------------------------------------------------------
-if (!isset($_SESSION['neptun']) && !isset($_SESSION['neptun_k'])) {
-    http_response_code(401);
-    header('Content-Type: application/json; charset=utf-8');
-    echo json_encode(['ok' => false, 'error' => ['code' => 'UNAUTH', 'message' => 'Bejelentkezés szükséges']]);
-    exit;
+$data = json_decode(file_get_contents('php://input'), true);
+if (!isset($data['class_code']) || empty($data['class_code'])) {
+    http_response_code(400);
+    echo json_encode(['error' => 'Hiányzó class_code']);
+    exit();
 }
-$me = $_SESSION['neptun'] ?? $_SESSION['neptun_k'];
 
-// -- PDO (használhatod a meglévő db connt / db.php-t) -----------------------
+$neptun = $_SESSION['user_neptun'];
+$class_code = $data['class_code'];
+
 require_once __DIR__ . '/../config.php';
-$pdo = db();
+$conn = getMysqliConnection();
 
-// -- Paraméterek -------------------------------------------------------------
-$q        = isset($_GET['q']) ? trim((string)$_GET['q']) : '';
-$page     = max(1, (int)($_GET['page'] ?? 1));
-$pageSize = min(50, max(1, (int)($_GET['pageSize'] ?? 20)));
-$offset   = ($page - 1) * $pageSize;
-
-// -- WHERE és COUNT ----------------------------------------------------------
-$where = 'WHERE 1=1';
-$params = [];
-
-if ($q !== '') {
-    $where .= ' AND (c.class_code LIKE :q OR c.class_name LIKE :q)';
-    $params[':q'] = "%{$q}%";
+if ($conn->connect_error) {
+    http_response_code(500);
+    echo json_encode(['error' => 'Adatbázis kapcsolat sikertelen']);
+    exit();
 }
+$conn->set_charset("utf8");
 
-// Olyan tárgyak, amelyekre a felhasználó nincs felvéve aktívan
-// (ha az "allapot" flag nincs használva, vedd ki az AND uc.allapot = 1 részt)
-$sqlBase = "
-    FROM class c
-    LEFT JOIN user_classes uc
-      ON uc.class_code = c.class_code
-     AND uc.neptun = :me
-     AND uc.allapot = 1
-    $where
-    AND uc.neptun IS NULL
-";
-$params[':me'] = $me;
+// Ellenőrzés: létezik-e a tárgy
+$checkSql = "SELECT class_code FROM class WHERE class_code = ?";
+$checkStmt = $conn->prepare($checkSql);
+$checkStmt->bind_param("s", $class_code);
+$checkStmt->execute();
+$checkResult = $checkStmt->get_result();
 
-// Total
-$stmt = $pdo->prepare("SELECT COUNT(*) $sqlBase");
-$stmt->execute($params);
-$total = (int)$stmt->fetchColumn();
-
-// Lista
-$stmt = $pdo->prepare("
-    SELECT c.class_code, c.class_name
-    $sqlBase
-    ORDER BY c.class_name ASC
-    LIMIT :limit OFFSET :offset
-");
-foreach ($params as $k => $v) {
-    $stmt->bindValue($k, $v, is_int($v) ? \PDO::PARAM_INT : \PDO::PARAM_STR);
+if ($checkResult->num_rows === 0) {
+    $checkStmt->close();
+    $conn->close();
+    http_response_code(404);
+    echo json_encode(['error' => 'Tárgy nem található']);
+    exit();
 }
-$stmt->bindValue(':limit', $pageSize, \PDO::PARAM_INT);
-$stmt->bindValue(':offset', $offset, \PDO::PARAM_INT);
-$stmt->execute();
+$checkStmt->close();
 
-$data = $stmt->fetchAll(\PDO::FETCH_ASSOC);
+// Ellenőrzés: már felvette-e a felhasználó
+$checkUserSql = "SELECT class_code FROM user_classes WHERE neptun = ? AND class_code = ?";
+$checkUserStmt = $conn->prepare($checkUserSql);
+$checkUserStmt->bind_param("ss", $neptun, $class_code);
+$checkUserStmt->execute();
+$checkUserResult = $checkUserStmt->get_result();
 
-// -- Válasz ------------------------------------------------------------------
-header('Content-Type: application/json; charset=utf-8');
-echo json_encode([
-    'ok'   => true,
-    'data' => $data,
-    'meta' => [
-        'page' => $page,
-        'pageSize' => $pageSize,
-        'total' => $total
-    ]
-], JSON_UNESCAPED_UNICODE);
+if ($checkUserResult->num_rows > 0) {
+    $checkUserStmt->close();
+    $conn->close();
+    http_response_code(409);
+    echo json_encode(['error' => 'Tárgy már felvéve']);
+    exit();
+}
+$checkUserStmt->close();
+
+// Tárgy felvétele
+$insertSql = "INSERT INTO user_classes (class_code, neptun, allapot) VALUES (?, ?, 'F')";
+$insertStmt = $conn->prepare($insertSql);
+$insertStmt->bind_param("ss", $class_code, $neptun);
+
+if ($insertStmt->execute()) {
+    $insertStmt->close();
+    $conn->close();
+    echo json_encode(['success' => true, 'message' => 'Tárgy sikeresen felvéve']);
+} else {
+    $insertStmt->close();
+    $conn->close();
+    http_response_code(500);
+    echo json_encode(['error' => 'Tárgy felvétele sikertelen']);
+}
+?>

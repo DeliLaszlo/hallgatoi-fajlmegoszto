@@ -78,35 +78,52 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     // Dashboard tárgyak generálása
-    /*/*function generateSubjects() {
-        const subjectCount = 3; // Felhasználó fájlainak száma, PHP-val generált
-        const subjectSection = document.getElementById('dashboard_targyak');
-        if (subjectSection) {
-            if (subjectCount === 0) {
+    async function generateSubjects() {
+        const subjectSection = document.getElementById('user_subjects');
+        if (!subjectSection) return;
+        subjectSection.innerHTML = '';
+
+        try {
+            const response = await fetch('php/getUserSubjects.php');
+            
+            if (!response.ok) {
+                throw new Error('Nem sikerült betölteni a tárgyakat.');
+            }
+            
+            const subjects = await response.json();
+            
+            if (subjects.length === 0) {
                 subjectSection.insertAdjacentHTML('beforeend', 
                     '<h2 class="no_content_message">Még nincsenek felvett tárgyaid.</h2>'
                 );
             } else {
-                for (let i = 0; i < subjectCount; i++) {
+                subjects.forEach(subject => {
                     subjectSection.insertAdjacentHTML('beforeend', `
                         <div class="content_container own_subject_container">
-                            <a href="#" class="container_link subject_link" aria-label="Tárgy megnyitása"></a>
+                            <a href="subject.php?class_code=${encodeURIComponent(subject.class_code)}" class="container_link subject_link" aria-label="Tárgy megnyitása"></a>
                             <button class="button small_button content_delete_button" aria-label="Törlés">
                                 <span class="icon_text">Törlés</span>
                                 <img src="icons/delete.svg" alt="Törlés">
                             </button>
-                            <h2>Tárgy neve</h2> <!-- PHP-val generált -->
-                            <p>Tárgy kódja</p> <!-- PHP-val generált -->
-                            <p>Fájlok száma, kérelmek száma</p> <!-- PHP-val generált -->
+                            <h2>${subject.class_name}</h2>
+                            <p>${subject.class_code}</p>
+                            <p>${subject.file_count} fájl, ${subject.request_count} kérelem</p>
                         </div>
                     `);
-                }
+                });
             }
+        } catch (error) {
+            console.error('Error loading subjects:', error);
+            subjectSection.insertAdjacentHTML('beforeend', 
+                '<h2 class="no_content_message">Hiba történt a tárgyak betöltésekor.</h2>'
+            );
         }
     }
     if (window.location.pathname.includes('dashboard.php')) {
-        generateSubjects();
-  }   */
+        generateSubjects().then(() => {
+            searchOwnSubjects();
+        });
+    }
 
     // Dashboard fájlok generálása
     function generateFiles() {
@@ -252,35 +269,49 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     // Dashboard felvehető tárgyak generálása
-    /* function generateAvailableSubjects() {
-        const availableSubjectCount = 3; // Felvehető tárgyak száma, PHP-val generált
+    async function generateAvailableSubjects() {
         const subjectSection = document.getElementById('subject_list_container');
-        if (subjectSection) {
-            if (availableSubjectCount === 0) {
-                subjectSection.insertAdjacentHTML('beforeend', `
-                    <h2 class="no_content_message">Nincsenek felvehető tárgyak.</h2>
-                `);
+        if (!subjectSection) return;
+        subjectSection.innerHTML = '';
+
+        try {
+            const response = await fetch('php/getAvailableSubjects.php');
+            
+            if (!response.ok) {
+                throw new Error('Nem sikerült betölteni a felvehető tárgyakat.');
+            }
+            
+            const subjects = await response.json();
+            
+            if (subjects.length === 0) {
+                subjectSection.insertAdjacentHTML('beforeend', 
+                    '<h2 class="no_content_message">Nincsenek felvehető tárgyak.</h2>'
+                );
             } else {
-                for (let i = 0; i < availableSubjectCount; i++) {
+                subjects.forEach(subject => {
                     subjectSection.insertAdjacentHTML('beforeend', `
                         <div class="content_container available_subject_container">
                             <div class="subject_details">
-                                <h2>Tárgy neve</h2> <!-- PHP-val generált -->
-                                <p>Tárgy kódja</p> <!-- PHP-val generált -->
+                                <h2>${subject.class_name}</h2>
+                                <p>${subject.class_code}</p>
                             </div>
-                            <button class="button small_button subject_add_button" aria-label="Tárgy felvétele">
+                            <button class="button small_button subject_add_button" data-class-code="${subject.class_code}" aria-label="Tárgy felvétele">
                                 <img src="icons/add.svg" alt="Felvétel">
                                 <span class="icon_text">Felvétel</span>
                             </button>
                         </div>
                     `);
-                }
+                });
             }
+        } catch (error) {
+            subjectSection.insertAdjacentHTML('beforeend', 
+                '<h2 class="no_content_message">Hiba történt a felvehető tárgyak betöltésekor.</h2>'
+            );
         }
     }
     if (window.location.pathname.includes('dashboard.php')) {
         generateAvailableSubjects();
-    } */
+    }
 
     // Subject fájlok generálása
     function generateSubjectFiles() {
@@ -328,8 +359,8 @@ document.addEventListener('DOMContentLoaded', function() {
                                     <span>42<span class="hideable_text"> letöltés</span></span> <!-- PHP-val generált -->
                                     <img src="icons/download.svg" alt="Letöltések">
                                 </div>
-                                <div class="content_voting voting_container">
-                                    <span class="vote_count hideable_text">17</span> <!-- PHP-val generált -->
+                                <div class="content_voting voting_container hideable_content">
+                                    <span class="vote_count">17</span> <!-- PHP-val generált -->
                                     <button class="button small_button content_downvote_button downvote_button" aria-label="Nem tetszik">
                                         <img src="icons/downvote.svg" alt="Nem tetszik">
                                     </button>  
@@ -680,6 +711,13 @@ document.addEventListener('DOMContentLoaded', function() {
                 fileSearchInput.value = '';
                 fileSearchInput.dispatchEvent(new Event('input'));
             }
+
+            // Tárgy keresés törlése szekció váltáskor
+            const subjectSearchInput = document.getElementById('dashboard_subject_search');
+            if (subjectSearchInput) {
+                subjectSearchInput.value = '';
+                subjectSearchInput.dispatchEvent(new Event('input'));
+            }
         }
 
         Object.keys(navLinks).forEach(function(navId) {
@@ -828,10 +866,16 @@ document.addEventListener('DOMContentLoaded', function() {
     if (addSubjectButton) {
         addSubjectButton.addEventListener('click', function(e) {
             e.preventDefault();
-            const addSubjectModal = document.querySelector('.add_subject_modal');
-            if (addSubjectModal) {
-                addSubjectModal.classList.remove('hidden');
-            }
+            showLoading("Felvehető tárgyak betöltése...");
+            generateAvailableSubjects().then(() => {
+                setTimeout(() => {
+                    hideLoading();
+                    const addSubjectModal = document.querySelector('.add_subject_modal');
+                    if (addSubjectModal) {
+                        addSubjectModal.classList.remove('hidden');
+                    }  
+                }, 500);
+            });
         });
     }
 
@@ -1216,6 +1260,33 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
+    // Felvett tárgyak keresése
+    function searchOwnSubjects() {
+        const ownSubjectSearchInput = document.querySelector('.subject_search_input');
+        if (ownSubjectSearchInput) {
+            ownSubjectSearchInput.addEventListener('input', function() {
+                const searchTerm = this.value.toLowerCase().trim();
+                const subjectContainers = document.querySelectorAll('.own_subject_container');     
+                subjectContainers.forEach(function(container) {
+                    const subjectName = container.querySelector('h2');
+                    const subjectCode = container.querySelector('p');
+                    
+                    if (subjectName && subjectCode) {
+                        const nameText = subjectName.textContent.toLowerCase();
+                        const codeText = subjectCode.textContent.toLowerCase();
+                        
+                        if (searchTerm === '' || nameText.includes(searchTerm) || codeText.includes(searchTerm)) {
+                            container.style.display = 'block';
+                        } else {
+                            container.style.display = 'none';
+                        }
+                    }
+                });
+            });
+        }
+    }
+
+
     // Fájl keresés
     const fileSearchInput = document.getElementById('file_search_input');
     if (fileSearchInput) {
@@ -1445,101 +1516,93 @@ document.addEventListener('DOMContentLoaded', function() {
             });
         });
     }
-
     // TODO: Backend - Új üzenetek időszakos lekérése (pl. AJAX segítségével)
-})()});
+})();
 
-const AVAILABLE_SUBJECTS_ENDPOINT = 'php/getAvailableSubjects.php';
-
-// Egyszerű debounce – gépelés közbeni szerverhívás csökkentésére
-function debounce(fn, wait = 300) {
-  let t;
-  return (...args) => { clearTimeout(t); t = setTimeout(() => fn(...args), wait); };
-}
-
-function renderMessage(container, text, cssClass = 'info') {
-  container.innerHTML = '';
-  const p = document.createElement('p');
-  p.className = `message ${cssClass}`;
-  p.textContent = text;
-  container.appendChild(p);
-}
-
-function renderAvailableSubjects(list, container) {
-  container.innerHTML = '';
-  if (!Array.isArray(list) || list.length === 0) {
-    renderMessage(container, 'Nincsenek felvehető tárgyak.', 'empty');
-    return;
-  }
-  const frag = document.createDocumentFragment();
-  list.forEach(it => {
-    const wrap = document.createElement('div');
-    wrap.className = 'available_subject_container';
-
-    const title = document.createElement('h2');
-    title.textContent = it.class_name ?? it.class_code ?? 'Ismeretlen tárgy';
-    wrap.appendChild(title);
-
-    const code = document.createElement('p');
-    code.textContent = it.class_code ?? '';
-    wrap.appendChild(code);
-
-    // Később ide jön a "Felvétel" gomb
-    frag.appendChild(wrap);
-  });
-  container.appendChild(frag);
-}
-
-async function loadAvailableSubjects({ q = '', page = 1, pageSize = 20 } = {}) {
-  const container = document.querySelector('#subject_list_container');
-  if (!container) return;
-
-  renderMessage(container, 'Betöltés…', 'loading');
-
-  const params = new URLSearchParams();
-  if (q && q.trim() !== '') params.set('q', q.trim());
-  params.set('page', String(page));
-  params.set('pageSize', String(pageSize));
-
-  const url = `${AVAILABLE_SUBJECTS_ENDPOINT}?${params.toString()}`;
-
-  try {
-    const res = await fetch(url, { credentials: 'same-origin' }); // session cookie megy
-    if (!res.ok) {
-      if (res.status === 401) {
-        renderMessage(container, 'Bejelentkezés szükséges (lejárt a munkamenet).', 'error');
-        return;
-      }
-      throw new Error('Hiba a betöltés közben');
-    }
-    const payload = await res.json();
-    const list = Array.isArray(payload) ? payload : (payload.data || []);
-    renderAvailableSubjects(list, container);
-  } catch (err) {
-    console.error(err);
-    renderMessage(container, 'Nem sikerült betölteni a tárgyakat.', 'error');
-  }
-}
-
-function attachAvailableSubjectSearch() {
-  const input = document.querySelector('#subject_search_input');
-  if (!input) return;
-  if (input.dataset.bound === '1') return; // ne kössük duplán
-  input.dataset.bound = '1';
-
-  const handler = debounce(() => {
-    loadAvailableSubjects({ q: input.value });
-  }, 300);
-  input.addEventListener('input', handler);
-}
-
-// A TELJES bekötést a DOM betöltése után végezzük:
-document.addEventListener('DOMContentLoaded', () => {
-  // amikor a + Tárgy felvétele gomb megnyitjuk, töltsük be a listát
-  document.querySelectorAll('.add_subject_button').forEach(btn => {
-    btn.addEventListener('click', () => {
-      attachAvailableSubjectSearch();
-      loadAvailableSubjects({ q: '' });
+    // Tárgy felvétele
+    document.addEventListener('click', async function(e) {
+        if (e.target.closest('.subject_add_button')) {
+            const button = e.target.closest('.subject_add_button');
+            const classCode = button.getAttribute('data-class-code');
+            
+            if (!classCode) return;
+            button.disabled = true;
+            
+            try {
+                const response = await fetch('php/add_subject.php', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ class_code: classCode })
+                });
+                
+                if (!response.ok) {
+                    throw new Error('Nem sikerült felvenni a tárgyat.');
+                }
+                
+                const result = await response.json();    
+                if (result.success) {
+                    // Gomb megjelenésének módosítása
+                    const imgElement = button.querySelector('img');
+                    const textElement = button.querySelector('.icon_text');
+                    
+                    if (imgElement) {
+                        imgElement.src = 'icons/tick.svg';
+                        imgElement.alt = 'Felvéve';
+                    }
+                    if (textElement) {
+                        textElement.textContent = 'Felvéve';
+                    }
+                    button.setAttribute('aria-label', 'Tárgy felvéve');
+                    
+                    // Tárgy hozzáadása a saját tárgyak közé
+                    const userSubjectsSection = document.getElementById('user_subjects');
+                    if (userSubjectsSection) {
+                        // Ha "Még nincsenek felvett tárgyaid" üzenet van, távolítsuk el
+                        const noContentMessage = userSubjectsSection.querySelector('.no_content_message');
+                        if (noContentMessage) {
+                            noContentMessage.remove();
+                        }
+                        
+                        // Tárgy adatainak lekérése a backend-től
+                        try {
+                            const subjectsResponse = await fetch('php/getUserSubjects.php');
+                            if (subjectsResponse.ok) {
+                                const subjects = await subjectsResponse.json();
+                                const addedSubject = subjects.find(s => s.class_code === classCode);
+                                
+                                if (addedSubject) {
+                                    userSubjectsSection.insertAdjacentHTML('beforeend', `
+                                        <div class="content_container own_subject_container">
+                                            <a href="subject.php?class_code=${encodeURIComponent(addedSubject.class_code)}" class="container_link subject_link" aria-label="Tárgy megnyitása"></a>
+                                            <button class="button small_button content_delete_button" aria-label="Törlés">
+                                                <span class="icon_text">Törlés</span>
+                                                <img src="icons/delete.svg" alt="Törlés">
+                                            </button>
+                                            <h2>${addedSubject.class_name}</h2>
+                                            <p>${addedSubject.class_code}</p>
+                                            <p>${addedSubject.file_count} fájl, ${addedSubject.request_count} kérelem</p>
+                                        </div>
+                                    `);
+                                    
+                                    // Keresés újrainicializálása az új tárggyal
+                                    searchOwnSubjects();
+                                }
+                            }
+                            alert('Tárgy sikeresen felvéve!');
+                        } catch (error) {
+                            console.error('Hiba történt a tárgy részleteinek lekérésekor:', error);
+                        }
+                    }
+                } else {
+                    throw new Error(result.error || 'Ismeretlen hiba történt.');
+                }
+            } catch (error) {
+                console.error('Error adding subject:', error);
+                alert('Hiba történt a tárgy felvételekor: ' + error.message);
+                button.disabled = false;
+            }
+        }
     });
-  });
 });
