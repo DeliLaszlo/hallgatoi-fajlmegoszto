@@ -138,7 +138,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 for (let i = 0; i < fileCount; i++) {
                     fileSection.insertAdjacentHTML('beforeend', `
                         <div class="content_container own_file_container">
-                            <a href="#" class="container_link own_details_link" aria-label="Fájl megnyitása"></a>
+                            <a href="#" class="container_link own_details_link" data-up-id="" aria-label="Fájl megnyitása"></a> <!-- data-up-id PHP-val generált -->
                             <button class="button small_button content_download_button" aria-label="Letöltés">
                                 <span class="icon_text">Letöltés</span>
                                 <img src="icons/download.svg" alt="Letöltés">
@@ -179,7 +179,7 @@ document.addEventListener('DOMContentLoaded', function() {
                                     <span class="icon_text">Teljesítve</span>
                                     <img src="icons/tick.svg" alt="Teljesítve" class="status_icon">  
                                 </span>
-                                <a href="#" class="container_link own_completed_requests_link" aria-label="Kérelem megnyitása"></a>
+                                <a href="#" class="container_link own_completed_requests_link" data-request-id="" aria-label="Kérelem megnyitása"></a> <!-- data-request-id PHP-val generált -->
                                 <h2>Kérelem címe</h2> <!-- PHP-val generált -->
                                 <p>Kérelem leírása</p> <!-- PHP-val generált -->
                                 <p>Létrehozás dátuma, tárgy neve</p> <!-- PHP-val generált -->
@@ -328,7 +328,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     if (isOwnFile) {
                         fileSection.insertAdjacentHTML('beforeend', `
                             <div class="content_container uploaded_files_container">
-                                <a href="#" class="container_link own_details_link" aria-label="Fájl részletei"></a>
+                                <a href="#" class="container_link own_details_link" data-up-id="" aria-label="Fájl részletei"></a> <!-- data-up-id PHP-val generált -->
                                 <button class="button small_button content_download_button" aria-label="Letöltés">
                                     <span class="icon_text">Letöltés</span>
                                     <img src="icons/download.svg" alt="Letöltés">
@@ -350,7 +350,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     } else {
                         fileSection.insertAdjacentHTML('beforeend', `
                             <div class="content_container uploaded_files_container">
-                                <a href="#" class="container_link file_details_link" aria-label="Fájl részletei"></a>
+                                <a href="#" class="container_link file_details_link" data-up-id="" aria-label="Fájl részletei"></a> <!-- data-up-id PHP-val generált -->
                                 <button class="button small_button content_download_button" aria-label="Letöltés">
                                     <span class="icon_text">Letöltés</span>
                                     <img src="icons/download.svg" alt="Letöltés">
@@ -927,27 +927,136 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     });
 
-    // Fájl részletei modal megnyitása
-    document.addEventListener('click', function(e) {
-    if (e.target.closest('.file_details_link')) {
-        e.preventDefault();
-        const fileDetailsModal = document.querySelector('.file_details_modal');
-        if (fileDetailsModal) {
-            fileDetailsModal.classList.remove('hidden');
+    // Fájl részletei modal megnyitása és adatok betöltése
+    document.addEventListener('click', async function(e) {
+        const link = e.target.closest('.file_details_link');
+        if (link) {
+            e.preventDefault();
+            const upId = link.getAttribute('data-up-id');
+            
+            if (!upId) {
+                alert('Hiányzó fájl azonosító');
+                return;
+            }
+            
+            showLoading('Fájl részleteinek betöltése...');
+            
+            try {
+                const response = await fetch(`getFileDetails.php?mode=upload&id=${upId}`);
+                
+                if (!response.ok) {
+                    throw new Error('Hiba a fájl részleteinek betöltésekor');
+                }
+                
+                const result = await response.json();
+                
+                if (!result.success) {
+                    throw new Error(result.message || 'Ismeretlen hiba');
+                }
+                
+                const data = result.data;
+                const fileDetailsModal = document.querySelector('.file_details_modal');
+                
+                if (fileDetailsModal) {
+                    // Adatok beállítása a modalban
+                    const titleElement = fileDetailsModal.querySelector('.data-file-title');
+                    const uploaderElement = fileDetailsModal.querySelector('.data-file-uploader');
+                    const fileNameElement = fileDetailsModal.querySelector('.data-file-name');
+                    const dateElement = fileDetailsModal.querySelector('.data-file-date');
+                    const sizeElement = fileDetailsModal.querySelector('.data-file-size');
+                    const downloadsElement = fileDetailsModal.querySelector('.data-file-downloads');
+                    const ratingElement = fileDetailsModal.querySelector('.data-file-rating');
+                    const descriptionElement = fileDetailsModal.querySelector('.data-file-description');
+                    
+                    if (titleElement) titleElement.textContent = data.title;
+                    if (uploaderElement) uploaderElement.textContent = data.uploader;
+                    if (fileNameElement) fileNameElement.textContent = data.file_name;
+                    if (dateElement) dateElement.textContent = data.upload_date;
+                    if (sizeElement) sizeElement.textContent = data.file_size;
+                    if (downloadsElement) downloadsElement.textContent = data.downloads;
+                    if (ratingElement) ratingElement.textContent = data.rating;
+                    if (descriptionElement) descriptionElement.textContent = data.description;
+                    
+                    // Loading eltűntetése kis késleltetéssel
+                    setTimeout(() => {
+                        hideLoading();
+                        // Modal megjelenítése
+                        fileDetailsModal.classList.remove('hidden');
+                    }, 1250);
+                }
+                
+            } catch (error) {
+                console.error('Hiba:', error);
+                hideLoading();
+                alert('Hiba történt a fájl részleteinek betöltése közben: ' + error.message);
+            }
         }
-    }
     });
 
-    // Saját fájl részletei modal megnyitása
-    const ownDetailsLinks = document.querySelectorAll('.own_details_link');
-    ownDetailsLinks.forEach(function(link) {
-        link.addEventListener('click', function(e) {
+    // Saját fájl részletei modal megnyitása és adatok betöltése
+    document.addEventListener('click', async function(e) {
+        const link = e.target.closest('.own_details_link');
+        if (link) {
             e.preventDefault();
-            const ownFileModal = document.querySelector('.own_file_details_modal');
-            if (ownFileModal) {
-                ownFileModal.classList.remove('hidden');
+            const upId = link.getAttribute('data-up-id');
+            
+            if (!upId) {
+                alert('Hiányzó fájl azonosító');
+                return;
             }
-        });
+            
+            showLoading('Fájl részleteinek betöltése...');
+            
+            try {
+                const response = await fetch(`getFileDetails.php?mode=upload&id=${upId}`);
+                
+                if (!response.ok) {
+                    throw new Error('Hiba a fájl részleteinek betöltésekor');
+                }
+                
+                const result = await response.json();
+                
+                if (!result.success) {
+                    throw new Error(result.message || 'Ismeretlen hiba');
+                }
+                
+                const data = result.data;
+                const ownFileModal = document.querySelector('.own_file_details_modal');
+                
+                if (ownFileModal) {
+                    // Adatok beállítása a modalban
+                    const titleElement = ownFileModal.querySelector('.data-file-title');
+                    const fileNameElement = ownFileModal.querySelector('.data-file-name');
+                    const subjectElement = ownFileModal.querySelector('.data-file-subject');
+                    const dateElement = ownFileModal.querySelector('.data-file-date');
+                    const sizeElement = ownFileModal.querySelector('.data-file-size');
+                    const downloadsElement = ownFileModal.querySelector('.data-file-downloads');
+                    const ratingElement = ownFileModal.querySelector('.data-file-rating');
+                    const descriptionElement = ownFileModal.querySelector('.data-file-description');
+                    
+                    if (titleElement) titleElement.textContent = data.title;
+                    if (fileNameElement) fileNameElement.textContent = data.file_name;
+                    if (subjectElement) subjectElement.textContent = data.class_name;
+                    if (dateElement) dateElement.textContent = data.upload_date;
+                    if (sizeElement) sizeElement.textContent = data.file_size;
+                    if (downloadsElement) downloadsElement.textContent = data.downloads;
+                    if (ratingElement) ratingElement.textContent = data.rating;
+                    if (descriptionElement) descriptionElement.textContent = data.description;
+                    
+                    // Loading eltüntetése kis késleltetéssel
+                    setTimeout(() => {
+                        hideLoading();
+                        // Modal megjelenítése
+                        ownFileModal.classList.remove('hidden');
+                    }, 1250);
+                }
+                
+            } catch (error) {
+                console.error('Hiba:', error);
+                hideLoading();
+                alert('Hiba történt a fájl részleteinek betöltése közben: ' + error.message);
+            }
+        }
     });
 
     // Saját teljesítetlen kérelmek modal megnyitása
@@ -962,16 +1071,74 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     });
 
-    // Saját teljesített kérelmek modal megnyitása
-    const ownCompletedRequestsLinks = document.querySelectorAll('.own_completed_requests_link');
-    ownCompletedRequestsLinks.forEach(function(link) {
-        link.addEventListener('click', function(e) {
+    // Saját teljesített kérelmek modal megnyitása és adatok betöltése
+    document.addEventListener('click', async function(e) {
+        const link = e.target.closest('.own_completed_requests_link');
+        if (link) {
             e.preventDefault();
-            const ownCompletedRequestsModal = document.querySelector('.own_completed_requests_modal');
-            if (ownCompletedRequestsModal) {
-                ownCompletedRequestsModal.classList.remove('hidden');
+            const requestId = link.getAttribute('data-request-id');
+            
+            if (!requestId) {
+                alert('Hiányzó kérelem azonosító');
+                return;
             }
-        });
+            
+            showLoading('Kérelem részleteinek betöltése...');
+            
+            try {
+                const response = await fetch(`getFileDetails.php?mode=request&id=${requestId}`);
+                
+                if (!response.ok) {
+                    throw new Error('Hiba a kérelem részleteinek betöltésekor');
+                }
+                
+                const result = await response.json();
+                
+                if (!result.success) {
+                    throw new Error(result.message || 'Ismeretlen hiba');
+                }
+                
+                const data = result.data;
+                const ownCompletedRequestsModal = document.querySelector('.own_completed_requests_modal');
+                
+                if (ownCompletedRequestsModal) {
+                    // Adatok beállítása a modalban
+                    const requestTitleElement = ownCompletedRequestsModal.querySelector('.data-request-title');
+                    const fileTitleElement = ownCompletedRequestsModal.querySelector('.data-file-title');
+                    const uploaderElement = ownCompletedRequestsModal.querySelector('.data-file-uploader');
+                    const fileNameElement = ownCompletedRequestsModal.querySelector('.data-file-name');
+                    const subjectElement = ownCompletedRequestsModal.querySelector('.data-file-subject');
+                    const dateElement = ownCompletedRequestsModal.querySelector('.data-file-date');
+                    const sizeElement = ownCompletedRequestsModal.querySelector('.data-file-size');
+                    const downloadsElement = ownCompletedRequestsModal.querySelector('.data-file-downloads');
+                    const ratingElement = ownCompletedRequestsModal.querySelector('.data-file-rating');
+                    const descriptionElement = ownCompletedRequestsModal.querySelector('.data-file-description');
+                    
+                    if (requestTitleElement) requestTitleElement.textContent = data.request_name;
+                    if (fileTitleElement) fileTitleElement.textContent = data.title;
+                    if (uploaderElement) uploaderElement.textContent = data.uploader;
+                    if (fileNameElement) fileNameElement.textContent = data.file_name;
+                    if (subjectElement) subjectElement.textContent = data.class_name;
+                    if (dateElement) dateElement.textContent = data.upload_date;
+                    if (sizeElement) sizeElement.textContent = data.file_size;
+                    if (downloadsElement) downloadsElement.textContent = data.downloads;
+                    if (ratingElement) ratingElement.textContent = data.rating;
+                    if (descriptionElement) descriptionElement.textContent = data.description;
+                    
+                    // Loading eltűntetése kis késleltetéssel
+                    setTimeout(() => {
+                        hideLoading();
+                        // Modal megjelenítése
+                        ownCompletedRequestsModal.classList.remove('hidden');
+                    }, 1250);
+                }
+                
+            } catch (error) {
+                console.error('Hiba:', error);
+                hideLoading();
+                alert('Hiba történt a kérelem részleteinek betöltése közben: ' + error.message);
+            }
+        }
     });
 
     // Fájl szerkesztés modal megnyitása
