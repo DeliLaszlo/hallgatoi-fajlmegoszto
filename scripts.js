@@ -1,3 +1,49 @@
+// Töltő képernyő kezelése
+function showLoading(message = 'Betöltés...') {
+    let loadingScreen = document.getElementById('loading-screen');
+    
+    if (!loadingScreen) {
+        loadingScreen = document.createElement('div');
+        loadingScreen.id = 'loading-screen';
+        loadingScreen.className = 'loading-screen';
+        loadingScreen.innerHTML = `
+            <div class="loading-spinner">
+                <img src="icons/hourglass.svg" alt="Betöltés">
+                <div class="loading-text">${message}</div>
+            </div>
+        `;
+        document.body.appendChild(loadingScreen);
+    } else {
+        const loadingText = loadingScreen.querySelector('.loading-text');
+        if (loadingText) {
+            loadingText.textContent = message;
+        }
+    }
+    
+    setTimeout(() => {
+        loadingScreen.classList.add('active');
+    }, 10);
+}
+
+function hideLoading() {
+    const loadingScreen = document.getElementById('loading-screen');
+    if (loadingScreen) {
+        setTimeout(() => {
+            if (loadingScreen.classList.contains('initial-loading')) {
+                loadingScreen.remove();
+                return;
+            }
+            loadingScreen.classList.remove('active');
+        }, 10);
+    }
+}
+
+window.onload = function() {
+    setTimeout(() => {
+        hideLoading();
+    }, 1250);
+};
+
 document.addEventListener('DOMContentLoaded', function() {
     // Sötét mód váltó
     const darkModeToggle = document.querySelector('.dark-mode-toggle');

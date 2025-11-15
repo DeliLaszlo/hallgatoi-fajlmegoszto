@@ -1370,6 +1370,66 @@ form .modal_footer {
     background-color: var(--secondary-color);
 }
 
+/* Töltő képernyő */
+.loading-screen {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: var(--shadow-dark);
+    z-index: 2000;
+    justify-content: center;
+    align-items: center;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.initial-loading {
+    background-color: #222;
+}
+
+.loading-screen.active, .initial-loading {
+    display: flex;
+    opacity: 1;
+}
+
+.loading-spinner {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1rem;
+}
+
+.loading-spinner img {
+    width: 64px;
+    height: 64px;
+    animation: spin 2.5s ease-in-out infinite;
+}
+
+@keyframes spin {
+    0% {
+        transform: rotate(0deg);
+    }
+    50% {
+        transform: rotate(180deg);
+    }
+    100% {
+        transform: rotate(360deg);
+    }
+}
+
+.loading-text {
+    color: var(--text-secondary);
+    font-size: 1.25rem;
+    font-weight: bold;
+}
+
+.initial-loading .loading-text {
+    color: var(--text-secondary);
+}
+
 /* Chatszobák */
 #chatszobak {
   width: 60%;

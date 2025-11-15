@@ -23,6 +23,12 @@ if (isset($_SESSION['last_activity']) && (time() - $_SESSION['last_activity'] > 
     <title>Dashboard</title>
 </head>
 <body>
+    <div id="loading-screen" class="loading-screen initial-loading">
+        <div class="loading-spinner">
+            <img src="icons/hourglass.svg" alt="Betöltés">
+            <div class="loading-text">Oldal betöltése...</div>
+        </div>
+    </div>
     <header>
         <img src="icons/IVK_logo.png" alt="IVK logo" class="ivk_logo header_img" width="1920" height="586">
         <span class="active-section-name"></span>

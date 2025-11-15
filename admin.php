@@ -8,6 +8,12 @@
     <title>Admin felület</title>
 </head>
 <body>
+    <div id="loading-screen" class="loading-screen initial-loading">
+        <div class="loading-spinner">
+            <img src="icons/hourglass.svg" alt="Betöltés">
+            <div class="loading-text">Oldal betöltése...</div>
+        </div>
+    </div>
 <header>
     <span class="active-section-name"></span>
 
