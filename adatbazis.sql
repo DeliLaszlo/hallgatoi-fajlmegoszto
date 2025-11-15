@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Gép: 127.0.0.1
--- Létrehozás ideje: 2025. Nov 12. 15:34
+-- Létrehozás ideje: 2025. Nov 15. 09:43
 -- Kiszolgáló verziója: 10.4.32-MariaDB
 -- PHP verzió: 8.2.12
 
@@ -145,7 +145,7 @@ CREATE TABLE `message` (
   `sender_neptun` varchar(6) CHARACTER SET utf8 COLLATE utf8_hungarian_ci NOT NULL,
   `room_id` int(5) NOT NULL,
   `text` varchar(255) CHARACTER SET utf8 COLLATE utf8_hungarian_ci NOT NULL,
-  `send_time` date NOT NULL
+  `send_time` datetime NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- --------------------------------------------------------
@@ -180,7 +180,7 @@ CREATE TABLE `request` (
   `request_id` int(5) NOT NULL,
   `neptun_k` varchar(6) CHARACTER SET utf8 COLLATE utf8_hungarian_ci NOT NULL,
   `class_code` varchar(50) CHARACTER SET utf8 COLLATE utf8_hungarian_ci NOT NULL,
-  `class_name` varchar(100) CHARACTER SET utf8 COLLATE utf8_hungarian_ci NOT NULL,
+  `request_name` varchar(50) CHARACTER SET utf8 COLLATE utf8_hungarian_ci NOT NULL,
   `description` varchar(255) CHARACTER SET utf8 COLLATE utf8_hungarian_ci NOT NULL COMMENT 'Melyik anyag/óra tartalmát kéri a felhasználó'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
@@ -188,9 +188,9 @@ CREATE TABLE `request` (
 -- A tábla adatainak kiíratása `request`
 --
 
-INSERT INTO `request` (`request_id`, `neptun_k`, `class_code`, `class_name`, `description`) VALUES
-(10001, 'asd123', 'GKNB_INTM118', 'Szoftvertechnológia 1.', '\"uml diagrammok elemei\"'),
-(10002, 'asd123', 'GKNB_INTM115', 'Operációs rendszerek', 'Az elso zh-ban szereplő anyagok');
+INSERT INTO `request` (`request_id`, `neptun_k`, `class_code`, `request_name`, `description`) VALUES
+(10001, 'asd123', 'GKNB_INTM118', 'Uml diagram', '\"uml diagrammok elemei\"'),
+(10002, 'asd123', 'GKNB_INTM115', 'Op rendszer zh anyagai', 'Az elso zh-ban szereplő anyagok');
 
 -- --------------------------------------------------------
 
@@ -224,6 +224,7 @@ CREATE TABLE `upload` (
   `neptun` varchar(6) CHARACTER SET utf8 COLLATE utf8_hungarian_ci NOT NULL,
   `file_name` varchar(60) CHARACTER SET utf8 COLLATE utf8_hungarian_ci NOT NULL,
   `path_to_file` varchar(255) CHARACTER SET utf8 COLLATE utf8_hungarian_ci NOT NULL,
+  `upload_title` varchar(50) CHARACTER SET utf8 COLLATE utf8_hungarian_ci NOT NULL,
   `comment` varchar(255) CHARACTER SET utf8 COLLATE utf8_hungarian_ci NOT NULL,
   `rating` int(11) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
@@ -232,9 +233,9 @@ CREATE TABLE `upload` (
 -- A tábla adatainak kiíratása `upload`
 --
 
-INSERT INTO `upload` (`up_id`, `class_code`, `neptun`, `file_name`, `path_to_file`, `comment`, `rating`) VALUES
-(1000001, 'GKNB_INTM118', 'asd123', 'uml.pdf', 'Projektmunka\\xampp\\htdocs\\project\\files', 'Az uml diagramokban hasznáható elemek és azok szerepe', 0),
-(1000002, 'GKNB_INTM115', 'asd123', 'elso_op_zh.txt', 'Projektmunka\\xampp\\htdocs\\project\\files', 'Az elso zh-ban előforduló kérdések és válaszaik', 0);
+INSERT INTO `upload` (`up_id`, `class_code`, `neptun`, `file_name`, `path_to_file`, `upload_title`, `comment`, `rating`) VALUES
+(1000001, 'GKNB_INTM118', 'asd123', 'uml.pdf', 'Projektmunka\\xampp\\htdocs\\project\\files', 'Uml diagrammok elemei', 'Az uml diagramokban hasznáható elemek és azok szerepe', 0),
+(1000002, 'GKNB_INTM115', 'asd123', 'elso_op_zh.txt', 'Projektmunka\\xampp\\htdocs\\project\\files', 'Zh kérdések és válaszok', 'Az elso zh-ban előforduló kérdések és válaszaik', 0);
 
 -- --------------------------------------------------------
 
