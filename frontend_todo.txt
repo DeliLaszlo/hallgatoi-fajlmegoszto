@@ -1,2 +1,0 @@
-Chatszoba oldal létrehozása
-Admin felület létrehozása

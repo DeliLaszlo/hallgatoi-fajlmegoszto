@@ -1,21 +1,17 @@
 I. Kilistázás:
-1. Dashboard tárgyak, feltöltött fájlok, kérelmek, chatszobák, felvehető tárgyak kilistázása
-2. Dashboard tárgyakra kattintás a helyes tárgy oldalra vezessen
-3. Subject oldalcím felülírása, fájlok, kérelmek, chatszobák kilistázása
+1. Dashboard kérelmek, chatszobák kilistázása
+2. Subject, kérelmek, chatszobák kilistázása
 
 II. Gombok:
-1. Dashboard tárgyfelvétel, törlés gombok, letöltés gombok, követés megszüntetés gombok, szerkesztés gombok működtetése
+1. Dashboard törlés gombok, letöltés gombok, követés megszüntetés gombok, szerkesztés gombok működtetése
 2. Subject új fájl feltöltés, új kérelem, új chatszoba, letöltés gombok, feltöltés gombok, törlés gombok, szerkesztés gombok, követés gombok működtetése
 
-III. Profil szerkesztés:
-1. Felhasználó adatainak megjelenítése
-2. Adatszerkesztés kezelése
-
-IV. Felugró ablakok kezelése:
-1. Dashboard, subject - Fájl részletek megjelenítése, kérelem részletek megjelenítése
+III. Felugró ablakok kezelése:
+1. Dashboard, subject kérelem részletek megjelenítése
 2. Felugró ablakok gombjainak kezelése
 
-V. Később megoldandó dolgok
+IV. Később megoldandó dolgok
 - Chatszobák helyes chatszobához irányítsanak át
+- Chatszoba üzenetek kezelése
 - Jelentés gombok működtetése
 - Admin oldal kezelése

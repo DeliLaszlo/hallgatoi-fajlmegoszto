@@ -105,6 +105,7 @@ $conn->close();
                 </div>
             </div>
             <hr>
+            <div id="subject_file_container"></div>
         </section>
         <section id="subject_kerelemek">
             <div class="section_header">

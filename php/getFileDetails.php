@@ -3,12 +3,8 @@ session_start();
 header('Content-Type: application/json');
 
 // Adatbázis kapcsolat
-$conn = new mysqli("localhost", "root", "", "pm_db_fm_v1");
-if ($conn->connect_error) {
-    echo json_encode(['success' => false, 'message' => 'Adatbázis kapcsolat hiba']);
-    exit();
-}
-$conn->set_charset("utf8");
+require_once __DIR__ . '/../config.php';
+$conn = getMysqliConnection();
 
 // Ellenőrizzük, hogy be van-e jelentkezve a felhasználó
 if (!isset($_SESSION['user_neptun'])) {

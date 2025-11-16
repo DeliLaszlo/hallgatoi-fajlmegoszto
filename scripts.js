@@ -126,19 +126,35 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     // Dashboard fájlok generálása
-    function generateFiles() {
-        const fileCount = 3; // Felhasználó fájlainak száma, PHP-val generált
-        const fileSection = document.getElementById('dashboard_fajlok');
-        if (fileSection) {
-            if (fileCount === 0) {
+    async function generateFiles() {
+        const fileSection = document.getElementById('dashboard_file_container');
+        if (!fileSection) return;
+        fileSection.innerHTML = '';
+
+        try {
+            const response = await fetch('php/getFiles.php?mode=neptun');
+            
+            if (!response.ok) {
+                throw new Error('Nem sikerült betölteni a fájlokat.');
+            }
+            
+            const result = await response.json();
+            
+            if (!result.success) {
+                throw new Error(result.message || 'Ismeretlen hiba');
+            }
+            
+            const files = result.files;
+            
+            if (files.length === 0) {
                 fileSection.insertAdjacentHTML('beforeend', 
                     '<h2 class="no_content_message">Még nem töltöttél fel fájlokat.</h2>'
                 );
             } else {
-                for (let i = 0; i < fileCount; i++) {
+                files.forEach(file => {
                     fileSection.insertAdjacentHTML('beforeend', `
-                        <div class="content_container own_file_container">
-                            <a href="#" class="container_link own_details_link" data-up-id="" aria-label="Fájl megnyitása"></a> <!-- data-up-id PHP-val generált -->
+                        <div class="content_container uploaded_files_container own_file_container">
+                            <a href="#" class="container_link own_details_link" data-up-id="${file.up_id}" aria-label="Fájl megnyitása"></a>
                             <button class="button small_button content_download_button" aria-label="Letöltés">
                                 <span class="icon_text">Letöltés</span>
                                 <img src="icons/download.svg" alt="Letöltés">
@@ -147,13 +163,18 @@ document.addEventListener('DOMContentLoaded', function() {
                                 <span class="icon_text">Törlés</span>
                                 <img src="icons/delete.svg" alt="Törlés">
                             </button>
-                            <h2>Fájl címe</h2> <!-- PHP-val generált -->
-                            <p>Fájl leírása</p> <!-- PHP-val generált -->
-                            <p>Feltöltés dátuma, tárgy neve</p> <!-- PHP-val generált -->
+                            <h2>${file.title}</h2>
+                            <p>${file.description}</p>
+                            <p>${file.upload_date}, ${file.class_name}</p>
                         </div>
                     `);
-                }
+                });
             }
+        } catch (error) {
+            console.error('Error loading files:', error);
+            fileSection.insertAdjacentHTML('beforeend', 
+                '<h2 class="no_content_message">Hiba történt a fájlok betöltésekor.</h2>'
+            );
         }
     }
     if (window.location.pathname.includes('dashboard.php')) {
@@ -314,53 +335,79 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     // Subject fájlok generálása
-    function generateSubjectFiles() {
-        const fileCount = 3; // Feltöltött fájlok száma, PHP-val generált
-        const fileSection = document.getElementById('subject_fajlok');
-        if (fileSection) {
-            if (fileCount === 0) {
+    async function generateSubjectFiles() {
+        const fileSection = document.getElementById('subject_file_container');
+        if (!fileSection) return;
+        fileSection.innerHTML = '';
+
+        // Tárgy kód lekérése az URL-ből
+        const urlParams = new URLSearchParams(window.location.search);
+        const classCode = urlParams.get('class_code');
+
+        if (!classCode) {
+            fileSection.insertAdjacentHTML('beforeend', 
+                '<h2 class="no_content_message">Hiányzó tárgy azonosító.</h2>'
+            );
+            return;
+        }
+
+        try {
+            const response = await fetch(`php/getFiles.php?mode=class&class_code=${encodeURIComponent(classCode)}`);
+            
+            if (!response.ok) {
+                throw new Error('Nem sikerült betölteni a fájlokat.');
+            }
+            
+            const result = await response.json();
+            
+            if (!result.success) {
+                throw new Error(result.message || 'Ismeretlen hiba');
+            }
+            
+            const files = result.files;
+            
+            if (files.length === 0) {
                 fileSection.insertAdjacentHTML('beforeend', 
                     '<h2 class="no_content_message">Még nincsenek feltöltött fájlok ehhez a tárgyhoz.</h2>'
                 );
             } else {
-                for (let i = 0; i < fileCount; i++) {
-                    const isOwnFile = (i % 2 === 0); // Helyettesítendő PHP-val
-                    if (isOwnFile) {
+                files.forEach(file => {
+                    if (file.is_own) {
                         fileSection.insertAdjacentHTML('beforeend', `
                             <div class="content_container uploaded_files_container">
-                                <a href="#" class="container_link own_details_link" data-up-id="" aria-label="Fájl részletei"></a> <!-- data-up-id PHP-val generált -->
+                                <a href="#" class="container_link own_details_link" data-up-id="${file.up_id}" aria-label="Fájl részletei"></a>
                                 <button class="button small_button content_download_button" aria-label="Letöltés">
                                     <span class="icon_text">Letöltés</span>
                                     <img src="icons/download.svg" alt="Letöltés">
                                 </button>
                                 <div class="content_downloads">
-                                    <span>42<span class="hideable_text"> letöltés</span></span> <!-- PHP-val generált -->
+                                    <span>${file.downloads}<span class="hideable_text"> letöltés</span></span>
                                     <img src="icons/download.svg" alt="Letöltések">
                                 </div>
                                 <div class="content_voting voting_container hideable_content">
-                                    <span class="vote_count">17</span> <!-- PHP-val generált -->
+                                    <span class="vote_count">${file.rating}</span>
                                     <img class="own_downvote_icon" src="icons/downvote.svg" alt="Nem tetszik">
                                     <img src="icons/upvote.svg" alt="Tetszik">
                                 </div>
-                                <h2>Fájl neve</h2> <!-- PHP-val generált -->
-                                <p>Fájl leírása</p> <!-- PHP-val generált -->
-                                <p>Te, feltöltés dátuma</p> <!-- PHP-val generált -->
+                                <h2>${file.title}</h2>
+                                <p>${file.description}</p>
+                                <p>Én, ${file.upload_date}</p>
                             </div>
                         `);
                     } else {
                         fileSection.insertAdjacentHTML('beforeend', `
                             <div class="content_container uploaded_files_container">
-                                <a href="#" class="container_link file_details_link" data-up-id="" aria-label="Fájl részletei"></a> <!-- data-up-id PHP-val generált -->
+                                <a href="#" class="container_link file_details_link" data-up-id="${file.up_id}" aria-label="Fájl részletei"></a>
                                 <button class="button small_button content_download_button" aria-label="Letöltés">
                                     <span class="icon_text">Letöltés</span>
                                     <img src="icons/download.svg" alt="Letöltés">
                                 </button>
                                 <div class="content_downloads">
-                                    <span>42<span class="hideable_text"> letöltés</span></span> <!-- PHP-val generált -->
+                                    <span>${file.downloads}<span class="hideable_text"> letöltés</span></span>
                                     <img src="icons/download.svg" alt="Letöltések">
                                 </div>
                                 <div class="content_voting voting_container hideable_content">
-                                    <span class="vote_count">17</span> <!-- PHP-val generált -->
+                                    <span class="vote_count">${file.rating}</span>
                                     <button class="button small_button content_downvote_button downvote_button" aria-label="Nem tetszik">
                                         <img src="icons/downvote.svg" alt="Nem tetszik">
                                     </button>  
@@ -368,14 +415,19 @@ document.addEventListener('DOMContentLoaded', function() {
                                         <img src="icons/upvote.svg" alt="Tetszik">
                                     </button>  
                                 </div>
-                                <h2>Fájl neve</h2> <!-- PHP-val generált -->
-                                <p>Fájl leírása</p> <!-- PHP-val generált -->
-                                <p>Feltöltő, feltöltés dátuma</p> <!-- PHP-val generált -->
+                                <h2>${file.title}</h2>
+                                <p>${file.description}</p>
+                                <p>${file.uploader_nickname}, ${file.upload_date}</p>
                             </div>
                         `);
                     }
-                }
+                });
             }
+        } catch (error) {
+            console.error('Error loading files:', error);
+            fileSection.insertAdjacentHTML('beforeend', 
+                '<h2 class="no_content_message">Hiba történt a fájlok betöltésekor.</h2>'
+            );
         }
     }
     if (window.location.pathname.includes('subject.php')) {
@@ -942,7 +994,7 @@ document.addEventListener('DOMContentLoaded', function() {
             showLoading('Fájl részleteinek betöltése...');
             
             try {
-                const response = await fetch(`getFileDetails.php?mode=upload&id=${upId}`);
+                const response = await fetch(`php/getFileDetails.php?mode=upload&id=${upId}`);
                 
                 if (!response.ok) {
                     throw new Error('Hiba a fájl részleteinek betöltésekor');
@@ -1008,7 +1060,7 @@ document.addEventListener('DOMContentLoaded', function() {
             showLoading('Fájl részleteinek betöltése...');
             
             try {
-                const response = await fetch(`getFileDetails.php?mode=upload&id=${upId}`);
+                const response = await fetch(`php/getFileDetails.php?mode=upload&id=${upId}`);
                 
                 if (!response.ok) {
                     throw new Error('Hiba a fájl részleteinek betöltésekor');

@@ -311,6 +311,7 @@ textarea:focus {
     display: flex;
     align-items: center;
     justify-content: center;
+    transform: translateY(-3px);
 }
 
 .dark-mode-toggle:hover {
@@ -611,14 +612,21 @@ textarea:focus {
         align-items: flex-start;
         gap: 0rem;
     }
+
+    .dark-mode-toggle {
+        transform: translateY(0);
+    }
 }
 
 @media (max-width: 650px) {
     .header_img {
         height: 40%;
     }
-    .own_subject_container h2 {
+    .own_subject_container h2, .uploaded_files_container h2 {
         font-size: 1rem;
+    }
+    .section_header h1 {
+        font-size: 1.5rem;
     }
 }
 
@@ -728,7 +736,8 @@ textarea:focus {
 
 .content_downloads {
     position: absolute;
-    top: 3rem;
+    top: 50%;
+    transform: translateY(-50%);
     right: 1rem;
     display: flex;
     align-items: center;
@@ -809,7 +818,7 @@ textarea:focus {
     }
 
     .large_button {
-        border-radius: 20px;
+        border-radius: 50px;
     }
 
     .content_search_container {
@@ -841,6 +850,7 @@ textarea:focus {
     .content_downloads {
         bottom: -1rem;
         right: 1rem;
+        transform: translateY(0);
     }
 }
 
