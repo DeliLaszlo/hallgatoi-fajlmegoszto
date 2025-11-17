@@ -45,6 +45,9 @@ window.onload = function() {
 };
 
 document.addEventListener('DOMContentLoaded', function() {
+    // Flag a form váltás érzékeléséhez (register form blur események letiltására)
+    let isRegisterFormSwitching = false;
+    
     // Sötét mód váltó
     const darkModeToggle = document.querySelector('.dark-mode-toggle');
     if (darkModeToggle) {
@@ -582,39 +585,158 @@ document.addEventListener('DOMContentLoaded', function() {
                     neptunInput.focus();
                 }
             } else {
+                // AZONNAL beállítjuk a flaget és töröljük a hibákat
+                isRegisterFormSwitching = true;
+                clearAllRegisterErrors();
+                
+                // Ezután töröljük az űrlap adatokat és váltunk
+                const regForm = document.getElementById('registerForm');
+                if (regForm) {
+                    regForm.reset();
+                }
+                
                 loginDiv.style.display = 'block';
                 registerDiv.style.display = 'none';
                 const neptunInput = document.getElementById('loginNeptun');
                 if (neptunInput) {
                     neptunInput.focus();
                 }
+                
+                // Flag visszaállítása
+                setTimeout(function() {
+                    isRegisterFormSwitching = false;
+                }, 50);
             }
         }
     });
 
+    // Flag a login form váltás érzékeléséhez (login form blur események letiltására)
+    let isLoginFormSwitching = false;
+    
     if (showRegisterLink && showLoginLink) {
+        // Mousedown-nál már beállítjuk a flaget, hogy a blur ne váltson ki hibát
+        showRegisterLink.addEventListener('mousedown', function() {
+            isLoginFormSwitching = true;
+            clearAllLoginErrors();
+        });
+        
         showRegisterLink.addEventListener('click', function(e) {
             e.preventDefault();
+            
+            // Flag már be van állítva a mousedown-nál
+            clearAllLoginErrors();
+            
+            // Töröljük a login form adatokat és váltunk
+            if (loginForm) {
+                loginForm.reset();
+            }
+            
             loginDiv.style.display = 'none';
             registerDiv.style.display = 'block';
             const neptunInput = document.getElementById('registerNeptun');
             if (neptunInput) {
                 neptunInput.focus();
             }
+            
+            // Flag visszaállítása kis késleltetéssel
+            setTimeout(function() {
+                isLoginFormSwitching = false;
+            }, 100);
         });
 
+        // Mousedown-nál már beállítjuk a flaget, hogy a blur ne váltson ki hibát
+        showLoginLink.addEventListener('mousedown', function() {
+            isRegisterFormSwitching = true;
+            clearAllRegisterErrors();
+        });
+        
         showLoginLink.addEventListener('click', function(e) {
             e.preventDefault();
+            
+            // Flag már be van állítva a mousedown-nál
+            clearAllRegisterErrors();
+            
+            // Töröljük az űrlap adatokat és váltunk
+            if (registerForm) {
+                registerForm.reset();
+            }
+            
             registerDiv.style.display = 'none';
             loginDiv.style.display = 'block';
             const neptunInput = document.getElementById('loginNeptun');
             if (neptunInput) {
                 neptunInput.focus();
             }
+            
+            // Flag visszaállítása kis késleltetéssel
+            setTimeout(function() {
+                isRegisterFormSwitching = false;
+            }, 100);
         });
     }
 
-    // Input ellenőrzés regisztrációnál
+    // Login és regisztráció segédfüggvények
+    function showLoginError(field, message, shouldFocus = false) {
+        const input = document.getElementById('login' + field.charAt(0).toUpperCase() + field.slice(1));
+        const errorSpan = document.getElementById('error_login_' + field);
+        
+        if (input && errorSpan) {
+            input.classList.add('error');
+            errorSpan.textContent = message;
+            if (shouldFocus) {
+                input.focus();
+            }
+        }
+    }
+    
+    function clearLoginError(field) {
+        const input = document.getElementById('login' + field.charAt(0).toUpperCase() + field.slice(1));
+        const errorSpan = document.getElementById('error_login_' + field);
+        
+        if (input && errorSpan) {
+            input.classList.remove('error');
+            errorSpan.textContent = '';
+        }
+    }
+    
+    function clearAllLoginErrors() {
+        const fields = ['neptun', 'password'];
+        fields.forEach(field => clearLoginError(field));
+    }
+    
+    function showRegisterError(field, message, shouldFocus = false) {
+        // Convert field name to camelCase for input ID (e.g., confirm_password -> ConfirmPassword)
+        const inputIdSuffix = field.split('_').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join('');
+        const input = document.getElementById('register' + inputIdSuffix);
+        const errorSpan = document.getElementById('error_register_' + field);
+        
+        if (input && errorSpan) {
+            input.classList.add('error');
+            errorSpan.textContent = message;
+            if (shouldFocus) {
+                input.focus();
+            }
+        }
+    }
+    
+    function clearRegisterError(field) {
+        // Convert field name to camelCase for input ID (e.g., confirm_password -> ConfirmPassword)
+        const inputIdSuffix = field.split('_').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join('');
+        const input = document.getElementById('register' + inputIdSuffix);
+        const errorSpan = document.getElementById('error_register_' + field);
+        
+        if (input && errorSpan) {
+            input.classList.remove('error');
+            errorSpan.textContent = '';
+        }
+    }
+    
+    function clearAllRegisterErrors() {
+        const fields = ['neptun', 'username', 'fullname', 'email', 'password', 'confirm_password'];
+        fields.forEach(field => clearRegisterError(field));
+    }
+
+    // Validációs minták
     const patterns = {
         neptun: /^[A-Z0-9]{6}$/i,
         username: /^[a-zA-Z0-9_]{3,20}$/,
@@ -623,56 +745,438 @@ document.addEventListener('DOMContentLoaded', function() {
         password: /^(?=.*[A-Z])(?=.*\d).{8,}$/
     };
 
+    // Login form kezelése
+    const loginForm = document.getElementById('loginForm');
+    if (loginForm) {
+        const loginNeptun = document.getElementById('loginNeptun');
+        const loginPassword = document.getElementById('loginPassword');
+        
+        // Neptun validáció
+        if (loginNeptun) {
+            loginNeptun.addEventListener('input', function() {
+                const value = this.value.trim();
+                if (value !== '' && patterns.neptun.test(value)) {
+                    clearLoginError('neptun');
+                }
+            });
+            
+            loginNeptun.addEventListener('blur', function() {
+                // Ne mutassunk hibát, ha form váltás közben vagyunk
+                if (isLoginFormSwitching) return;
+                
+                const value = this.value.trim();
+                if (value === '') {
+                    showLoginError('neptun', 'A Neptun kód megadása kötelező!');
+                } else if (!patterns.neptun.test(value)) {
+                    showLoginError('neptun', 'A Neptun kód 6 alfanumerikus karakterből kell álljon!');
+                } else {
+                    clearLoginError('neptun');
+                }
+            });
+        }
+        
+        // Jelszó validáció
+        if (loginPassword) {
+            loginPassword.addEventListener('input', function() {
+                if (this.value !== '') {
+                    clearLoginError('password');
+                }
+            });
+            
+            loginPassword.addEventListener('blur', function() {
+                // Ne mutassunk hibát, ha form váltás közben vagyunk
+                if (isLoginFormSwitching) return;
+                
+                if (this.value === '') {
+                    showLoginError('password', 'A jelszó megadása kötelező!');
+                } else {
+                    clearLoginError('password');
+                }
+            });
+        }
+        
+        // Form submit kezelése AJAX-szal
+        loginForm.addEventListener('submit', async function(e) {
+            e.preventDefault();
+            clearAllLoginErrors();
+            
+            const neptun = loginNeptun?.value.trim() || '';
+            const password = loginPassword?.value || '';
+            
+            let hasError = false;
+            
+            // Validáció
+            if (neptun === '') {
+                showLoginError('neptun', 'A Neptun kód megadása kötelező!', true);
+                hasError = true;
+            } else if (!patterns.neptun.test(neptun)) {
+                showLoginError('neptun', 'A Neptun kód 6 alfanumerikus karakterből kell álljon!', true);
+                hasError = true;
+            }
+            
+            if (password === '') {
+                showLoginError('password', 'A jelszó megadása kötelező!', !hasError);
+                hasError = true;
+            }
+            
+            if (hasError) return;
+            
+            // AJAX kérés
+            try {
+                showLoading('Bejelentkezés...');
+                
+                const response = await fetch('php/login.php', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ neptun, password })
+                });
+                
+                const result = await response.json();
+                
+                
+                if (result.success) {
+                    setTimeout(() => {
+                        hideLoading();
+                        // Sikeres bejelentkezés - átirányítás
+                        window.location.href = 'dashboard.php';
+                    }, 1250);
+                } else {
+                    setTimeout(() => {
+                        hideLoading();
+                        // Hiba megjelenítése - mindig a jelszó mező alá
+                        if (result.field && result.field !== '') {
+                            showLoginError(result.field, result.error, true);
+                        } else {
+                            // Általános hiba a jelszó mező alatt, input mezők nem lesznek error state-ben
+                            const errorSpan = document.getElementById('error_login_password');
+                            if (errorSpan) {
+                                errorSpan.textContent = result.error || 'Hiba történt a bejelentkezés során!';
+                            }
+                        }
+                    }, 1250);
+                }
+            } catch (error) {
+                hideLoading();
+                console.error('Login error:', error);
+                alert('Hiba történt a bejelentkezés során!');
+            }
+        });
+    }
+
+    // Regisztráció form kezelése
     const registerForm = document.getElementById('registerForm');
     if (registerForm) {
-        registerForm.addEventListener('submit', function(e) {
-            const neptun = document.getElementById('registerNeptun').value;
-            const username = document.getElementById('registerUsername').value;
-            const fullname = document.getElementById('registerFullname').value;
-            const email = document.getElementById('registerEmail').value;
-            const password = document.getElementById('registerPassword').value;
-            const confirmPassword = document.getElementById('registerConfirmPassword').value;
+        // Valós idejű validáció
+        const registerNeptun = document.getElementById('registerNeptun');
+        const registerUsername = document.getElementById('registerUsername');
+        const registerFullname = document.getElementById('registerFullname');
+        const registerEmail = document.getElementById('registerEmail');
+        const registerPassword = document.getElementById('registerPassword');
+        const registerConfirmPassword = document.getElementById('registerConfirmPassword');
+        
+        // Neptun validáció
+        if (registerNeptun) {
+            registerNeptun.addEventListener('input', function() {
+                const value = this.value.trim();
+                if (value !== '' && patterns.neptun.test(value)) {
+                    clearRegisterError('neptun');
+                }
+            });
             
-            // Neptun
-            if (!patterns.neptun.test(neptun)) {
-                e.preventDefault();
-                alert('A Neptun kód 6 alfanumerikus karakterből kell álljon!');
-                return false;
+            registerNeptun.addEventListener('blur', function() {
+                // Ne mutassunk hibát, ha form váltás közben vagyunk
+                if (isRegisterFormSwitching) return;
+                
+                const value = this.value.trim();
+                if (value === '') {
+                    showRegisterError('neptun', 'A Neptun kód megadása kötelező!');
+                } else if (!patterns.neptun.test(value)) {
+                    showRegisterError('neptun', 'A Neptun kód 6 alfanumerikus karakterből kell álljon!');
+                } else {
+                    clearRegisterError('neptun');
+                }
+            });
+        }
+        
+        // Felhasználónév validáció
+        if (registerUsername) {
+            registerUsername.addEventListener('input', function() {
+                const value = this.value.trim();
+                if (value !== '' && patterns.username.test(value)) {
+                    clearRegisterError('username');
+                }
+            });
+            
+            registerUsername.addEventListener('blur', function() {
+                // Ne mutassunk hibát, ha form váltás közben vagyunk
+                if (isRegisterFormSwitching) return;
+                
+                const value = this.value.trim();
+                if (value === '') {
+                    showRegisterError('username', 'A felhasználónév megadása kötelező!');
+                } else if (!patterns.username.test(value)) {
+                    showRegisterError('username', '3-20 karakter, csak betűk, számok és aláhúzás!');
+                } else {
+                    clearRegisterError('username');
+                }
+            });
+        }
+        
+        // Teljes név validáció
+        if (registerFullname) {
+            registerFullname.addEventListener('input', function() {
+                const value = this.value.trim();
+                if (value !== '' && patterns.fullname.test(value)) {
+                    clearRegisterError('fullname');
+                }
+            });
+            
+            registerFullname.addEventListener('blur', function() {
+                // Ne mutassunk hibát, ha form váltás közben vagyunk
+                if (isRegisterFormSwitching) return;
+                
+                const value = this.value.trim();
+                if (value === '') {
+                    showRegisterError('fullname', 'A teljes név megadása kötelező!');
+                } else if (!patterns.fullname.test(value)) {
+                    showRegisterError('fullname', 'Vezetéknév és legalább egy keresztnév szükséges!');
+                } else {
+                    clearRegisterError('fullname');
+                }
+            });
+        }
+        
+        // Email validáció
+        if (registerEmail) {
+            registerEmail.addEventListener('input', function() {
+                const value = this.value.trim();
+                if (value !== '' && patterns.email.test(value)) {
+                    clearRegisterError('email');
+                }
+            });
+            
+            registerEmail.addEventListener('blur', function() {
+                // Ne mutassunk hibát, ha form váltás közben vagyunk
+                if (isRegisterFormSwitching) return;
+                
+                const value = this.value.trim();
+                if (value === '') {
+                    showRegisterError('email', 'Az email cím megadása kötelező!');
+                } else if (!patterns.email.test(value)) {
+                    showRegisterError('email', 'Érvénytelen email formátum!');
+                } else {
+                    clearRegisterError('email');
+                }
+            });
+        }
+        
+        // Jelszó validáció
+        if (registerPassword) {
+            registerPassword.addEventListener('input', function() {
+                const value = this.value;
+                if (value !== '' && patterns.password.test(value)) {
+                    clearRegisterError('password');
+                }
+            });
+            
+            registerPassword.addEventListener('blur', function() {
+                // Ne mutassunk hibát, ha form váltás közben vagyunk
+                if (isRegisterFormSwitching) return;
+                
+                const value = this.value;
+                if (value === '') {
+                    showRegisterError('password', 'A jelszó megadása kötelező!');
+                } else if (!patterns.password.test(value)) {
+                    showRegisterError('password', 'Legalább 8 karakter, 1 nagybetű és 1 szám!');
+                } else {
+                    clearRegisterError('password');
+                }
+            });
+        }
+        
+        // Jelszó megerősítés validáció
+        if (registerConfirmPassword) {
+            registerConfirmPassword.addEventListener('input', function() {
+                const value = this.value;
+                const password = registerPassword?.value || '';
+                
+                // Ha üres, ne mutassunk hibát (majd blur fogja)
+                if (value === '') {
+                    clearRegisterError('confirm_password');
+                } else if (value === password) {
+                    // Ha egyezik, töröljük a hibát
+                    clearRegisterError('confirm_password');
+                } else {
+                    // Ha nem egyezik, mutassuk a hibát
+                    showRegisterError('confirm_password', 'A két jelszó nem egyezik!');
+                }
+            });
+            
+            registerConfirmPassword.addEventListener('blur', function() {
+                // Ne mutassunk hibát, ha form váltás közben vagyunk
+                if (isRegisterFormSwitching) return;
+                
+                const value = this.value;
+                const password = registerPassword?.value || '';
+                if (value === '') {
+                    showRegisterError('confirm_password', 'A jelszó megerősítése kötelező!');
+                } else if (value !== password) {
+                    showRegisterError('confirm_password', 'A két jelszó nem egyezik!');
+                } else {
+                    clearRegisterError('confirm_password');
+                }
+            });
+        }
+        
+        // Form submit kezelése AJAX-szal
+        registerForm.addEventListener('submit', async function(e) {
+            e.preventDefault();
+            clearAllRegisterErrors();
+            
+            const neptun = registerNeptun?.value.trim() || '';
+            const username = registerUsername?.value.trim() || '';
+            const fullname = registerFullname?.value.trim() || '';
+            const email = registerEmail?.value.trim() || '';
+            const password = registerPassword?.value || '';
+            const confirmPassword = registerConfirmPassword?.value || '';
+            
+            let hasError = false;
+            let firstErrorField = null;
+            
+            // Validáció
+            if (neptun === '') {
+                showRegisterError('neptun', 'A Neptun kód megadása kötelező!');
+                if (!firstErrorField) firstErrorField = 'neptun';
+                hasError = true;
+            } else if (!patterns.neptun.test(neptun)) {
+                showRegisterError('neptun', 'A Neptun kód 6 alfanumerikus karakterből kell álljon!');
+                if (!firstErrorField) firstErrorField = 'neptun';
+                hasError = true;
             }
             
-            // Felhasználónév
-            if (!patterns.username.test(username)) {
-                e.preventDefault();
-                alert('A felhasználónév 3-20 karakter hosszú lehet, csak betűket, számokat és aláhúzást tartalmazhat!');
-                return false;
+            if (username === '') {
+                showRegisterError('username', 'A felhasználónév megadása kötelező!');
+                if (!firstErrorField) firstErrorField = 'username';
+                hasError = true;
+            } else if (!patterns.username.test(username)) {
+                showRegisterError('username', '3-20 karakter, csak betűk, számok és aláhúzás!');
+                if (!firstErrorField) firstErrorField = 'username';
+                hasError = true;
             }
             
-            // Teljes név
-            if (!patterns.fullname.test(fullname)) {
-                e.preventDefault();
-                alert('A teljes név 2-50 karakter hosszú lehet, csak betűket és legalább 1 szóközt tartalmazhat!');
-                return false;
+            if (fullname === '') {
+                showRegisterError('fullname', 'A teljes név megadása kötelező!');
+                if (!firstErrorField) firstErrorField = 'fullname';
+                hasError = true;
+            } else if (!patterns.fullname.test(fullname)) {
+                showRegisterError('fullname', 'Vezetéknév és legalább egy keresztnév szükséges!');
+                if (!firstErrorField) firstErrorField = 'fullname';
+                hasError = true;
             }
             
-            // Email
-            if (!patterns.email.test(email)) {
-                e.preventDefault();
-                alert('Kérem adjon meg egy érvényes email címet!');
-                return false;
+            if (email === '') {
+                showRegisterError('email', 'Az email cím megadása kötelező!');
+                if (!firstErrorField) firstErrorField = 'email';
+                hasError = true;
+            } else if (!patterns.email.test(email)) {
+                showRegisterError('email', 'Érvénytelen email formátum!');
+                if (!firstErrorField) firstErrorField = 'email';
+                hasError = true;
             }
             
-            // Jelszó
-            if (!patterns.password.test(password)) {
-                e.preventDefault();
-                alert('A jelszónak legalább 8 karakter hosszúnak kell lennie, és tartalmaznia kell legalább 1 nagybetűt és 1 számot!');
-                return false;
+            if (password === '') {
+                showRegisterError('password', 'A jelszó megadása kötelező!');
+                if (!firstErrorField) firstErrorField = 'password';
+                hasError = true;
+            } else if (!patterns.password.test(password)) {
+                showRegisterError('password', 'Legalább 8 karakter, 1 nagybetű és 1 szám!');
+                if (!firstErrorField) firstErrorField = 'password';
+                hasError = true;
             }
+            
+            if (confirmPassword === '') {
+                showRegisterError('confirm_password', 'A jelszó megerősítése kötelező!');
+                if (!firstErrorField) firstErrorField = 'confirm_password';
+                hasError = true;
+            } else if (password !== confirmPassword) {
+                showRegisterError('confirm_password', 'A két jelszó nem egyezik!');
+                if (!firstErrorField) firstErrorField = 'confirm_password';
+                hasError = true;
+            }
+            
+            if (hasError) {
+                if (firstErrorField) {
+                    // Convert field name to camelCase for input ID (e.g., confirm_password -> ConfirmPassword)
+                    const inputIdSuffix = firstErrorField.split('_').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join('');
+                    const firstInput = document.getElementById('register' + inputIdSuffix);
+                    if (firstInput) firstInput.focus();
+                }
+                return;
+            }
+            
+            // AJAX kérés
+            try {
+                showLoading('Regisztráció...');
+                
+                const response = await fetch('php/registration.php', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ 
+                        neptun, 
+                        username, 
+                        fullname, 
+                        email, 
+                        password, 
+                        confirm_password: confirmPassword 
+                    })
+                });
+                
+                const result = await response.json();
+                
+                setTimeout(() => {
+                    hideLoading();
+                    if (result.success) {
+                    // Sikeres regisztráció
+                    alert(result.message || 'Sikeres regisztráció!');
+                    
+                    // Űrlap törlése
+                    registerForm.reset();
+                    clearAllRegisterErrors();
+                    
+                    // Átváltás bejelentkezésre
+                    const loginDiv = document.getElementById('login');
+                    const registerDiv = document.getElementById('register');
+                    if (loginDiv && registerDiv) {
+                        registerDiv.style.display = 'none';
+                        loginDiv.style.display = 'block';
+                        window.location.hash = '';
+                        
+                        // Neptun kód előtöltése a login formba
+                        const loginNeptunInput = document.getElementById('loginNeptun');
+                        if (loginNeptunInput) {
+                            loginNeptunInput.value = neptun;
+                            loginNeptunInput.focus();
+                        }
+                    }
+                    } else {
+                        // Hiba megjelenítése
+                        if (result.field) {
+                            showRegisterError(result.field, result.error, true);
+                        } else {
+                            alert(result.error || 'Hiba történt a regisztráció során!');
+                        }
+                    }
+                }, 1250);
 
-            // Jelszó megerősítése
-            if (password !== confirmPassword) {
-                e.preventDefault();
-                alert('A jelszavak nem egyeznek!');
-                return false;
+                
+            } catch (error) {
+                hideLoading();
+                console.error('Registration error:', error);
+                alert('Hiba történt a regisztráció során!');
             }
         });
     }
@@ -1291,13 +1795,47 @@ document.addEventListener('DOMContentLoaded', function() {
         document.getElementById('profile_email')
     ];
     
+    // Segédfüggvény hibaüzenet megjelenítéséhez
+    function showError(inputId, message, shouldFocus = false) {
+        const input = document.getElementById(inputId);
+        const errorSpan = document.getElementById('error_' + inputId.replace('profile_', ''));
+        
+        if (input && errorSpan) {
+            input.classList.add('error');
+            errorSpan.textContent = message;
+            if (shouldFocus) {
+                input.focus();
+            }
+        }
+    }
+    
+    // Segédfüggvény hibaüzenet eltávolításához
+    function clearError(inputId) {
+        const input = document.getElementById(inputId);
+        const errorSpan = document.getElementById('error_' + inputId.replace('profile_', ''));
+        
+        if (input && errorSpan) {
+            input.classList.remove('error');
+            errorSpan.textContent = '';
+        }
+    }
+    
+    // Segédfüggvény az összes hiba törlésére
+    function clearAllErrors() {
+        const allInputs = ['profile_neptun', 'profile_username', 'profile_fullname', 'profile_email', 
+                           'profile_current_password', 'profile_new_password', 'profile_repeat_password'];
+        allInputs.forEach(inputId => clearError(inputId));
+    }
+    
+    // Profil szerkesztés mód bekapcsolása
     if (editProfileButton) {
         editProfileButton.addEventListener('click', function(e) {
             e.preventDefault();
+            clearAllErrors();
+            
             profileInputs.forEach(function(input) {
                 if (input) {
                     input.removeAttribute('readonly');
-                    input.setAttribute('required', 'required');
                 }
             });
             if (passwordFields) {
@@ -1307,20 +1845,31 @@ document.addEventListener('DOMContentLoaded', function() {
             if (profileEditButtons) {
                 profileEditButtons.style.display = 'flex';
             }
+            
+            // Valós idejű validáció hozzáadása
+            setupProfileValidation();
         });
     }
     
+    // Profil szerkesztés megszakítása
     if (cancelProfileButton) {
         cancelProfileButton.addEventListener('click', function(e) {
             e.preventDefault();
+            clearAllErrors();
+            
             profileInputs.forEach(function(input) {
                 if (input) {
                     input.setAttribute('readonly', 'readonly');
-                    input.removeAttribute('required');
                 }
             });
             if (passwordFields) {
                 passwordFields.style.display = 'none';
+                // Jelszó mezők törlése
+                const pwdInputs = ['profile_current_password', 'profile_new_password', 'profile_repeat_password'];
+                pwdInputs.forEach(id => {
+                    const input = document.getElementById(id);
+                    if (input) input.value = '';
+                });
             }
             if (profileEditButtons) {
                 profileEditButtons.style.display = 'none';
@@ -1332,13 +1881,202 @@ document.addEventListener('DOMContentLoaded', function() {
             loadProfileData();
         });
     }
+    
+    // Valós idejű validáció beállítása
+    function setupProfileValidation() {
+        const neptunInput = document.getElementById('profile_neptun');
+        const usernameInput = document.getElementById('profile_username');
+        const fullnameInput = document.getElementById('profile_fullname');
+        const emailInput = document.getElementById('profile_email');
+        const currentPasswordInput = document.getElementById('profile_current_password');
+        const newPasswordInput = document.getElementById('profile_new_password');
+        const repeatPasswordInput = document.getElementById('profile_repeat_password');
+        
+        // Érvényesítési minták
+        const patterns = {
+            neptun: /^[A-Z0-9]{6}$/i,
+            username: /^[a-zA-Z0-9_]{3,20}$/,
+            fullname: /^[a-zA-ZáéíóöőúüűÁÉÍÓÖŐÚÜŰ]+ [a-zA-ZáéíóöőúüűÁÉÍÓÖŐÚÜŰ\s]{1,49}$/,
+            email: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
+            password: /^(?=.*[A-Z])(?=.*\d).{8,}$/
+        };
+        
+        // Neptun kód validálás
+        if (neptunInput) {
+            neptunInput.addEventListener('blur', function() {
+                const value = this.value.trim();
+                if (value === '') {
+                    showError('profile_neptun', 'A Neptun kód megadása kötelező!');
+                } else if (!patterns.neptun.test(value)) {
+                    showError('profile_neptun', 'A Neptun kód pontosan 6 alfanumerikus karakter kell legyen!');
+                } else {
+                    clearError('profile_neptun');
+                }
+            });
+            
+            neptunInput.addEventListener('input', function() {
+                const value = this.value.trim();
+                if (value !== '' && patterns.neptun.test(value)) {
+                    clearError('profile_neptun');
+                }
+            });
+        }
+        
+        // Felhasználónév validálás
+        if (usernameInput) {
+            usernameInput.addEventListener('blur', function() {
+                const value = this.value.trim();
+                if (value === '') {
+                    showError('profile_username', 'A felhasználónév megadása kötelező!');
+                } else if (!patterns.username.test(value)) {
+                    showError('profile_username', '3-20 karakter, csak betűk, számok és aláhúzás!');
+                } else {
+                    clearError('profile_username');
+                }
+            });
+            
+            usernameInput.addEventListener('input', function() {
+                const value = this.value.trim();
+                if (value !== '' && patterns.username.test(value)) {
+                    clearError('profile_username');
+                }
+            });
+        }
+        
+        // Teljes név validálás
+        if (fullnameInput) {
+            fullnameInput.addEventListener('blur', function() {
+                const value = this.value.trim();
+                if (value === '') {
+                    showError('profile_fullname', 'A teljes név megadása kötelező!');
+                } else if (!patterns.fullname.test(value)) {
+                    showError('profile_fullname', 'Vezetéknév és legalább egy keresztnév szükséges!');
+                } else {
+                    clearError('profile_fullname');
+                }
+            });
+            
+            fullnameInput.addEventListener('input', function() {
+                const value = this.value.trim();
+                if (value !== '' && patterns.fullname.test(value)) {
+                    clearError('profile_fullname');
+                }
+            });
+        }
+        
+        // Email validálás
+        if (emailInput) {
+            emailInput.addEventListener('blur', function() {
+                const value = this.value.trim();
+                if (value === '') {
+                    showError('profile_email', 'Az email cím megadása kötelező!');
+                } else if (!patterns.email.test(value)) {
+                    showError('profile_email', 'Érvénytelen email formátum!');
+                } else {
+                    clearError('profile_email');
+                }
+            });
+            
+            emailInput.addEventListener('input', function() {
+                const value = this.value.trim();
+                if (value !== '' && patterns.email.test(value)) {
+                    clearError('profile_email');
+                }
+            });
+        }
+        
+        // Jelszó mezők kezelése - ha az egyik ki van töltve, a többit is kötelezővé tesszük
+        const passwordInputs = [currentPasswordInput, newPasswordInput, repeatPasswordInput];
+        
+        passwordInputs.forEach(input => {
+            if (input) {
+                input.addEventListener('input', function() {
+                    const anyFilled = passwordInputs.some(inp => inp && inp.value.trim() !== '');
+                    
+                    if (anyFilled) {
+                        // Ha bármelyik jelszó mező ki van töltve, jelezzük a többit is
+                        if (currentPasswordInput && currentPasswordInput.value.trim() === '') {
+                            showError('profile_current_password', 'A jelenlegi jelszó megadása kötelező!');
+                        } else {
+                            clearError('profile_current_password');
+                        }
+                        
+                        if (newPasswordInput && newPasswordInput.value.trim() === '') {
+                            showError('profile_new_password', 'Az új jelszó megadása kötelező!');
+                        } else if (newPasswordInput && newPasswordInput.value.trim() !== '') {
+                            clearError('profile_new_password');
+                        }
+                        
+                        if (repeatPasswordInput && repeatPasswordInput.value.trim() === '') {
+                            showError('profile_repeat_password', 'Az új jelszó megerősítése kötelező!');
+                        } else if (repeatPasswordInput && repeatPasswordInput.value.trim() !== '') {
+                            clearError('profile_repeat_password');
+                        }
+                    } else {
+                        // Ha mindegyik üres, töröljük a hibákat
+                        clearError('profile_current_password');
+                        clearError('profile_new_password');
+                        clearError('profile_repeat_password');
+                    }
+                });
+            }
+        });
+        
+        // Új jelszó validálás
+        if (newPasswordInput) {
+            newPasswordInput.addEventListener('blur', function() {
+                const value = this.value.trim();
+                const anyFilled = passwordInputs.some(inp => inp && inp.value.trim() !== '');
+                
+                if (anyFilled) {
+                    if (value === '') {
+                        showError('profile_new_password', 'Az új jelszó megadása kötelező!');
+                    } else if (!patterns.password.test(value)) {
+                        showError('profile_new_password', 'Legalább 8 karakter, 1 nagybetű és 1 szám!');
+                    } else {
+                        clearError('profile_new_password');
+                    }
+                }
+            });
+        }
+        
+        // Jelszó megerősítés validálás
+        if (repeatPasswordInput) {
+            repeatPasswordInput.addEventListener('blur', function() {
+                const value = this.value.trim();
+                const newPwd = newPasswordInput ? newPasswordInput.value.trim() : '';
+                const anyFilled = passwordInputs.some(inp => inp && inp.value.trim() !== '');
+                
+                if (anyFilled) {
+                    if (value === '') {
+                        showError('profile_repeat_password', 'Az új jelszó megerősítése kötelező!');
+                    } else if (value !== newPwd) {
+                        showError('profile_repeat_password', 'A két jelszó nem egyezik!');
+                    } else {
+                        clearError('profile_repeat_password');
+                    }
+                }
+            });
+            
+            repeatPasswordInput.addEventListener('input', function() {
+                const value = this.value.trim();
+                const newPwd = newPasswordInput ? newPasswordInput.value.trim() : '';
+                
+                if (value !== '' && value === newPwd) {
+                    clearError('profile_repeat_password');
+                }
+            });
+        }
+    }
 
     // Profil frissítés
     const profileForm = document.getElementById('profile_form');
     if (profileForm) {
         profileForm.addEventListener('submit', async function(e) {
             e.preventDefault();
+            clearAllErrors();
             
+            const neptunInput = document.getElementById('profile_neptun');
             const usernameInput = document.getElementById('profile_username');
             const fullnameInput = document.getElementById('profile_fullname');
             const emailInput = document.getElementById('profile_email');
@@ -1346,6 +2084,7 @@ document.addEventListener('DOMContentLoaded', function() {
             const newPasswordInput = document.getElementById('profile_new_password');
             const repeatPasswordInput = document.getElementById('profile_repeat_password');
             
+            const neptun = neptunInput?.value.trim() || '';
             const username = usernameInput?.value.trim() || '';
             const fullname = fullnameInput?.value.trim() || '';
             const email = emailInput?.value.trim() || '';
@@ -1355,51 +2094,102 @@ document.addEventListener('DOMContentLoaded', function() {
             
             // Érvényesítési minták
             const patterns = {
+                neptun: /^[A-Z0-9]{6}$/i,
                 username: /^[a-zA-Z0-9_]{3,20}$/,
                 fullname: /^[a-zA-ZáéíóöőúüűÁÉÍÓÖŐÚÜŰ]+ [a-zA-ZáéíóöőúüűÁÉÍÓÖŐÚÜŰ\s]{1,49}$/,
                 email: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
                 password: /^(?=.*[A-Z])(?=.*\d).{8,}$/
             };
             
-            if (!patterns.username.test(username)) {
-                alert('Érvénytelen felhasználónév! 3-20 karakter, csak betűk, számok és aláhúzás.');
-                return;
+            // Validáció hibák gyűjtése
+            let hasError = false;
+            let firstErrorField = null;
+            
+            // Neptun kód validálás
+            if (neptun === '') {
+                showError('profile_neptun', 'A Neptun kód megadása kötelező!');
+                if (!firstErrorField) firstErrorField = 'profile_neptun';
+                hasError = true;
+            } else if (!patterns.neptun.test(neptun)) {
+                showError('profile_neptun', 'A Neptun kód pontosan 6 alfanumerikus karakter kell legyen!');
+                if (!firstErrorField) firstErrorField = 'profile_neptun';
+                hasError = true;
             }
             
-            if (!patterns.fullname.test(fullname)) {
-                alert('Érvénytelen név! Vezetéknév és legalább egy keresztnév szükséges.');
-                return;
+            // Felhasználónév validálás
+            if (username === '') {
+                showError('profile_username', 'A felhasználónév megadása kötelező!');
+                if (!firstErrorField) firstErrorField = 'profile_username';
+                hasError = true;
+            } else if (!patterns.username.test(username)) {
+                showError('profile_username', '3-20 karakter, csak betűk, számok és aláhúzás!');
+                if (!firstErrorField) firstErrorField = 'profile_username';
+                hasError = true;
             }
             
-            if (!patterns.email.test(email)) {
-                alert('Érvénytelen email cím!');
-                return;
+            // Teljes név validálás
+            if (fullname === '') {
+                showError('profile_fullname', 'A teljes név megadása kötelező!');
+                if (!firstErrorField) firstErrorField = 'profile_fullname';
+                hasError = true;
+            } else if (!patterns.fullname.test(fullname)) {
+                showError('profile_fullname', 'Vezetéknév és legalább egy keresztnév szükséges!');
+                if (!firstErrorField) firstErrorField = 'profile_fullname';
+                hasError = true;
             }
             
+            // Email validálás
+            if (email === '') {
+                showError('profile_email', 'Az email cím megadása kötelező!');
+                if (!firstErrorField) firstErrorField = 'profile_email';
+                hasError = true;
+            } else if (!patterns.email.test(email)) {
+                showError('profile_email', 'Érvénytelen email formátum!');
+                if (!firstErrorField) firstErrorField = 'profile_email';
+                hasError = true;
+            }
+            
+            // Jelszó validálás - csak ha bármelyik jelszó mező ki van töltve
             if (currentPassword || newPassword || repeatPassword) {
                 if (!currentPassword) {
-                    alert('Add meg a jelenlegi jelszavadat!');
-                    return;
+                    showError('profile_current_password', 'A jelenlegi jelszó megadása kötelező!');
+                    if (!firstErrorField) firstErrorField = 'profile_current_password';
+                    hasError = true;
                 }
                 
                 if (!newPassword) {
-                    alert('Add meg az új jelszavadat!');
-                    return;
+                    showError('profile_new_password', 'Az új jelszó megadása kötelező!');
+                    if (!firstErrorField) firstErrorField = 'profile_new_password';
+                    hasError = true;
+                } else if (!patterns.password.test(newPassword)) {
+                    showError('profile_new_password', 'Legalább 8 karakter, 1 nagybetű és 1 szám!');
+                    if (!firstErrorField) firstErrorField = 'profile_new_password';
+                    hasError = true;
                 }
                 
-                if (!patterns.password.test(newPassword)) {
-                    alert('Az új jelszó legalább 8 karakter hosszú legyen, tartalmazzon nagybetűt és számot!');
-                    return;
+                if (!repeatPassword) {
+                    showError('profile_repeat_password', 'Az új jelszó megerősítése kötelező!');
+                    if (!firstErrorField) firstErrorField = 'profile_repeat_password';
+                    hasError = true;
+                } else if (newPassword !== repeatPassword) {
+                    showError('profile_repeat_password', 'A két jelszó nem egyezik!');
+                    if (!firstErrorField) firstErrorField = 'profile_repeat_password';
+                    hasError = true;
                 }
-                
-                if (newPassword !== repeatPassword) {
-                    alert('Az új jelszavak nem egyeznek!');
-                    return;
+            }
+            
+            // Ha van hiba, fókuszáljuk az első hibás mezőt és ne küldjük el az űrlapot
+            if (hasError) {
+                if (firstErrorField) {
+                    const firstInput = document.getElementById(firstErrorField);
+                    if (firstInput) firstInput.focus();
                 }
+                return;
             }
             
             // Küldendő adatok előkészítése
             const data = {
+                neptun: neptun,
                 username: username,
                 fullname: fullname,
                 email: email,
@@ -1421,10 +2211,11 @@ document.addEventListener('DOMContentLoaded', function() {
                 
                 if (result.success) {
                     alert(result.message || 'Profil sikeresen frissítve!');
+                    clearAllErrors();
+                    
                     profileInputs.forEach(function(input) {
                         if (input) {
                             input.setAttribute('readonly', 'readonly');
-                            input.removeAttribute('required');
                         }
                     });
                     
@@ -1446,7 +2237,22 @@ document.addEventListener('DOMContentLoaded', function() {
                     // Profiladatok újratöltése
                     loadProfileData();
                 } else {
-                    alert(result.error || 'Hiba történt a profil frissítése során!');
+                    // Backend validációs hibák kezelése
+                    const errorMsg = result.error || 'Hiba történt a profil frissítése során!';
+                    
+                    // Próbáljuk meg felismerni, melyik mezőhöz tartozik a hiba
+                    if (errorMsg.toLowerCase().includes('neptun')) {
+                        showError('profile_neptun', errorMsg, true);
+                    } else if (errorMsg.toLowerCase().includes('email')) {
+                        showError('profile_email', errorMsg, true);
+                    } else if (errorMsg.toLowerCase().includes('felhasználónév') || errorMsg.toLowerCase().includes('username')) {
+                        showError('profile_username', errorMsg, true);
+                    } else if (errorMsg.toLowerCase().includes('jelszó') || errorMsg.toLowerCase().includes('password')) {
+                        showError('profile_current_password', errorMsg, true);
+                    } else {
+                        // Ha nem tudjuk beazonosítani, alert-tel jelezzük
+                        alert(errorMsg);
+                    }
                 }
             } catch (error) {
                 console.error('Hiba a profil frissítése közben:', error);

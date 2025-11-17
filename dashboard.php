@@ -99,6 +99,7 @@ if (isset($_SESSION['last_activity']) && (time() - $_SESSION['last_activity'] > 
         <section id="dashboard_chatszobak">
             <h1>Saját chatszobáim</h1>
             <hr>
+            <h1>Követett chatszobáim</h1>
             <hr>
         </section>
         <section id="dashboard_profile">
@@ -107,22 +108,43 @@ if (isset($_SESSION['last_activity']) && (time() - $_SESSION['last_activity'] > 
             <form id="profile_form">
                 <div id="profile_info">
                     <!-- Felhasználó profil adatai, később PHP-vel generálandó -->
-                    <h3>Neptun kód:</h3>
-                    <input type="text" id="profile_neptun" name="neptun" value="ABC123" readonly/>
-                    <h3>Felhasználónév:</h3>
-                    <input type="text" id="profile_username" name="username" value="felhasznalonev" readonly/>
-                    <h3>Teljes név:</h3>
-                    <input type="text" id="profile_fullname" name="fullname" value="Teljes Név" readonly/>
-                    <h3>Email:</h3>
-                    <input type="text" id="profile_email" name="email" value="email@example.com" readonly/>
+                    <div class="profile_field">
+                        <h3>Neptun kód:</h3>
+                        <input type="text" id="profile_neptun" name="neptun" value="ABC123" readonly/>
+                        <span class="error-message" id="error_neptun"></span>
+                    </div>
+                    <div class="profile_field">
+                        <h3>Felhasználónév:</h3>
+                        <input type="text" id="profile_username" name="username" value="felhasznalonev" readonly/>
+                        <span class="error-message" id="error_username"></span>
+                    </div>
+                    <div class="profile_field">
+                        <h3>Teljes név:</h3>
+                        <input type="text" id="profile_fullname" name="fullname" value="Teljes Név" readonly/>
+                        <span class="error-message" id="error_fullname"></span>
+                    </div>
+                    <div class="profile_field">
+                        <h3>Email:</h3>
+                        <input type="text" id="profile_email" name="email" value="email@example.com" readonly/>
+                        <span class="error-message" id="error_email"></span>
+                    </div>
                     <!-- Generálandó rész vége -->
                     <div id="password_fields" style="display: none;">
-                        <h3>Jelenlegi jelszó:</h3>
-                        <input type="password" id="profile_current_password" name="current_password"/>
-                        <h3>Új jelszó:</h3>
-                        <input type="password" id="profile_new_password" name="new_password"/>
-                        <h3>Új jelszó megerősítése:</h3>
-                        <input type="password" id="profile_repeat_password" name="repeat_password"/>
+                        <div class="profile_field">
+                            <h3>Jelenlegi jelszó:</h3>
+                            <input type="password" id="profile_current_password" name="current_password"/>
+                            <span class="error-message" id="error_current_password"></span>
+                        </div>
+                        <div class="profile_field">
+                            <h3>Új jelszó:</h3>
+                            <input type="password" id="profile_new_password" name="new_password"/>
+                            <span class="error-message" id="error_new_password"></span>
+                        </div>
+                        <div class="profile_field">
+                            <h3>Új jelszó megerősítése:</h3>
+                            <input type="password" id="profile_repeat_password" name="repeat_password"/>
+                            <span class="error-message" id="error_repeat_password"></span>
+                        </div>
                     </div>
                     <div id="profile_buttons">
                         <button type="button" class="large_button edit_profile_button" aria-label="Profil szerkesztése">

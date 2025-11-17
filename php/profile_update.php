@@ -13,6 +13,7 @@ require_once __DIR__ . '/../config.php';
 try {
     $conn = getPdoConnection();
     $input = json_decode(file_get_contents('php://input'), true);
+    $neptun = strtoupper(trim($input['neptun'] ?? ''));
     $nickname = trim($input['username'] ?? '');
     $fullname = trim($input['fullname'] ?? '');
     $email = trim($input['email'] ?? '');
@@ -20,10 +21,16 @@ try {
     $new_password = $input['new_password'] ?? '';
     
     // Regex minták
+    $neptunPattern = '/^[A-Z0-9]{6}$/';
     $usernamePattern = '/^[a-zA-Z0-9_]{3,20}$/';
     $fullnamePattern = '/^[a-zA-ZáéíóöőúüűÁÉÍÓÖŐÚÜŰ]+ [a-zA-ZáéíóöőúüűÁÉÍÓÖŐÚÜŰ\s]{1,49}$/';
     $emailPattern = '/^[^\s@]+@[^\s@]+\.[^\s@]+$/';
     $passwordPattern = '/^(?=.*[A-Z])(?=.*\d).{8,}$/';
+    
+    if (empty($neptun) || !preg_match($neptunPattern, $neptun)) {
+        echo json_encode(['success' => false, 'error' => 'Érvénytelen Neptun kód! Pontosan 6 alfanumerikus karakter szükséges.']);
+        exit();
+    }
     
     if (empty($nickname) || !preg_match($usernamePattern, $nickname)) {
         echo json_encode(['success' => false, 'error' => 'Érvénytelen felhasználónév! 3-20 karakter, csak betűk, számok és aláhúzás.']);
@@ -45,25 +52,49 @@ try {
     $vnev = $nameParts[0] ?? '';
     $knev = $nameParts[1] ?? '';
     
-    // Neptun kód létezésének ellenőrzése
-    $stmt = $conn->prepare("SELECT neptun_k FROM user WHERE nickname = :nickname AND neptun_k != :current_neptun");
-    $stmt->bindParam(':nickname', $nickname);
-    $stmt->bindParam(':current_neptun', $_SESSION['user_neptun']);
-    $stmt->execute(); 
-    if ($stmt->fetch()) {
-        echo json_encode(['success' => false, 'error' => 'Ez a felhasználónév már foglalt!']);
+    // Jelenlegi felhasználó adatainak lekérése
+    $stmt = $conn->prepare("SELECT neptun_k, nickname, email FROM user WHERE neptun_k = :neptun");
+    $stmt->bindParam(':neptun', $_SESSION['user_neptun']);
+    $stmt->execute();
+    $currentUser = $stmt->fetch(PDO::FETCH_ASSOC);
+    
+    if (!$currentUser) {
+        echo json_encode(['success' => false, 'error' => 'Felhasználó nem található!']);
         exit();
     }
     
-    // Email cím létezésének ellenőrzése
-    $stmt = $conn->prepare("SELECT neptun_k FROM user WHERE email = :email AND neptun_k != :current_neptun");
-    $stmt->bindParam(':email', $email);
-    $stmt->bindParam(':current_neptun', $_SESSION['user_neptun']);
-    $stmt->execute();
+    // Neptun kód létezésének ellenőrzése (ha változott)
+    if ($neptun !== $currentUser['neptun_k']) {
+        $stmt = $conn->prepare("SELECT neptun_k FROM user WHERE neptun_k = :neptun");
+        $stmt->bindParam(':neptun', $neptun);
+        $stmt->execute();
+        if ($stmt->fetch()) {
+            echo json_encode(['success' => false, 'error' => 'Ez a Neptun kód már foglalt!']);
+            exit();
+        }
+    }
     
-    if ($stmt->fetch()) {
-        echo json_encode(['success' => false, 'error' => 'Ez az email cím már foglalt!']);
-        exit();
+    // Felhasználónév létezésének ellenőrzése (csak ha változott)
+    if ($nickname !== $currentUser['nickname']) {
+        $stmt = $conn->prepare("SELECT neptun_k FROM user WHERE nickname = :nickname");
+        $stmt->bindParam(':nickname', $nickname);
+        $stmt->execute(); 
+        if ($stmt->fetch()) {
+            echo json_encode(['success' => false, 'error' => 'Ez a felhasználónév már foglalt!']);
+            exit();
+        }
+    }
+    
+    // Email cím létezésének ellenőrzése (csak ha változott)
+    if ($email !== $currentUser['email']) {
+        $stmt = $conn->prepare("SELECT neptun_k FROM user WHERE email = :email");
+        $stmt->bindParam(':email', $email);
+        $stmt->execute();
+        
+        if ($stmt->fetch()) {
+            echo json_encode(['success' => false, 'error' => 'Ez az email cím már foglalt!']);
+            exit();
+        }
     }
     
     // Amennyiben nem üresek a jelszó mezők
@@ -95,25 +126,29 @@ try {
         
         // Frissítés jelszóváltoztatással
         $hashed_password = password_hash($new_password, PASSWORD_DEFAULT);
-        $stmt = $conn->prepare("UPDATE user SET nickname = :nickname, vnev = :vnev, knev = :knev, email = :email, password = :password WHERE neptun_k = :neptun");
+        $stmt = $conn->prepare("UPDATE user SET neptun_k = :new_neptun, nickname = :nickname, vnev = :vnev, knev = :knev, email = :email, password = :password WHERE neptun_k = :current_neptun");
         $stmt->bindParam(':password', $hashed_password);
     } else {
         // Frissítés jelszóváltoztatás nélkül
-        $stmt = $conn->prepare("UPDATE user SET nickname = :nickname, vnev = :vnev, knev = :knev, email = :email WHERE neptun_k = :neptun");
+        $stmt = $conn->prepare("UPDATE user SET neptun_k = :new_neptun, nickname = :nickname, vnev = :vnev, knev = :knev, email = :email WHERE neptun_k = :current_neptun");
     }
     
+    $stmt->bindParam(':new_neptun', $neptun);
     $stmt->bindParam(':nickname', $nickname);
     $stmt->bindParam(':vnev', $vnev);
     $stmt->bindParam(':knev', $knev);
     $stmt->bindParam(':email', $email);
-    $stmt->bindParam(':neptun', $_SESSION['user_neptun']);
+    $stmt->bindParam(':current_neptun', $_SESSION['user_neptun']);
     
     if ($stmt->execute()) {
+        // Neptun kód session frissítése
+        $_SESSION['user_neptun'] = $neptun;
+        
         echo json_encode([
             'success' => true, 
             'message' => 'Profil sikeresen frissítve!',
             'data' => [
-                'neptun' => $_SESSION['user_neptun'],
+                'neptun' => $neptun,
                 'nickname' => $nickname,
                 'full_name' => $fullname,
                 'email' => $email
