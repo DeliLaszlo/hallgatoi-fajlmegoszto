@@ -110,12 +110,21 @@ $conn->close();
         <section id="subject_kerelemek">
             <div class="section_header">
                 <h1>Kérelmek</h1>
-                <button class="large_button add_request_button" aria-label="Kérelem hozzáadása">
-                    <img src="icons/add.svg" alt="Kérelem hozzáadása">
-                    <span class="icon_text">Új kérelem</span>
-                </button>
+                <div class="section_header_actions">
+                    <div class="search_container content_search_container">
+                        <input type="text" id="request_search_input" placeholder="Kérelem keresése..." aria-label="Kérelem keresése">
+                        <button id="request_search_button" aria-label="Keresés">
+                            <img src="icons/search.svg" alt="Keresés">
+                        </button>
+                    </div>
+                    <button class="large_button add_request_button" aria-label="Kérelem hozzáadása">
+                        <img src="icons/add.svg" alt="Kérelem hozzáadása">
+                        <span class="icon_text">Új kérelem</span>
+                    </button>
+                </div>       
             </div>
             <hr>
+            <div id="subject_request_container"></div>
         </section>
         <section id="subject_chatszobak">
             <div class="section_header">

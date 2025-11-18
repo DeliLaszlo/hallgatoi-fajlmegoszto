@@ -93,8 +93,19 @@ if (isset($_SESSION['last_activity']) && (time() - $_SESSION['last_activity'] > 
             <div id="dashboard_file_container"></div>
         </section>
         <section id="dashboard_kerelemek">
-            <h1>Kérelmeim</h1>
+            <div class="section_header">
+                <h1>Kérelmeim</h1>
+                <div class="section_header_actions">
+                    <div class="search_container content_search_container">
+                        <input type="text" id="request_search_input" placeholder="Kérelem keresése..." aria-label="Kérelem keresése">
+                        <button id="request_search_button" aria-label="Keresés">
+                            <img src="icons/search.svg" alt="Keresés">
+                        </button>
+                    </div>
+                </div>
+            </div> 
             <hr>
+            <div id="dashboard_request_container"></div>
         </section>
         <section id="dashboard_chatszobak">
             <h1>Saját chatszobáim</h1>

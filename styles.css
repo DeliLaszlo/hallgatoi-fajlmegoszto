@@ -626,7 +626,7 @@ textarea:focus {
     .header_img {
         height: 40%;
     }
-    .own_subject_container h2, .uploaded_files_container h2 {
+    .content_container h2 {
         font-size: 1rem;
     }
     .section_header h1 {

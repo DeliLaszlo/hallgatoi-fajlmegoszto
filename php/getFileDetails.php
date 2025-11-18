@@ -128,6 +128,7 @@ try {
             'success' => true,
             'data' => [
                 'up_id' => $row['up_id'],
+                'request_id' => $request_id,
                 'title' => $row['upload_title'],
                 'file_name' => $row['file_name'],
                 'uploader' => $row['uploader_nickname'] . ' (' . $row['uploader_neptun'] . ')',
