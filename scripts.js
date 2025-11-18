@@ -1642,7 +1642,7 @@ document.addEventListener('DOMContentLoaded', function() {
             showLoading('Kérelem részleteinek betöltése...');
             
             try {
-                const response = await fetch(`getFileDetails.php?mode=request&id=${requestId}`);
+                const response = await fetch(`php/getFileDetails.php?mode=request&id=${requestId}`);
                 
                 if (!response.ok) {
                     throw new Error('Hiba a kérelem részleteinek betöltésekor');
