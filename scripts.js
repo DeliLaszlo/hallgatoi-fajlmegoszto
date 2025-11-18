@@ -115,9 +115,9 @@ document.addEventListener('DOMContentLoaded', function() {
                                 <span class="icon_text">Törlés</span>
                                 <img src="icons/delete.svg" alt="Törlés">
                             </button>
-                            <h2>${subject.class_name}</h2>
-                            <p>${subject.class_code}</p>
-                            <p>${subject.file_count} fájl, ${subject.request_count} kérelem</p>
+                            <h2>${escapeHtml(subject.class_name)}</h2>
+                            <p>${escapeHtml(subject.class_code)}</p>
+                            <p>${escapeHtml(subject.file_count.toString())} fájl, ${escapeHtml(subject.request_count.toString())} kérelem</p>
                         </div>
                     `);
                 });
@@ -173,9 +173,9 @@ document.addEventListener('DOMContentLoaded', function() {
                                 <span class="icon_text">Törlés</span>
                                 <img src="icons/delete.svg" alt="Törlés">
                             </button>
-                            <h2>${file.title}</h2>
-                            <p>${file.description}</p>
-                            <p>${file.upload_date}, ${file.class_name}</p>
+                            <h2>${escapeHtml(file.title)}</h2>
+                            <p>${escapeHtml(file.description)}</p>
+                            <p>${escapeHtml(file.upload_date)}, ${escapeHtml(file.class_name)}</p>
                         </div>
                     `);
                 });
@@ -263,21 +263,34 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     // Dashboard chatszobák generálása
-    function generateChatrooms() {
-        const ownChatroomCount = 2; // Felhasználó saját chatszobáinak száma, PHP-val generált
-        const followedChatroomCount = 2; // Felhasználó követett chatszobáinak száma, PHP-val generált
+    async function generateChatrooms() {
         const chatroomSection = document.getElementById('dashboard_chatszobak');
+        if (!chatroomSection) return;
+        
         const firstHr = chatroomSection.querySelector('hr');
-        if (chatroomSection) {
-            if (ownChatroomCount === 0) {
+
+        try {
+            const response = await fetch('php/getChatrooms.php?mode=neptun');
+            const data = await response.json();
+
+            if (!data.success) {
+                console.error('Hiba a chatszobák betöltésekor:', data.message);
+                return;
+            }
+
+            const ownChatrooms = data.chatrooms.filter(chatroom => chatroom.chatroom_type === 'own');
+            const followedChatrooms = data.chatrooms.filter(chatroom => chatroom.chatroom_type === 'followed');
+
+            // Saját chatszobák megjelenítése
+            if (ownChatrooms.length === 0) {
                 firstHr.insertAdjacentHTML('afterend', `
-                    '<h2 class="no_content_message">Még nem hoztál létre chatszobát.</h2>'
+                    <h2 class="no_content_message">Még nem hoztál létre chatszobát.</h2><br>
                 `);
             } else {
-                for (let i = 0; i < ownChatroomCount; i++) {
+                ownChatrooms.forEach(chatroom => {
                     firstHr.insertAdjacentHTML('afterend', `
-                        <div class="content_container own_chatroom_container">
-                            <a href="#" class="container_link chatroom_link" aria-label="Chatroom megnyitása"></a>
+                        <div class="content_container chatroom_container own_chatroom_container" data-room-id="${escapeHtml(chatroom.room_id)}">
+                            <a href="chatroom.php?room_id=${escapeHtml(chatroom.room_id)}" class="container_link chatroom_link" aria-label="Chatroom megnyitása"></a>
                             <button class="button small_button content_edit_button edit_chatroom_button" aria-label="Szerkesztés">
                                 <span class="icon_text">Szerkesztés</span>
                                 <img src="icons/edit.svg" alt="Szerkesztés">
@@ -286,33 +299,38 @@ document.addEventListener('DOMContentLoaded', function() {
                                 <span class="icon_text">Törlés</span>
                                 <img src="icons/delete.svg" alt="Törlés">
                             </button>
-                            <h2>Chatroom címe</h2> <!-- PHP-val generált -->
-                            <p>Chatroom leírása</p> <!-- PHP-val generált -->
-                            <p>Létrehozás dátuma, tárgy neve, követők száma</p> <!-- PHP-val generált -->
+                            <h2>${escapeHtml(chatroom.title)}</h2>
+                            <p>${escapeHtml(chatroom.description)}</p>
+                            <p>${escapeHtml(chatroom.create_date)}, ${escapeHtml(chatroom.class_name)}</p>
                         </div>
                     `);
-                }
+                });
             }
-            if (followedChatroomCount === 0) {
+
+            // Követett chatszobák megjelenítése
+            if (followedChatrooms.length === 0) {
                 chatroomSection.insertAdjacentHTML('beforeend', `
                     <h2 class="no_content_message">Még nem követsz chatszobát.</h2>
                 `);
             } else {
-                for (let i = 0; i < followedChatroomCount; i++) {
+                followedChatrooms.forEach(chatroom => {
                     chatroomSection.insertAdjacentHTML('beforeend', `
-                        <div class="content_container followed_chatroom_container">
-                            <a href="#" class="container_link chatroom_link" aria-label="Chatroom megnyitása"></a>
+                        <div class="content_container chatroom_container followed_chatroom_container" data-room-id="${escapeHtml(chatroom.room_id)}">
+                            <a href="chatroom.php?room_id=${escapeHtml(chatroom.room_id)}" class="container_link chatroom_link" aria-label="Chatroom megnyitása"></a>
                             <button class="button small_button content_unfollow_button" aria-label="Követés megszüntetése">
                                 <span class="icon_text">Követés megszüntetése</span>
                                 <img src="icons/unfollow.svg" alt="Követés megszüntetése">
                             </button>
-                            <h2>Chatroom címe</h2> <!-- PHP-val generált -->
-                            <p>Chatroom leírása</p> <!-- PHP-val generált -->
-                            <p>Létrehozás dátuma, tárgy neve, követők száma</p> <!-- PHP-val generált -->
+                            <h2>${escapeHtml(chatroom.title)}</h2>
+                            <p>${escapeHtml(chatroom.description)}</p>
+                            <p>${escapeHtml(chatroom.creater_nickname)}, ${escapeHtml(chatroom.create_date)}, ${escapeHtml(chatroom.class_name)}</p>
                         </div>
                     `);
-                }
+                });
             }
+        } catch (error) {
+            console.error('Hiba történt a chatszobák betöltésekor:', error);
+            chatroomSection.innerHTML = '<h2 class="no_content_message">Hiba történt a chatszobák betöltésekor.</h2>';
         }
     }
     if (window.location.pathname.includes('dashboard.php')) {
@@ -516,7 +534,7 @@ document.addEventListener('DOMContentLoaded', function() {
                                 </button>
                                 <h2>${escapeHtml(request.request_name)}</h2>
                                 <p>${escapeHtml(request.description)}</p>
-                                <p>Te, ${escapeHtml(request.request_date)}</p>
+                                <p>Én, ${escapeHtml(request.request_date)}</p>
                             </div>
                         `);
                     } else {
@@ -551,21 +569,38 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     // Subject chatszobák generálása
-    function generateSubjectChatrooms() {
-        const chatroomCount = 3; // Chatszobák száma, PHP-val generált
+    async function generateSubjectChatrooms() {
         const chatroomSection = document.getElementById('subject_chatszobak');
-        if (chatroomSection) {
-            if (chatroomCount === 0) {
+        if (!chatroomSection) return;
+
+        // Tárgy kód lekérése az URL-ből
+        const urlParams = new URLSearchParams(window.location.search);
+        const classCode = urlParams.get('class_code');
+
+        if (!classCode) {
+            chatroomSection.innerHTML = '<h2 class="no_content_message">Hiányzik a tárgy kód az URL-ből.</h2>';
+            return;
+        }
+
+        try {
+            const response = await fetch(`php/getChatrooms.php?mode=class&class_code=${encodeURIComponent(classCode)}`);
+            const data = await response.json();
+
+            if (!data.success) {
+                console.error('Hiba a chatszobák betöltésekor:', data.message);
+                return;
+            }
+
+            if (data.chatrooms.length === 0) {
                 chatroomSection.insertAdjacentHTML('beforeend',
                     '<h2 class="no_content_message">Még nincsenek chatszobák ehhez a tárgyhoz.</h2>'
                 );
             } else {
-                for (let i = 0; i < chatroomCount; i++) {
-                    const isOwnChatroom = (i % 2 === 0); // Helyettesítendő PHP-val
-                    if (isOwnChatroom) {
+                data.chatrooms.forEach(chatroom => {
+                    if (chatroom.is_own) {
                         chatroomSection.insertAdjacentHTML('beforeend', `
-                            <div class="content_container chatroom_container">
-                                <a href="#" class="container_link chatroom_link" aria-label="Chatroom megnyitása"></a>
+                            <div class="content_container chatroom_container" data-room-id="${escapeHtml(chatroom.room_id)}">
+                                <a href="chatroom.php?room_id=${escapeHtml(chatroom.room_id)}" class="container_link chatroom_link" aria-label="Chatroom megnyitása"></a>
                                 <button class="button small_button content_edit_button edit_chatroom_button" aria-label="Szerkesztés">
                                     <span class="icon_text">Szerkesztés</span>
                                     <img src="icons/edit.svg" alt="Szerkesztés">
@@ -574,20 +609,23 @@ document.addEventListener('DOMContentLoaded', function() {
                                     <span class="icon_text">Törlés</span>
                                     <img src="icons/delete.svg" alt="Törlés">
                                 </button>
-                                <h2>Chatroom címe</h2> <!-- PHP-val generált -->
-                                <p>Chatroom leírása</p> <!-- PHP-val generált -->
-                                <p>Te, követők száma</p> <!-- PHP-val generált -->
+                                <h2>${escapeHtml(chatroom.title)}</h2>
+                                <p>${escapeHtml(chatroom.description)}</p>
+                                <p>Én, ${escapeHtml(chatroom.create_date)}</p>
                             </div>
                         `);
                     } else {
+                        const followButtonStyle = chatroom.is_following ? 'display: none;' : '';
+                        const unfollowButtonStyle = chatroom.is_following ? '' : 'display: none;';
+                        
                         chatroomSection.insertAdjacentHTML('beforeend', `
-                            <div class="content_container chatroom_container">
-                                <a href="#" class="container_link chatroom_link" aria-label="Chatszoba megnyitása"></a>
-                                <button class="button small_button content_follow_button" aria-label="Követés">
+                            <div class="content_container chatroom_container" data-room-id="${escapeHtml(chatroom.room_id)}">
+                                <a href="chatroom.php?room_id=${escapeHtml(chatroom.room_id)}" class="container_link chatroom_link" aria-label="Chatszoba megnyitása"></a>
+                                <button class="button small_button content_follow_button" aria-label="Követés" style="${followButtonStyle}">
                                     <span class="icon_text">Követés</span>
                                     <img src="icons/follow.svg" alt="Követés">
                                 </button>
-                                <button class="button small_button content_unfollow_button" aria-label="Követés megszüntetése" style="display: none;">
+                                <button class="button small_button content_unfollow_button" aria-label="Követés megszüntetése" style="${unfollowButtonStyle}">
                                     <span class="icon_text">Követés megszüntetése</span>
                                     <img src="icons/unfollow.svg" alt="Követés megszüntetése">
                                 </button>
@@ -595,14 +633,17 @@ document.addEventListener('DOMContentLoaded', function() {
                                     <span class="icon_text">Jelentés</span>
                                     <img src="icons/report.svg" alt="Chatszoba jelentése">
                                 </button>
-                                <h2>Chatszoba címe</h2> <!-- PHP-val generált -->
-                                <p>Chatszoba leírása</p> <!-- PHP-val generált -->
-                                <p>Létrehozó, követők száma</p> <!-- PHP-val generált -->
+                                <h2>${escapeHtml(chatroom.title)}</h2>
+                                <p>${escapeHtml(chatroom.description)}</p>
+                                <p>${escapeHtml(chatroom.creater_nickname)}, ${escapeHtml(chatroom.create_date)}</p>
                             </div>
                         `);
                     }
-                }
+                });
             }
+        } catch (error) {
+            console.error('Hiba történt a chatszobák betöltésekor:', error);
+            chatroomSection.innerHTML = '<h2 class="no_content_message">Hiba történt a chatszobák betöltésekor.</h2>';
         }
     }
     if (window.location.pathname.includes('subject.php')) {
@@ -1331,6 +1372,13 @@ document.addEventListener('DOMContentLoaded', function() {
             if (requestSearchInput) {
                 requestSearchInput.value = '';
                 requestSearchInput.dispatchEvent(new Event('input'));
+            }
+
+            // Chatszoba keresés törlése szekció váltáskor
+            const chatroomSearchInput = document.getElementById('chatroom_search_input');
+            if (chatroomSearchInput) {
+                chatroomSearchInput.value = '';
+                chatroomSearchInput.dispatchEvent(new Event('input'));
             }
 
             // Tárgy keresés törlése szekció váltáskor
@@ -2441,11 +2489,37 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
+    // Chatszoba keresés
+    const chatroomSearchInput = document.getElementById('chatroom_search_input');
+    if (chatroomSearchInput) {
+        chatroomSearchInput.addEventListener('input', function() {
+            const searchTerm = this.value.toLowerCase().trim();
+            const chatroomContainers = document.querySelectorAll('.chatroom_container');
+            chatroomContainers.forEach(function(container) {
+                const chatroomTitle = container.querySelector('h2');
+                const chatroomParagraphs = container.querySelectorAll('p');
+                
+                if (chatroomTitle) {
+                    const titleText = chatroomTitle.textContent.toLowerCase();
+                    let paragraphText = '';
+                    chatroomParagraphs.forEach(function(p) {
+                        paragraphText += p.textContent.toLowerCase() + ' ';
+                    });
+                    
+                    if (searchTerm === '' || titleText.includes(searchTerm) || paragraphText.includes(searchTerm)) {
+                        container.style.display = 'block';
+                    } else {
+                        container.style.display = 'none';
+                    }
+                }
+            });
+        });
+    }
+
     // Követés gombok közötti váltás
-    const followButtons = document.querySelectorAll('.content_follow_button');
-    const unfollowButtons = document.querySelectorAll('.content_unfollow_button');
-    followButtons.forEach(function(followButton) {
-        followButton.addEventListener('click', function(e) {
+    document.addEventListener('click', function(e) {
+        const followButton = e.target.closest('.content_follow_button');
+        if (followButton) {
             e.preventDefault();
             e.stopPropagation();
             const container = followButton.closest('.content_container');
@@ -2454,10 +2528,10 @@ document.addEventListener('DOMContentLoaded', function() {
                 followButton.style.display = 'none';
                 unfollowButton.style.display = 'flex';
             }
-        });
-    });
-    unfollowButtons.forEach(function(unfollowButton) {
-        unfollowButton.addEventListener('click', function(e) {
+        }
+        
+        const unfollowButton = e.target.closest('.content_unfollow_button');
+        if (unfollowButton) {
             e.preventDefault();
             e.stopPropagation();
             const container = unfollowButton.closest('.content_container');
@@ -2466,14 +2540,13 @@ document.addEventListener('DOMContentLoaded', function() {
                 unfollowButton.style.display = 'none';
                 followButton.style.display = 'flex';
             }
-        });
+        }
     });
 
     // Upvote és downvote kezelés
-    const upvoteButtons = document.querySelectorAll('.upvote_button');
-    const downvoteButtons = document.querySelectorAll('.downvote_button');
-    upvoteButtons.forEach(function(upvoteButton) {
-        upvoteButton.addEventListener('click', function(e) {
+    document.addEventListener('click', function(e) {
+        const upvoteButton = e.target.closest('.upvote_button');
+        if (upvoteButton) {
             e.preventDefault();
             e.stopPropagation();  
             const container = upvoteButton.closest('.voting_container');
@@ -2482,10 +2555,10 @@ document.addEventListener('DOMContentLoaded', function() {
             if (upvoteButton.classList.contains('active') && downvoteButton) {
                 downvoteButton.classList.remove('active');
             }
-        });
-    });
-    downvoteButtons.forEach(function(downvoteButton) {
-        downvoteButton.addEventListener('click', function(e) {
+        }
+        
+        const downvoteButton = e.target.closest('.downvote_button');
+        if (downvoteButton) {
             e.preventDefault();
             e.stopPropagation();
             const container = downvoteButton.closest('.voting_container');
@@ -2494,7 +2567,7 @@ document.addEventListener('DOMContentLoaded', function() {
             if (downvoteButton.classList.contains('active') && upvoteButton) {
                 upvoteButton.classList.remove('active');
             }
-        });
+        }
     });
 
 // Chatszoba

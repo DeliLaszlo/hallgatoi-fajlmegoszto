@@ -620,6 +620,10 @@ textarea:focus {
     .dark-mode-toggle {
         transform: translateY(0);
     }
+    
+    .shrinkText{
+        text-align: center;
+    }
 }
 
 @media (max-width: 650px) {
@@ -629,7 +633,7 @@ textarea:focus {
     .content_container h2 {
         font-size: 1rem;
     }
-    .section_header h1 {
+    .section_header h1, .shrinkText {
         font-size: 1.5rem;
     }
 }

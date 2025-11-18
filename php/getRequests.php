@@ -86,7 +86,7 @@ try {
                   FROM request r
                   INNER JOIN user usr ON r.neptun_k = usr.neptun_k
                   LEFT JOIN upload_request ur ON r.request_id = ur.request_id
-                  WHERE r.class_code = ?
+                  WHERE r.class_code = ? AND (ur.status IS NULL OR ur.status != 'T')
                   ORDER BY r.request_id DESC";
         
         $stmt = $conn->prepare($query);

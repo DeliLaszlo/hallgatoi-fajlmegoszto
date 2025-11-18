@@ -129,10 +129,18 @@ $conn->close();
         <section id="subject_chatszobak">
             <div class="section_header">
                 <h1>Chatszobák</h1>
-                <button class="large_button add_chatroom_button" aria-label="Chatszoba hozzáadása">
-                    <img src="icons/add.svg" alt="Chatszoba hozzáadása">
-                    <span class="icon_text">Új chatszoba</span>
-                </button>
+                <div class="section_header_actions">
+                    <div class="search_container content_search_container">
+                        <input type="text" id="chatroom_search_input" placeholder="Chatszoba keresése..." aria-label="Chatszoba keresése">
+                        <button id="chatroom_search_button" aria-label="Keresés">
+                            <img src="icons/search.svg" alt="Keresés">
+                        </button>
+                    </div>
+                    <button class="large_button add_chatroom_button" aria-label="Chatszoba hozzáadása">
+                        <img src="icons/add.svg" alt="Chatszoba hozzáadása">
+                        <span class="icon_text">Új chatszoba</span>
+                    </button>
+                </div>
             </div>
             <hr>
         </section>

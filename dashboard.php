@@ -108,9 +108,19 @@ if (isset($_SESSION['last_activity']) && (time() - $_SESSION['last_activity'] > 
             <div id="dashboard_request_container"></div>
         </section>
         <section id="dashboard_chatszobak">
-            <h1>Saját chatszobáim</h1>
+            <div class="section_header">
+                <h1>Saját chatszobáim</h1>
+                <div class="section_header_actions">
+                    <div class="search_container content_search_container">
+                        <input type="text" id="chatroom_search_input" placeholder="Chatszoba keresése..." aria-label="Chatszoba keresése">
+                        <button id="chatroom_search_button" aria-label="Keresés">
+                            <img src="icons/search.svg" alt="Keresés">
+                        </button>
+                    </div>
+                </div>
+            </div>
             <hr>
-            <h1>Követett chatszobáim</h1>
+            <h1 class="shrinkText">Követett chatszobáim</h1>
             <hr>
         </section>
         <section id="dashboard_profile">
