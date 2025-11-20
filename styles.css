@@ -1672,3 +1672,7 @@ form .modal_footer {
 .badge-red   { background: #e84141; color: #fff; }
 .badge-green { background: #2ecc71; color: #fff; }
 .badge-yellow{ background: #f1c40f; color: #000; }
+
+#adminh1 {
+    margin: 0 auto;
+}
