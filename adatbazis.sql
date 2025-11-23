@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Gép: 127.0.0.1
--- Létrehozás ideje: 2025. Nov 23. 16:54
+-- Létrehozás ideje: 2025. Nov 23. 18:54
 -- Kiszolgáló verziója: 10.4.32-MariaDB
 -- PHP verzió: 8.2.12
 
@@ -223,6 +223,7 @@ CREATE TABLE `upload` (
   `up_id` int(7) NOT NULL,
   `class_code` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_hungarian_ci NOT NULL,
   `neptun` varchar(6) CHARACTER SET utf8 COLLATE utf8_hungarian_ci NOT NULL,
+  `file_name` varchar(60) CHARACTER SET utf8 COLLATE utf8_hungarian_ci NOT NULL,
   `path_to_file` varchar(255) CHARACTER SET utf8 COLLATE utf8_hungarian_ci NOT NULL,
   `upload_title` varchar(50) CHARACTER SET utf8 COLLATE utf8_hungarian_ci NOT NULL,
   `upload_date` date NOT NULL DEFAULT current_timestamp(),
@@ -235,14 +236,10 @@ CREATE TABLE `upload` (
 -- A tábla adatainak kiíratása `upload`
 --
 
-INSERT INTO `upload` (`up_id`, `class_code`, `neptun`, `path_to_file`, `upload_title`, `upload_date`, `downloads`, `comment`, `rating`) VALUES
-(772842, 'randomtargy', 'asd123', '/files', '3_Önálló.pdf', '2025-11-21', 1, 'Csakegyteszt', 259443),
-(1000002, 'GKNB_INTM115', 'asd123', 'Projektmunka\\xampp\\htdocs\\project\\files', 'Zh kérdések és válaszok', '2025-11-20', 0, 'Az elso zh-ban előforduló kérdések és válaszaik', 0),
-(1000006, 'GKNB_INTM115', 'asd123', '/files/name.txt', 'name.txt', '2025-11-23', 5, 'Szia', 0),
-(1605147, 'GKNB_INTM123', 'asd123', '/files', '04_9320.pdf', '2025-11-21', 0, 'Csakegyteszt', 1651414),
-(4652652, 'randomtargy', 'asd123', '/files', '3_Önálló.pdf', '2025-11-21', 1, 'Csakegyteszt', 259443),
-(7895092, 'randomtargy', 'asd123', '/files', '3_Önálló.pdf', '2025-11-21', 1, 'Csakegyteszt', 259443),
-(8654348, 'randomtargy', 'asd123', '/files', '2_Önálló (1) (1).pdf', '2025-11-21', 0, 'Csakegyteszt', 191975);
+INSERT INTO `upload` (`up_id`, `class_code`, `neptun`, `file_name`, `path_to_file`, `upload_title`, `upload_date`, `downloads`, `comment`, `rating`) VALUES
+(1000002, 'GKNB_INTM115', 'asd123', 'zh_qa.txt', 'Projektmunka\\xampp\\htdocs\\project\\files', 'Zh kérdések és válaszok', '2025-11-20', 0, 'Az elso zh-ban előforduló kérdések és válaszaik', 0),
+(1000005, 'GKNB_INTM118', 'asd123', 'Uml.pdf', '/files', 'Uml diagram', '2025-11-23', 0, 'Uml diagrammok elemei és azok szerepe', 0),
+(1000006, 'GKNB_INTM115', 'asd123', 'name.txt', '/files/name.txt', 'Tesztfájl', '2025-11-23', 5, 'Teszt', 0);
 
 -- --------------------------------------------------------
 
