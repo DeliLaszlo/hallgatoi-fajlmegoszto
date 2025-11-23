@@ -2703,7 +2703,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // Chatszobák generálása
     function generateChatrooms() {
-        const chatroomCount = 3; // Felhasználó saját és követett chatszobáinak száma, PHP-val generált
+        const chatroomCount = 4; // Felhasználó saját és követett chatszobáinak száma, PHP-val generált
         const chatConvList = document.getElementById('chat_conv_list');
         if (chatConvList && chatroomCount > 0) {
             chatConvList.innerHTML = '';
@@ -2835,94 +2835,141 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
     // TODO: Backend - Új üzenetek időszakos lekérése (pl. AJAX segítségével)
-})();
 
-    // Tárgy felvétele
-    document.addEventListener('click', async function(e) {
-        if (e.target.closest('.subject_add_button')) {
-            const button = e.target.closest('.subject_add_button');
-            const classCode = button.getAttribute('data-class-code');
-            
-            if (!classCode) return;
-            button.disabled = true;
-            
-            try {
-                const response = await fetch('php/add_subject.php', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({ class_code: classCode })
-                });
-                
-                if (!response.ok) {
-                    throw new Error('Nem sikerült felvenni a tárgyat.');
-                }
-                
-                const result = await response.json();    
-                if (result.success) {
-                    // Gomb megjelenésének módosítása
-                    const imgElement = button.querySelector('img');
-                    const textElement = button.querySelector('.icon_text');
-                    
-                    if (imgElement) {
-                        imgElement.src = 'icons/tick.svg';
-                        imgElement.alt = 'Felvéve';
-                    }
-                    if (textElement) {
-                        textElement.textContent = 'Felvéve';
-                    }
-                    button.setAttribute('aria-label', 'Tárgy felvéve');
-                    
-                    // Tárgy hozzáadása a saját tárgyak közé
-                    const userSubjectsSection = document.getElementById('user_subjects');
-                    if (userSubjectsSection) {
-                        // Ha "Még nincsenek felvett tárgyaid" üzenet van, távolítsuk el
-                        const noContentMessage = userSubjectsSection.querySelector('.no_content_message');
-                        if (noContentMessage) {
-                            noContentMessage.remove();
-                        }
-                        
-                        // Tárgy adatainak lekérése a backend-től
-                        try {
-                            const subjectsResponse = await fetch('php/getUserSubjects.php');
-                            if (subjectsResponse.ok) {
-                                const subjects = await subjectsResponse.json();
-                                const addedSubject = subjects.find(s => s.class_code === classCode);
-                                
-                                if (addedSubject) {
-                                    userSubjectsSection.insertAdjacentHTML('beforeend', `
-                                        <div class="content_container own_subject_container">
-                                            <a href="subject.php?class_code=${encodeURIComponent(addedSubject.class_code)}" class="container_link subject_link" aria-label="Tárgy megnyitása"></a>
-                                            <button class="button small_button content_delete_button" aria-label="Törlés">
-                                                <span class="icon_text">Törlés</span>
-                                                <img src="icons/delete.svg" alt="Törlés">
-                                            </button>
-                                            <h2>${addedSubject.class_name}</h2>
-                                            <p>${addedSubject.class_code}</p>
-                                            <p>${addedSubject.file_count} fájl, ${addedSubject.request_count} kérelem</p>
-                                        </div>
-                                    `);
-                                    
-                                    // Keresés újrainicializálása az új tárggyal
-                                    searchOwnSubjects();
-                                }
-                            }
-                            alert('Tárgy sikeresen felvéve!');
-                        } catch (error) {
-                            console.error('Hiba történt a tárgy részleteinek lekérésekor:', error);
-                        }
-                    }
-                } else {
-                    throw new Error(result.error || 'Ismeretlen hiba történt.');
-                }
-            } catch (error) {
-                console.error('Error adding subject:', error);
-                alert('Hiba történt a tárgy felvételekor: ' + error.message);
-                button.disabled = false;
+    // Oldalsáv kezelése
+    const sidebarToggle = document.getElementById('sidebar-toggle');
+    const sidebar = document.getElementById('sidebar');
+    const backgroundOverlay = document.getElementById('background-overlay');
+    
+    if (sidebarToggle && sidebar && backgroundOverlay) {
+        // Kezdeti állapot beállítása mobilon (600px alatt)
+        function handleSidebarResize() {
+            if (window.innerWidth <= 600) {
+                sidebar.classList.remove('visible');
+                sidebar.classList.add('hidden');
+                backgroundOverlay.style.display = 'none';
+            } else {
+                // Nagyobb képernyőn eltávolítjuk a mobilos osztályokat
+                sidebar.classList.remove('hidden');
+                sidebar.classList.remove('visible');
+                backgroundOverlay.style.display = 'none';
             }
         }
-    });
+        
+        // Kezdeti állapot beállítása
+        handleSidebarResize();
+        
+        // Ablak átméretezésekor újra ellenőrzés
+        window.addEventListener('resize', handleSidebarResize);
+        
+        // Sidebar megnyitása/bezárása a toggle gombbal
+        sidebarToggle.addEventListener('click', function() {
+            if (sidebar.classList.contains('hidden')) {
+                sidebar.classList.remove('hidden');
+                sidebar.classList.add('visible');
+                backgroundOverlay.style.display = 'block';
+            } else {
+                sidebar.classList.remove('visible');
+                sidebar.classList.add('hidden');
+                backgroundOverlay.style.display = 'none';
+            }
+        });
+        
+        // Sidebar bezárása a háttérre kattintva
+        backgroundOverlay.addEventListener('click', function() {
+            sidebar.classList.remove('visible');
+            sidebar.classList.add('hidden');
+            backgroundOverlay.style.display = 'none';
+        });
+    }
+})();
+
+// Tárgy felvétele
+document.addEventListener('click', async function(e) {
+    if (e.target.closest('.subject_add_button')) {
+        const button = e.target.closest('.subject_add_button');
+        const classCode = button.getAttribute('data-class-code');
+        
+        if (!classCode) return;
+        button.disabled = true;
+        
+        try {
+            const response = await fetch('php/add_subject.php', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ class_code: classCode })
+            });
+            
+            if (!response.ok) {
+                throw new Error('Nem sikerült felvenni a tárgyat.');
+            }
+            
+            const result = await response.json();    
+            if (result.success) {
+                // Gomb megjelenésének módosítása
+                const imgElement = button.querySelector('img');
+                const textElement = button.querySelector('.icon_text');
+                
+                if (imgElement) {
+                    imgElement.src = 'icons/tick.svg';
+                    imgElement.alt = 'Felvéve';
+                }
+                if (textElement) {
+                    textElement.textContent = 'Felvéve';
+                }
+                button.setAttribute('aria-label', 'Tárgy felvéve');
+                
+                // Tárgy hozzáadása a saját tárgyak közé
+                const userSubjectsSection = document.getElementById('user_subjects');
+                if (userSubjectsSection) {
+                    // Ha "Még nincsenek felvett tárgyaid" üzenet van, távolítsuk el
+                    const noContentMessage = userSubjectsSection.querySelector('.no_content_message');
+                    if (noContentMessage) {
+                        noContentMessage.remove();
+                    }
+                    
+                    // Tárgy adatainak lekérése a backend-től
+                    try {
+                        const subjectsResponse = await fetch('php/getUserSubjects.php');
+                        if (subjectsResponse.ok) {
+                            const subjects = await subjectsResponse.json();
+                            const addedSubject = subjects.find(s => s.class_code === classCode);
+                            
+                            if (addedSubject) {
+                                userSubjectsSection.insertAdjacentHTML('beforeend', `
+                                    <div class="content_container own_subject_container">
+                                        <a href="subject.php?class_code=${encodeURIComponent(addedSubject.class_code)}" class="container_link subject_link" aria-label="Tárgy megnyitása"></a>
+                                        <button class="button small_button content_delete_button" aria-label="Törlés">
+                                            <span class="icon_text">Törlés</span>
+                                            <img src="icons/delete.svg" alt="Törlés">
+                                        </button>
+                                        <h2>${addedSubject.class_name}</h2>
+                                        <p>${addedSubject.class_code}</p>
+                                        <p>${addedSubject.file_count} fájl, ${addedSubject.request_count} kérelem</p>
+                                    </div>
+                                `);
+                                
+                                // Keresés újrainicializálása az új tárggyal
+                                searchOwnSubjects();
+                            }
+                        }
+                        alert('Tárgy sikeresen felvéve!');
+                    } catch (error) {
+                        console.error('Hiba történt a tárgy részleteinek lekérésekor:', error);
+                    }
+                }
+            } else {
+                throw new Error(result.error || 'Ismeretlen hiba történt.');
+            }
+        } catch (error) {
+            console.error('Error adding subject:', error);
+            alert('Hiba történt a tárgy felvételekor: ' + error.message);
+            button.disabled = false;
+        }
+    }
+});
 });
 // Tárgy törlése
 document.addEventListener('click', async function(e) {
