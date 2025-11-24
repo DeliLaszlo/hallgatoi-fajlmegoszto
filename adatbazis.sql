@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Gép: 127.0.0.1
--- Létrehozás ideje: 2025. Nov 24. 22:27
+-- Létrehozás ideje: 2025. Nov 24. 23:58
 -- Kiszolgáló verziója: 10.4.32-MariaDB
 -- PHP verzió: 8.2.12
 
@@ -237,9 +237,9 @@ CREATE TABLE `upload` (
 --
 
 INSERT INTO `upload` (`up_id`, `class_code`, `neptun`, `file_name`, `path_to_file`, `upload_title`, `upload_date`, `downloads`, `comment`, `rating`) VALUES
-(1000001, 'GKNB_INTM118', 'asd123', 'Uml.pdf', '/files', 'Uml diagram', '2025-11-23', 0, 'Uml diagrammok elemei és azok szerepe', 0),
+(1000001, 'GKNB_INTM118', 'asd123', 'Uml.pdf', '/files/', 'Uml diagram', '2025-11-23', 0, 'Uml diagrammok elemei és azok szerepe', 0),
 (1000002, 'GKNB_INTM115', 'asd123', 'zh_qa.txt', 'Projektmunka\\xampp\\htdocs\\project\\files', 'Zh kérdések és válaszok', '2025-11-20', 0, 'Az elso zh-ban előforduló kérdések és válaszaik', 0),
-(1000006, 'GKNB_INTM115', 'asd123', 'name.txt', '/files/name.txt', 'Tesztfájl', '2025-11-23', 5, 'Teszt', 0);
+(1000006, 'GKNB_INTM115', 'asd123', 'name.txt', '/files/', 'Tesztfájl', '2025-11-23', 5, 'Teszt', 0);
 
 -- --------------------------------------------------------
 
