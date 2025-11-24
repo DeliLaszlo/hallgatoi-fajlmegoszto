@@ -2799,3 +2799,502 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
 });
+// Tárgy törlése
+document.addEventListener('click', async function(e) {
+    const deleteButton = e.target.closest('.own_subject_container .content_delete_button');
+    if (deleteButton) {
+        e.preventDefault();
+        e.stopPropagation();
+        
+        // Megerősítés kérése
+        if (!confirm('Biztosan törölni szeretnéd ezt a tárgyat?')) {
+            return;
+        }
+        
+        const container = deleteButton.closest('.own_subject_container');
+        const classCode = container.querySelector('p').textContent.trim();
+        
+        if (!classCode) {
+            alert('Hiba: Nem található a tárgy kódja!');
+            return;
+        }
+        
+        try {
+            showLoading('Tárgy törlése...');
+            
+            const response = await fetch('php/delete_subject.php', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ class_code: classCode })
+            });
+            
+            if (!response.ok) {
+                throw new Error('Nem sikerült törölni a tárgyat.');
+            }
+            
+            const result = await response.json();
+            
+            setTimeout(() => {
+                hideLoading();
+                
+                if (result.success) {
+                    // Eltávolítjuk az oldalról
+                    container.remove();
+                    
+                    // Ha nincs több tárgy, megjelenítjük az üres üzenetet
+                    const userSubjectsSection = document.getElementById('user_subjects');
+                    if (userSubjectsSection) {
+                        const remainingSubjects = userSubjectsSection.querySelectorAll('.own_subject_container');
+                        if (remainingSubjects.length === 0) {
+                            userSubjectsSection.innerHTML = '<h2 class="no_content_message">Még nincsenek felvett tárgyaid.</h2>';
+                        }
+                    }
+                    
+                    alert('Tárgy sikeresen törölve!');
+                } else {
+                    alert('Hiba: ' + (result.error || 'Nem sikerült törölni a tárgyat!'));
+                }
+            }, 1250);
+            
+        } catch (error) {
+            hideLoading();
+            console.error('Tárgy törlési hiba:', error);
+            alert('Hiba történt a tárgy törlése során: ' + error.message);
+        }
+    }
+});
+// Fájl törlése - ezt illeszd be a scripts.js fájlba
+
+// Dashboard saját fájlok törlése (list nézetből)
+document.addEventListener('click', async function(e) {
+    const deleteButton = e.target.closest('.own_file_container .content_delete_button');
+    if (deleteButton) {
+        e.preventDefault();
+        e.stopPropagation();
+        
+        // Megerősítés kérése
+        if (!confirm('Biztosan törölni szeretnéd ezt a fájlt?')) {
+            return;
+        }
+        
+        const container = deleteButton.closest('.own_file_container');
+        const detailsLink = container.querySelector('.own_details_link');
+        const upId = detailsLink ? detailsLink.getAttribute('data-up-id') : null;
+        
+        if (!upId) {
+            alert('Hiba: Nem található a fájl azonosítója!');
+            return;
+        }
+        
+        try {
+            showLoading('Fájl törlése...');
+            
+            const response = await fetch('php/delete_file.php', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ up_id: upId })
+            });
+            
+            if (!response.ok) {
+                throw new Error('Nem sikerült törölni a fájlt.');
+            }
+            
+            const result = await response.json();
+            
+            setTimeout(() => {
+                hideLoading();
+                
+                if (result.success) {
+                    // Eltávolítjuk a fájlkártyát az oldalról
+                    container.remove();
+                    
+                    // Ha nincs több fájl, megjelenítjük az üres üzenetet
+                    const fileContainer = document.getElementById('dashboard_file_container');
+                    if (fileContainer) {
+                        const remainingFiles = fileContainer.querySelectorAll('.own_file_container');
+                        if (remainingFiles.length === 0) {
+                            fileContainer.innerHTML = '<h2 class="no_content_message">Még nem töltöttél fel fájlokat.</h2>';
+                        }
+                    }
+                    
+                    alert('Fájl sikeresen törölve!');
+                } else {
+                    alert('Hiba: ' + (result.error || 'Nem sikerült törölni a fájlt!'));
+                }
+            }, 1250);
+            
+        } catch (error) {
+            hideLoading();
+            console.error('Fájl törlési hiba:', error);
+            alert('Hiba történt a fájl törlése során: ' + error.message);
+        }
+    }
+});
+
+// Fájl törlése
+document.addEventListener('click', async function(e) {
+    const deleteButton = e.target.closest('.own_file_details_modal .modal_delete_button');
+    if (deleteButton) {
+        e.preventDefault();
+        e.stopPropagation();
+        
+        // Megerősítés kérése
+        if (!confirm('Biztosan törölni szeretnéd ezt a fájlt?')) {
+            return;
+        }
+        
+        const modal = deleteButton.closest('.own_file_details_modal');
+        const upId = modal ? modal.getAttribute('data-up-id') : null;
+        
+        if (!upId) {
+            alert('Hiba: Nem található a fájl azonosítója!');
+            return;
+        }
+        
+        try {
+            showLoading('Fájl törlése...');
+            
+            const response = await fetch('php/delete_file.php', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ up_id: upId })
+            });
+            
+            if (!response.ok) {
+                throw new Error('Nem sikerült törölni a fájlt.');
+            }
+            
+            const result = await response.json();
+            
+            setTimeout(() => {
+                hideLoading();
+                
+                if (result.success) {
+                    // Bezárjuk a modalt
+                    const modalCloseButton = modal.querySelector('.modal_close_button');
+                    if (modalCloseButton) {
+                        modalCloseButton.click();
+                    }
+                    
+                    // Eltávolítjuk a fájlkártyát az oldalról
+                    const container = document.querySelector(`.own_file_container .own_details_link[data-up-id="${upId}"]`)?.closest('.own_file_container');
+                    if (container) {
+                        container.remove();
+                    }
+                    
+                    // Ha nincs több fájl, megjelenítjük az üres üzenetet
+                    const fileContainer = document.getElementById('dashboard_file_container') || 
+                                         document.getElementById('subject_file_container');
+                    if (fileContainer) {
+                        const remainingFiles = fileContainer.querySelectorAll('.uploaded_files_container');
+                        if (remainingFiles.length === 0) {
+                            fileContainer.innerHTML = '<h2 class="no_content_message">Még nem töltöttél fel fájlokat.</h2>';
+                        }
+                    }
+                    
+                    alert('Fájl sikeresen törölve!');
+                } else {
+                    alert('Hiba: ' + (result.error || 'Nem sikerült törölni a fájlt!'));
+                }
+            }, 1250);
+            
+        } catch (error) {
+            hideLoading();
+            console.error('Fájl törlési hiba:', error);
+            alert('Hiba történt a fájl törlése során: ' + error.message);
+        }
+    }
+});
+// Fájl letöltése - ezt illeszd be a scripts.js fájlba
+
+// Fájl letöltése a lista nézetből (dashboard és subject oldalon)
+document.addEventListener('click', function(e) {
+    const downloadButton = e.target.closest('.content_download_button');
+    if (downloadButton) {
+        e.preventDefault();
+        e.stopPropagation();
+        
+        const container = downloadButton.closest('.uploaded_files_container') || 
+                         downloadButton.closest('.own_file_container');
+        
+        // Megpróbáljuk megtalálni az up_id-t
+        let upId = null;
+        
+        // Először a details link-ből próbáljuk
+        const detailsLink = container.querySelector('.own_details_link') || 
+                           container.querySelector('.file_details_link');
+        if (detailsLink) {
+            upId = detailsLink.getAttribute('data-up-id');
+        }
+        
+        if (!upId) {
+            alert('Hiba: Nem található a fájl azonosítója!');
+            return;
+        }
+        
+        // Letöltés indítása
+        downloadFile(upId);
+    }
+});
+
+// Fájl letöltése
+document.addEventListener('click', function(e) {
+    const downloadButton = e.target.closest('.modal_download_button');
+    if (downloadButton) {
+        e.preventDefault();
+        e.stopPropagation();
+        
+        // Megkeressük a modal-t és az up_id-t
+        const modal = downloadButton.closest('.modal');
+        const upId = modal ? modal.getAttribute('data-up-id') : null;
+        
+        if (!upId) {
+            alert('Hiba: Nem található a fájl azonosítója!');
+            return;
+        }
+        
+        // Letöltés indítása
+        downloadFile(upId);
+    }
+});
+
+// Letöltés végrehajtása
+function downloadFile(upId) {
+    try {
+        // Létrehozunk egy láthatatlan link elemet
+        const downloadLink = document.createElement('a');
+        downloadLink.href = `php/download_file.php?up_id=${upId}`;
+        downloadLink.download = ''; // Ez arra kényszeríti, hogy letöltse a fájlt
+        
+        // Hozzáadjuk a DOM-hoz, kattintunk rá, majd eltávolítjuk
+        document.body.appendChild(downloadLink);
+        downloadLink.click();
+        document.body.removeChild(downloadLink);
+        
+        // Opcionális: loading animáció rövid időre
+        showLoading('Letöltés indítása...');
+        setTimeout(() => {
+            hideLoading();
+        }, 1000);
+        
+    } catch (error) {
+        console.error('Letöltési hiba:', error);
+        alert('Hiba történt a fájl letöltése során!');
+    }
+}
+// Fájl szerkesztés és feltöltés funkciók - illeszd be a scripts.js fájlba
+
+// =========================
+// FÁJL SZERKESZTÉS MODAL MEGNYITÁSA
+// =========================
+
+// Szerkesztés gomb a modal-ban
+document.addEventListener('click', async function(e) {
+    const editButton = e.target.closest('.own_file_details_modal .edit_file_button');
+    if (editButton) {
+        e.preventDefault();
+        e.stopPropagation();
+        
+        const detailsModal = editButton.closest('.own_file_details_modal');
+        const upId = detailsModal ? detailsModal.getAttribute('data-up-id') : null;
+        
+        if (!upId) {
+            alert('Hiba: Nem található a fájl azonosítója!');
+            return;
+        }
+        
+        // Adatok betöltése a szerkesztő modal-ba
+        const fileTitle = detailsModal.querySelector('.data-file-title')?.textContent || '';
+        const fileDescription = detailsModal.querySelector('.data-file-description')?.textContent || '';
+        
+        const editModal = document.querySelector('.edit_file_modal');
+        if (editModal) {
+            // Up_id beállítása a modal-on
+            editModal.setAttribute('data-up-id', upId);
+            
+            // Form mezők kitöltése
+            const titleInput = editModal.querySelector('#fileTitle');
+            const descriptionTextarea = editModal.querySelector('#fileDescription');
+            
+            if (titleInput) titleInput.value = fileTitle;
+            if (descriptionTextarea) descriptionTextarea.value = fileDescription;
+            
+            // Részletek modal bezárása
+            const closeButton = detailsModal.querySelector('.modal_close_button');
+            if (closeButton) closeButton.click();
+            
+            // Szerkesztő modal megnyitása
+            editModal.classList.remove('hidden');
+        }
+    }
+});
+
+// =========================
+// FÁJL SZERKESZTÉS MENTÉSE
+// =========================
+
+const editFileForm = document.getElementById('editFileForm');
+if (editFileForm) {
+    editFileForm.addEventListener('submit', async function(e) {
+        e.preventDefault();
+        
+        const modal = this.closest('.edit_file_modal');
+        const upId = modal ? modal.getAttribute('data-up-id') : null;
+        
+        if (!upId) {
+            alert('Hiba: Nem található a fájl azonosítója!');
+            return;
+        }
+        
+        const formData = new FormData(this);
+        formData.append('up_id', upId);
+        
+        try {
+            showLoading('Fájl módosítása...');
+            
+            const response = await fetch('php/edit_file.php', {
+                method: 'POST',
+                body: formData
+            });
+            
+            if (!response.ok) {
+                throw new Error('Nem sikerült módosítani a fájlt.');
+            }
+            
+            const result = await response.json();
+            
+            setTimeout(() => {
+                hideLoading();
+                
+                if (result.success) {
+                    alert('Fájl sikeresen módosítva!');
+                    
+                    // Modal bezárása
+                    const closeButton = modal.querySelector('.edit_close_button');
+                    if (closeButton) closeButton.click();
+                    
+                    // Oldal újratöltése a frissített adatokért
+                    window.location.reload();
+                } else {
+                    alert('Hiba: ' + (result.error || 'Nem sikerült módosítani a fájlt!'));
+                }
+            }, 1250);
+            
+        } catch (error) {
+            hideLoading();
+            console.error('Fájl módosítási hiba:', error);
+            alert('Hiba történt a fájl módosítása során: ' + error.message);
+        }
+    });
+}
+
+// =========================
+// FÁJL FELTÖLTÉS
+// =========================
+
+const uploadFileForm = document.getElementById('upload_file_form');
+if (uploadFileForm) {
+    uploadFileForm.addEventListener('submit', async function(e) {
+        e.preventDefault();
+        
+        // Tárgy kód lekérése az URL-ből
+        const urlParams = new URLSearchParams(window.location.search);
+        const classCode = urlParams.get('class_code');
+        
+        if (!classCode) {
+            alert('Hiba: Nem található a tárgy kód!');
+            return;
+        }
+        
+        const formData = new FormData(this);
+        formData.append('class_code', classCode);
+        
+        // Ellenőrizzük, hogy ki lett-e választva fájl
+        const fileInput = document.getElementById('file_upload');
+        if (!fileInput || !fileInput.files || fileInput.files.length === 0) {
+            alert('Kérlek válassz ki egy fájlt!');
+            return;
+        }
+        
+        try {
+            showLoading('Fájl feltöltése...');
+            
+            const response = await fetch('php/upload_file.php', {
+                method: 'POST',
+                body: formData
+            });
+            
+            if (!response.ok) {
+                throw new Error('Nem sikerült feltölteni a fájlt.');
+            }
+            
+            const result = await response.json();
+            
+            setTimeout(() => {
+                hideLoading();
+                
+                if (result.success) {
+                    alert('Fájl sikeresen feltöltve!');
+                    
+                    // Form reset
+                    uploadFileForm.reset();
+                    
+                    // Modal bezárása
+                    const modal = uploadFileForm.closest('.upload_file_modal');
+                    if (modal) {
+                        const closeButton = modal.querySelector('.upload_close_button');
+                        if (closeButton) closeButton.click();
+                    }
+                    
+                    // Fájlok újratöltése
+                    if (window.location.pathname.includes('subject.php')) {
+                        generateSubjectFiles();
+                    } else {
+                        generateFiles();
+                    }
+                } else {
+                    alert('Hiba: ' + (result.error || 'Nem sikerült feltölteni a fájlt!'));
+                }
+            }, 1250);
+            
+        } catch (error) {
+            hideLoading();
+            console.error('Fájl feltöltési hiba:', error);
+            alert('Hiba történt a fájl feltöltése során: ' + error.message);
+        }
+    });
+}
+
+// Fájl feltöltés gomb megnyitása kérelemből
+document.addEventListener('click', function(e) {
+    const uploadButton = e.target.closest('.upload_file_button[data-request-id]');
+    if (uploadButton) {
+        e.preventDefault();
+        const requestId = uploadButton.getAttribute('data-request-id');
+        
+        const uploadModal = document.querySelector('.upload_file_modal');
+        if (uploadModal) {
+            // Request ID beállítása a form-ra (ha szükséges)
+            const form = uploadModal.querySelector('#upload_file_form');
+            if (form && requestId) {
+                // Létrehozunk egy hidden inputot a request_id-hoz
+                let requestInput = form.querySelector('input[name="request_id"]');
+                if (!requestInput) {
+                    requestInput = document.createElement('input');
+                    requestInput.type = 'hidden';
+                    requestInput.name = 'request_id';
+                    form.appendChild(requestInput);
+                }
+                requestInput.value = requestId;
+            }
+            
+            uploadModal.classList.remove('hidden');
+        }
+    }
+});

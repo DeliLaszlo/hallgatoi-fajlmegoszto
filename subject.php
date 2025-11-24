@@ -327,7 +327,7 @@ $conn->close();
                 </div>
                 <div id="file_upload_section" style="display: none;">
                     <label for="fileUpload">Fájl kiválasztása:</label>
-                    <input type="file" id="fileUpload" name="file_upload" accept=".pdf,.doc,.docx,.txt, .xls,.xlsx">
+                    <input type="file" id="fileUpload" name="file_upload" accept=".pdf,.doc,.docx,.txt,.xls,.xlsx">
                 </div>
                 <hr>
                 <div class="modal_footer">
