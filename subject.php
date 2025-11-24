@@ -201,7 +201,7 @@ $conn->close();
                 <label for="file_description">Rövid leírás:</label>
                 <textarea id="file_description" name="file_description" placeholder="Fájl leírása" required></textarea>
                 <label for="file_upload">Fájl kiválasztása:</label>
-                <input type="file" id="file_upload" name="file_upload" accept=".pdf,.doc,.docx,.txt,.jpg,.jpeg,.png">
+                <input type="file" id="file_upload" name="file_upload" accept=".pdf,.doc,.docx,.txt,.xls,.xlsx" required>
                 <hr>
                 <div class="modal_footer">
                     <button type="button" class="button upload_close_button" aria-label="Mégse">
@@ -327,7 +327,7 @@ $conn->close();
                 </div>
                 <div id="file_upload_section" style="display: none;">
                     <label for="fileUpload">Fájl kiválasztása:</label>
-                    <input type="file" id="fileUpload" name="file_upload" accept=".pdf,.doc,.docx,.txt,.jpg,.jpeg,.png">
+                    <input type="file" id="fileUpload" name="file_upload" accept=".pdf,.doc,.docx,.txt, .xls,.xlsx">
                 </div>
                 <hr>
                 <div class="modal_footer">
