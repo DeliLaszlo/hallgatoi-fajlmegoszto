@@ -9,6 +9,11 @@
 </form>
 
 */
+session_start();
+
+$conn = new mysqli("localhost", "root", "", "pm_db_fm_v1");
+
+$neptun1 = $_SESSION['user_neptun'];
 
 $targetDir = "files/";
 
@@ -16,7 +21,9 @@ if (!is_dir($targetDir)) {
     mkdir($targetDir, 0755, true);
 }
 
-$targetFile = $targetDir . basename($_FILES["fileToUpload"]["name"]);
+$filename = basename($_FILES["fileToUpload"]["name"]);
+$targetFile = $targetDir . $filename;
+
 $uploadOk = 1;
 
 $allowedExtensions = ['jpg', 'jpeg', 'png', 'gif', 'pdf', 'txt'];
@@ -35,10 +42,38 @@ if ($_FILES["fileToUpload"]["error"] !== UPLOAD_ERR_OK) {
 
 if ($uploadOk == 1) {
     if (move_uploaded_file($_FILES["fileToUpload"]["tmp_name"], $targetFile)) {
-        echo '<script>alert("A fájl sikeresen feltöltve: " . basename($_FILES["fileToUpload"]["name"]));history.back();</script>';
+
+        if ($conn->connect_error) {
+            die("Adatbázis hiba: " . $conn->connect_error);
+        }
+        $azonosito = str_pad(rand(0, 9999999), 7, "0", STR_PAD_LEFT);
+        $filesize = 0;//$_FILES["fileToUpload"]["size"];
+        $dl = 0;
+        //itt $_POST[]-tal a formbol kapott adatokat illesztjuk be, az $stmt->bind_param-ot modositani kell ehhez
+        //$neptun = "";
+        //$class_code = "";
+        //$ptf = "/files/".$filename;
+        //$comment = $_POST['file_description'];
+        
+        // SQL beszúrás
+        $stmt = $conn->prepare("INSERT INTO upload (up_id, class_code, neptun, file_name, path_to_file, upload_title, upload_date, downloads, comment, rating) VALUES (?, 'randomtargy', 'asd123', 'teszt',  '/files', ?, '2025-11-21', ?, 'Csakegyteszt', ?)");
+        $stmt->bind_param("isii", $azonosito, $filename, $dl, $filesize);
+
+        if ($stmt->execute()) {
+            echo '<script>
+            alert("A fájl sikeresen feltöltve és mentve az adatbázisba!\nAzonosító: ' . $azonosito . '\nNeptun: ' . $neptun1 . '\nOsztálykód: ' . $class_code1 . '");
+            history.back();
+            </script>';
+            
+        } else {
+            echo '<script>alert("A fájl feltöltődött, de az adatbázis mentés nem sikerült!");history.back();</script>';
+        }
+
+        $stmt->close();
+        $conn->close();
+
     } else {
-        echo '<script>alert("Hiba történt a fájl mentésekor.")</script>';
+        echo '<script>alert("Hiba történt a fájl mentésekor.");</script>';
     }
 }
-// '<script>alert("Hiba történt a feltöltés során!");history.back();</script>'
 ?>
