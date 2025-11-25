@@ -1735,8 +1735,62 @@ document.addEventListener('DOMContentLoaded', function() {
         const link = e.target.closest('.own_uncompleted_requests_link');
         if (link) {
             e.preventDefault();
+            const requestId = link.getAttribute('data-request-id');
+            
+            if (!requestId) {
+                alert('Hiányzó kérelem azonosító');
+                return;
+            }
+            
+            // Kérelem kártya megkeresése
+            // Dashboard: .own_uncompleted_request_container, Subject: .request_container
+            const requestContainer = link.closest('.own_uncompleted_request_container, .request_container');
+            if (!requestContainer) {
+                alert('Nem sikerült betölteni a kérelem adatait');
+                return;
+            }
+            
+            // Adatok kinyerése a kártyából
+            const title = requestContainer.querySelector('h2')?.textContent || '';
+            const paragraphs = requestContainer.querySelectorAll('p');
+            const description = paragraphs[0]?.textContent || '';
+            const dateAndSubject = paragraphs[1]?.textContent || '';
+            
+            // Dátum és tárgy szétválasztása
+            // Dashboard formátum: "2025-01-01, Tárgy neve"
+            // Subject formátum: "Én, 2025-01-01"
+            let date = '';
+            let subject = '';
+            
+            if (dateAndSubject.startsWith('Én, ')) {
+                // Subject.php formátum: "Én, 2025-01-01"
+                date = dateAndSubject.replace('Én, ', '').trim();
+                // Subject oldalon a tárgy neve a h1 elemben van
+                const h1Element = document.querySelector('h1');
+                subject = h1Element ? h1Element.textContent.trim() : 'Nincs megadva';
+            } else {
+                // Dashboard formátum: "2025-01-01, Tárgy neve"
+                [date, subject] = dateAndSubject.split(', ').map(s => s.trim());
+            }
+            
             const ownUncompletedRequestsModal = document.querySelector('.own_uncompleted_requests_modal');
+            
             if (ownUncompletedRequestsModal) {
+                // Modal gombokhoz id beállítása
+                ownUncompletedRequestsModal.setAttribute('data-request-id', requestId);
+                
+                // Adatok beállítása a modalban
+                const titleElement = ownUncompletedRequestsModal.querySelector('.data-request-title');
+                const subjectElement = ownUncompletedRequestsModal.querySelector('.data-request-subject');
+                const dateElement = ownUncompletedRequestsModal.querySelector('.data-request-date');
+                const descriptionElement = ownUncompletedRequestsModal.querySelector('.data-request-description');
+                
+                if (titleElement) titleElement.textContent = title;
+                if (subjectElement) subjectElement.textContent = subject || 'Nincs megadva';
+                if (dateElement) dateElement.textContent = date || 'Nincs megadva';
+                if (descriptionElement) descriptionElement.textContent = description;
+                
+                // Modal megjelenítése
                 ownUncompletedRequestsModal.classList.remove('hidden');
             }
         }
@@ -1848,8 +1902,54 @@ document.addEventListener('DOMContentLoaded', function() {
         const button = e.target.closest('.edit_request_button');
         if (button) {
             e.preventDefault();
+            
+            let requestId = null;
+            let title = '';
+            let description = '';
+            
+            // Ellenőrizzük, hogy a részletek modalból vagy a kártyából nyitjuk meg
+            const parentModal = button.closest('.own_uncompleted_requests_modal');
+            
+            if (parentModal) {
+                // Modalból nyitjuk meg - adatok a modalból
+                requestId = parentModal.getAttribute('data-request-id');
+                const titleElement = parentModal.querySelector('.data-request-title');
+                const descriptionElement = parentModal.querySelector('.data-request-description');
+                
+                title = titleElement?.textContent || '';
+                description = descriptionElement?.textContent || '';
+            } else {
+                // Kártyából nyitjuk meg - keressük meg a kártya elemet
+                // Dashboard: .own_uncompleted_request_container, Subject: .request_container
+                const requestContainer = button.closest('.own_uncompleted_request_container, .request_container');
+                if (requestContainer) {
+                    const link = requestContainer.querySelector('.own_uncompleted_requests_link');
+                    requestId = link?.getAttribute('data-request-id');
+                    
+                    title = requestContainer.querySelector('h2')?.textContent || '';
+                    const paragraphs = requestContainer.querySelectorAll('p');
+                    description = paragraphs[0]?.textContent || '';
+                }
+            }
+            
+            if (!requestId) {
+                alert('Hiányzó kérelem azonosító');
+                return;
+            }
+            
             const editRequestModal = document.querySelector('.edit_request_modal');
             if (editRequestModal) {
+                // Modal azonosító beállítása
+                editRequestModal.setAttribute('data-request-id', requestId);
+                
+                // Input mezők kitöltése
+                const titleInput = document.getElementById('requestTitle');
+                const descriptionInput = document.getElementById('requestDescription');
+                
+                if (titleInput) titleInput.value = title;
+                if (descriptionInput) descriptionInput.value = description;
+                
+                // Modal megjelenítése
                 editRequestModal.classList.remove('hidden');
             }
         }
@@ -1860,8 +1960,39 @@ document.addEventListener('DOMContentLoaded', function() {
         const button = e.target.closest('.edit_chatroom_button');
         if (button) {
             e.preventDefault();
+            
+            // Chatszoba kártya megkeresése
+            // Dashboard: .own_chatroom_container, Subject: .chatroom_container
+            const chatroomContainer = button.closest('.own_chatroom_container, .chatroom_container');
+            if (!chatroomContainer) {
+                alert('Nem sikerült betölteni a chatszoba adatait');
+                return;
+            }
+            
+            // Adatok kinyerése a kártyából
+            const roomId = chatroomContainer.getAttribute('data-room-id');
+            const title = chatroomContainer.querySelector('h2')?.textContent || '';
+            const paragraphs = chatroomContainer.querySelectorAll('p');
+            const description = paragraphs[0]?.textContent || '';
+            
+            if (!roomId) {
+                alert('Hiányzó chatszoba azonosító');
+                return;
+            }
+            
             const editChatroomModal = document.querySelector('.edit_chatroom_modal');
             if (editChatroomModal) {
+                // Modal azonosító beállítása
+                editChatroomModal.setAttribute('data-room-id', roomId);
+                
+                // Input mezők kitöltése
+                const titleInput = document.getElementById('chatroomTitle');
+                const descriptionInput = document.getElementById('chatroomDescription');
+                
+                if (titleInput) titleInput.value = title;
+                if (descriptionInput) descriptionInput.value = description;
+                
+                // Modal megjelenítése
                 editChatroomModal.classList.remove('hidden');
             }
         }
