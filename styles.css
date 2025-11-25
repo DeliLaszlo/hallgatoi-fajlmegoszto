@@ -90,11 +90,13 @@ header {
     background: var(--background-secondary);
     color: var(--text-secondary);
     padding: 1.5rem 2rem;
-    position: relative;
+    position: sticky;
+    top: 0;
     box-shadow: 0 2px 4px var(--shadow-light);
     display: flex;
     align-items: center;
     height: 100px;
+    z-index: 100;
 }
 
 .ivk_logo {
@@ -141,7 +143,7 @@ header {
     text-decoration: none;
     font-weight: bold;
     transition: color 0.3s ease;
-    border-radius: 10px;
+    border-radius: 15px;
     padding: 0.5rem 0.5rem;
     transition: background-color 0.3s ease, color 0.3s ease;
 }
@@ -303,6 +305,17 @@ textarea:focus {
     width: 100%;
 }
 
+.header-div {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.header-div img {
+    height: 48px;
+    width: auto;
+}
+
 .dark-mode-toggle {
     background: none;
     border: none;
@@ -346,7 +359,7 @@ textarea:focus {
     border: none;
     cursor: pointer;
     padding: 10px;
-    z-index: 1001;
+    z-index: 1002;
     margin-left: auto;
     position: relative;
 }
@@ -407,7 +420,7 @@ textarea:focus {
     background-color: var(--text-secondary);
     box-shadow: -2px 0 10px var(--shadow-medium);
     transition: right 0.3s ease;
-    z-index: 1000;
+    z-index: 1001;
     padding: 80px 20px 80px;
     flex-direction: column;
     justify-content: flex-start;
@@ -478,6 +491,10 @@ textarea:focus {
     border-radius: 10px;
 }
 
+.visible_hamburger .hamburger.active {
+    z-index: 1003;
+}
+
 .visible_hamburger .hamburger.active .menu-icon {
     opacity: 0;
     transform: rotate(90deg);
@@ -488,7 +505,7 @@ textarea:focus {
     transform: translate(-50%, -50%) rotate(0deg);
 }
 
-.visible_hamburger body.menu-open::after {
+.visible_hamburger header.menu-open::after {
     content: '';
     position: fixed;
     top: 0;
@@ -496,12 +513,14 @@ textarea:focus {
     width: 100%;
     height: 100%;
     background-color: var(--shadow-dark);
-    z-index: 999;
+    z-index: 50;
+    pointer-events: none;
 }
 
 @media (max-width: 1100px) {
     header:not(#chatBody header) {
         justify-content: flex-start;
+        z-index: 1001;
     }
 
     .hamburger:not(#chatBody .hamburger) {
@@ -522,7 +541,7 @@ textarea:focus {
         background-color: var(--text-secondary);
         box-shadow: -2px 0 10px var(--shadow-medium);
         transition: right 0.3s ease;
-        z-index: 1000;
+        z-index: 1002 !important;
         padding: 80px 20px 80px;
         flex-direction: column;
         justify-content: flex-start;
@@ -592,6 +611,10 @@ textarea:focus {
         border-radius: 10px;
     }
     
+    .hamburger.active {
+        z-index: 1003;
+    }
+    
     .hamburger.active .menu-icon {
         opacity: 0;
         transform: rotate(90deg);
@@ -602,7 +625,7 @@ textarea:focus {
         transform: translate(-50%, -50%) rotate(0deg);
     }
     
-    body.menu-open::after {
+    header.menu-open::after {
         content: '';
         position: fixed;
         top: 0;
@@ -610,7 +633,8 @@ textarea:focus {
         width: 100%;
         height: 100%;
         background-color: var(--shadow-dark);
-        z-index: 999;
+        z-index: 50;
+        pointer-events: none;
     }
 
     .section_header {
@@ -660,6 +684,7 @@ textarea:focus {
     padding-right: 200px;
     box-shadow: 0 2px 4px var(--shadow-light);
     border: 2px solid transparent;
+    border-left: 6px solid var(--primary-color);
     transition: border 0.3s ease;
     margin-bottom: 1.5rem;
     position: relative;
@@ -667,6 +692,11 @@ textarea:focus {
 
 .content_container:hover {
     border: 2px solid var(--primary-color);
+    border-left: 6px solid var(--primary-color);
+}
+
+.content_container h2 {
+    color: var(--primary-color);
 }
 
 .container_link {
@@ -708,8 +738,8 @@ textarea:focus {
 
 .large_button {
     background-color: var(--primary-color);
-    border-radius: 10px;
-    padding: 0.75rem 1.5rem;
+    border-radius: 30px;
+    padding: 0.5rem 1.5rem;
     font-size: 1rem;
     display: flex;
     align-items: center;
@@ -1353,6 +1383,10 @@ form .modal_footer {
 /*dark mode kivételek*/
 .dark_mode .nav-menu {
     background-color: var(--background-secondary);
+}
+
+.dark_mode .header-div img {
+    filter: brightness(0) invert(1);
 }
 
 .dark_mode .hamburger img {

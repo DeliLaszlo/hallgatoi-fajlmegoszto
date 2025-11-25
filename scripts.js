@@ -1306,11 +1306,12 @@ document.addEventListener('DOMContentLoaded', function() {
         // Hamburger menü kezelés
         const hamburger = document.querySelector('.hamburger');
         const activeSectionName = document.querySelector('.active-section-name');
+        const header = document.querySelector('header');
         if (hamburger) {
             hamburger.addEventListener('click', function() {
                 hamburger.classList.toggle('active');
                 navMenu.classList.toggle('active');
-                document.body.classList.toggle('menu-open');
+                if (header) header.classList.toggle('menu-open');
             });
             document.addEventListener('click', function(e) {
                 if (navMenu.classList.contains('active') && 
@@ -1318,7 +1319,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     !hamburger.contains(e.target)) {
                     hamburger.classList.remove('active');
                     navMenu.classList.remove('active');
-                    document.body.classList.remove('menu-open');
+                    if (header) header.classList.remove('menu-open');
                 }
             });
         }
@@ -1398,7 +1399,8 @@ document.addEventListener('DOMContentLoaded', function() {
                     if (hamburger) {
                         hamburger.classList.remove('active');
                         navMenu.classList.remove('active');
-                        document.body.classList.remove('menu-open');
+                        const header = document.querySelector('header');
+                        if (header) header.classList.remove('menu-open');
                     }
                 });
             }
@@ -2760,10 +2762,11 @@ document.addEventListener('DOMContentLoaded', function() {
             this.classList.add('active');
             const hamburger = document.querySelector('.hamburger');
             const navMenu = document.querySelector('.nav-menu');
+            const header = document.querySelector('header');
             if (hamburger && navMenu) {
                 hamburger.classList.remove('active');
                 navMenu.classList.remove('active');
-                document.body.classList.remove('menu-open');
+                if (header) header.classList.remove('menu-open');
             }
             activeChatroomId = selectedRoomId;
 
@@ -3037,7 +3040,6 @@ document.addEventListener('click', async function(e) {
         }
     }
 });
-// Fájl törlése - ezt illeszd be a scripts.js fájlba
 
 // Dashboard saját fájlok törlése (list nézetből)
 document.addEventListener('click', async function(e) {

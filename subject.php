@@ -90,7 +90,10 @@ $conn->close();
     <main>
         <section id="subject_fajlok">
             <div class="section_header subject_files_header">
-                <h1>Feltöltött fájlok</h1>
+                <div class="header-div">
+                    <img src="icons/file.svg" alt="Fájlok ikon">
+                    <h1>Feltöltött fájlok</h1>
+                </div>
                 <div class="section_header_actions">
                     <div class="search_container content_search_container">
                         <input type="text" id="file_search_input" placeholder="Fájl keresése..." aria-label="Fájl keresése">
@@ -109,7 +112,10 @@ $conn->close();
         </section>
         <section id="subject_kerelemek">
             <div class="section_header">
-                <h1>Kérelmek</h1>
+                <div class="header-div">
+                    <img src="icons/request.svg" alt="Kérelmek ikon">
+                    <h1>Kérelmek</h1>
+                </div>
                 <div class="section_header_actions">
                     <div class="search_container content_search_container">
                         <input type="text" id="request_search_input" placeholder="Kérelem keresése..." aria-label="Kérelem keresése">
@@ -128,7 +134,10 @@ $conn->close();
         </section>
         <section id="subject_chatszobak">
             <div class="section_header">
-                <h1>Chatszobák</h1>
+                <div class="header-div">
+                    <img src="icons/chat.svg" alt="Chatszobák ikon">
+                    <h1>Chatszobák</h1>
+                </div>
                 <div class="section_header_actions">
                     <div class="search_container content_search_container">
                         <input type="text" id="chatroom_search_input" placeholder="Chatszoba keresése..." aria-label="Chatszoba keresése">

@@ -60,7 +60,10 @@ if (isset($_SESSION['last_activity']) && (time() - $_SESSION['last_activity'] > 
     <main>
         <section id="dashboard_targyak">
             <div class="section_header subject_header">
-                <h1>Tárgyaim</h1>
+                <div class="header-div">
+                    <img src="icons/subjects.svg" alt="Tárgyak ikon">
+                    <h1>Tárgyaim</h1>
+                </div>
                 <div class="section_header_actions">
                     <div class="search_container content_search_container">
                         <input type="text" id="dashboard_subject_search" class="subject_search_input" placeholder="Tárgy keresése..." aria-label="Tárgy keresése">
@@ -79,7 +82,10 @@ if (isset($_SESSION['last_activity']) && (time() - $_SESSION['last_activity'] > 
         </section>
         <section id="dashboard_fajlok">
             <div class="section_header subject_header">
-                <h1>Feltöltött fájljaim</h1>
+                <div class="header-div">
+                    <img src="icons/file.svg" alt="Fájlok ikon">
+                    <h1>Feltöltött fájljaim</h1>
+                </div>
                 <div class="section_header_actions">
                     <div class="search_container content_search_container">
                         <input type="text" id="file_search_input" placeholder="Fájl keresése..." aria-label="Fájl keresése">
@@ -94,7 +100,10 @@ if (isset($_SESSION['last_activity']) && (time() - $_SESSION['last_activity'] > 
         </section>
         <section id="dashboard_kerelemek">
             <div class="section_header">
-                <h1>Kérelmeim</h1>
+                <div class="header-div">
+                    <img src="icons/request.svg" alt="Kérelmek ikon">
+                    <h1>Kérelmeim</h1>
+                </div>
                 <div class="section_header_actions">
                     <div class="search_container content_search_container">
                         <input type="text" id="request_search_input" placeholder="Kérelem keresése..." aria-label="Kérelem keresése">
@@ -109,7 +118,10 @@ if (isset($_SESSION['last_activity']) && (time() - $_SESSION['last_activity'] > 
         </section>
         <section id="dashboard_chatszobak">
             <div class="section_header">
-                <h1>Saját chatszobáim</h1>
+                <div class="header-div">
+                    <img src="icons/chat.svg" alt="Chatszobák ikon">
+                    <h1>Saját chatszobáim</h1>
+                </div>
                 <div class="section_header_actions">
                     <div class="search_container content_search_container">
                         <input type="text" id="chatroom_search_input" placeholder="Chatszoba keresése..." aria-label="Chatszoba keresése">
@@ -124,7 +136,10 @@ if (isset($_SESSION['last_activity']) && (time() - $_SESSION['last_activity'] > 
             <hr>
         </section>
         <section id="dashboard_profile">
-            <h1>Profilom</h1>
+            <div class="header-div">
+                <img src="icons/users.svg" alt="Profil ikon">
+                <h1>Profilom</h1>
+            </div>
             <hr>
             <form id="profile_form">
                 <div id="profile_info">
