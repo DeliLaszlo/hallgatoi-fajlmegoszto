@@ -36,7 +36,9 @@ try {
                     usr.nickname as uploader_nickname,
                     c.class_name,
                     u.class_code,
-                    u.path_to_file
+                    u.path_to_file,
+                    u.upload_date,
+                    u.downloads
                   FROM upload u
                   INNER JOIN user usr ON u.neptun = usr.neptun_k
                   INNER JOIN class c ON u.class_code = c.class_code
@@ -54,11 +56,6 @@ try {
         
         $row = $result->fetch_assoc();
         
-        // Statikus értékek (később implementálandók)
-        $upload_date = "2025-01-15"; // Statikus dátum
-        $file_size = "2.5 MB"; // Statikus fájlméret
-        $downloads = 42; // Statikus letöltésszám
-        
         // Válasz összeállítása
         $response = [
             'success' => true,
@@ -70,9 +67,8 @@ try {
                 'uploader_neptun' => $row['uploader_neptun'],
                 'class_name' => $row['class_name'],
                 'class_code' => $row['class_code'],
-                'upload_date' => $upload_date,
-                'file_size' => $file_size,
-                'downloads' => $downloads,
+                'upload_date' => $row['upload_date'],
+                'downloads' => $row['downloads'],
                 'rating' => $row['rating'],
                 'description' => $row['description'],
                 'path_to_file' => $row['path_to_file']
@@ -98,7 +94,9 @@ try {
                     u.path_to_file,
                     ur.status,
                     r.request_name,
-                    r.description as request_description
+                    r.description as request_description,
+                    u.upload_date,
+                    u.downloads
                   FROM upload_request ur
                   INNER JOIN upload u ON ur.upload_id = u.up_id
                   INNER JOIN user usr ON u.neptun = usr.neptun_k
@@ -118,11 +116,6 @@ try {
         
         $row = $result->fetch_assoc();
         
-        // Statikus értékek (később implementálandók)
-        $upload_date = "2025-01-15"; // Statikus dátum
-        $file_size = "2.5 MB"; // Statikus fájlméret
-        $downloads = 42; // Statikus letöltésszám
-        
         // Válasz összeállítása
         $response = [
             'success' => true,
@@ -135,9 +128,8 @@ try {
                 'uploader_neptun' => $row['uploader_neptun'],
                 'class_name' => $row['class_name'],
                 'class_code' => $row['class_code'],
-                'upload_date' => $upload_date,
-                'file_size' => $file_size,
-                'downloads' => $downloads,
+                'upload_date' => $row['upload_date'],
+                'downloads' => $row['downloads'],
                 'rating' => $row['rating'],
                 'description' => $row['description'],
                 'path_to_file' => $row['path_to_file'],

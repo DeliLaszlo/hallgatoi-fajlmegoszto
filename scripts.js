@@ -1635,7 +1635,6 @@ document.addEventListener('DOMContentLoaded', function() {
                     const uploaderElement = fileDetailsModal.querySelector('.data-file-uploader');
                     const fileNameElement = fileDetailsModal.querySelector('.data-file-name');
                     const dateElement = fileDetailsModal.querySelector('.data-file-date');
-                    const sizeElement = fileDetailsModal.querySelector('.data-file-size');
                     const downloadsElement = fileDetailsModal.querySelector('.data-file-downloads');
                     const ratingElement = fileDetailsModal.querySelector('.data-file-rating');
                     const descriptionElement = fileDetailsModal.querySelector('.data-file-description');
@@ -1644,7 +1643,6 @@ document.addEventListener('DOMContentLoaded', function() {
                     if (uploaderElement) uploaderElement.textContent = data.uploader;
                     if (fileNameElement) fileNameElement.textContent = data.file_name;
                     if (dateElement) dateElement.textContent = data.upload_date;
-                    if (sizeElement) sizeElement.textContent = data.file_size;
                     if (downloadsElement) downloadsElement.textContent = data.downloads;
                     if (ratingElement) ratingElement.textContent = data.rating;
                     if (descriptionElement) descriptionElement.textContent = data.description;
@@ -1704,7 +1702,6 @@ document.addEventListener('DOMContentLoaded', function() {
                     const fileNameElement = ownFileModal.querySelector('.data-file-name');
                     const subjectElement = ownFileModal.querySelector('.data-file-subject');
                     const dateElement = ownFileModal.querySelector('.data-file-date');
-                    const sizeElement = ownFileModal.querySelector('.data-file-size');
                     const downloadsElement = ownFileModal.querySelector('.data-file-downloads');
                     const ratingElement = ownFileModal.querySelector('.data-file-rating');
                     const descriptionElement = ownFileModal.querySelector('.data-file-description');
@@ -1713,7 +1710,6 @@ document.addEventListener('DOMContentLoaded', function() {
                     if (fileNameElement) fileNameElement.textContent = data.file_name;
                     if (subjectElement) subjectElement.textContent = data.class_name;
                     if (dateElement) dateElement.textContent = data.upload_date;
-                    if (sizeElement) sizeElement.textContent = data.file_size;
                     if (downloadsElement) downloadsElement.textContent = data.downloads;
                     if (ratingElement) ratingElement.textContent = data.rating;
                     if (descriptionElement) descriptionElement.textContent = data.description;
@@ -1788,7 +1784,6 @@ document.addEventListener('DOMContentLoaded', function() {
                     const fileNameElement = ownCompletedRequestsModal.querySelector('.data-file-name');
                     const subjectElement = ownCompletedRequestsModal.querySelector('.data-file-subject');
                     const dateElement = ownCompletedRequestsModal.querySelector('.data-file-date');
-                    const sizeElement = ownCompletedRequestsModal.querySelector('.data-file-size');
                     const downloadsElement = ownCompletedRequestsModal.querySelector('.data-file-downloads');
                     const ratingElement = ownCompletedRequestsModal.querySelector('.data-file-rating');
                     const descriptionElement = ownCompletedRequestsModal.querySelector('.data-file-description');
@@ -1799,7 +1794,6 @@ document.addEventListener('DOMContentLoaded', function() {
                     if (fileNameElement) fileNameElement.textContent = data.file_name;
                     if (subjectElement) subjectElement.textContent = data.class_name;
                     if (dateElement) dateElement.textContent = data.upload_date;
-                    if (sizeElement) sizeElement.textContent = data.file_size;
                     if (downloadsElement) downloadsElement.textContent = data.downloads;
                     if (ratingElement) ratingElement.textContent = data.rating;
                     if (descriptionElement) descriptionElement.textContent = data.description;

@@ -33,7 +33,8 @@ try {
                     u.file_name,
                     u.class_code,
                     c.class_name,
-                    u.rating
+                    u.rating,
+                    u.upload_date
                   FROM upload u
                   INNER JOIN class c ON u.class_code = c.class_code
                   WHERE u.neptun = ?
@@ -46,9 +47,6 @@ try {
         
         $files = [];
         while ($row = $result->fetch_assoc()) {
-            // Statikus értékek (később implementálandók)
-            $upload_date = "2025-01-15"; // Statikus dátum
-            
             $files[] = [
                 'up_id' => $row['up_id'],
                 'title' => $row['upload_title'],
@@ -56,7 +54,7 @@ try {
                 'file_name' => $row['file_name'],
                 'class_code' => $row['class_code'],
                 'class_name' => $row['class_name'],
-                'upload_date' => $upload_date,
+                'upload_date' => $row['upload_date'],
                 'rating' => $row['rating']
             ];
         }
@@ -81,7 +79,9 @@ try {
                     u.neptun as uploader_neptun,
                     usr.nickname as uploader_nickname,
                     u.rating,
-                    u.class_code
+                    u.class_code,
+                    u.upload_date,
+                    u.downloads
                   FROM upload u
                   INNER JOIN user usr ON u.neptun = usr.neptun_k
                   WHERE u.class_code = ?
@@ -94,10 +94,6 @@ try {
         
         $files = [];
         while ($row = $result->fetch_assoc()) {
-            // Statikus értékek (később implementálandók)
-            $upload_date = "2025-01-15"; // Statikus dátum
-            $downloads = 42; // Statikus letöltésszám
-            
             // Ellenőrizzük, hogy a felhasználó saját fájlja-e
             $is_own = ($row['uploader_neptun'] === $user_neptun);
             
@@ -108,8 +104,8 @@ try {
                 'file_name' => $row['file_name'],
                 'uploader_neptun' => $row['uploader_neptun'],
                 'uploader_nickname' => $row['uploader_nickname'],
-                'upload_date' => $upload_date,
-                'downloads' => $downloads,
+                'upload_date' => $row['upload_date'],
+                'downloads' => $row['downloads'],
                 'rating' => $row['rating'],
                 'is_own' => $is_own,
                 'class_code' => $row['class_code']

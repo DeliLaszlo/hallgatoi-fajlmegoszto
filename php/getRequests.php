@@ -32,7 +32,8 @@ try {
                     r.description,
                     r.class_code,
                     c.class_name,
-                    ur.status
+                    ur.status,
+                    r.request_date
                   FROM request r
                   INNER JOIN class c ON r.class_code = c.class_code
                   LEFT JOIN upload_request ur ON r.request_id = ur.request_id
@@ -46,9 +47,6 @@ try {
         
         $requests = [];
         while ($row = $result->fetch_assoc()) {
-            // Statikus értékek (később implementálandók)
-            $request_date = "2025-01-10"; // Statikus dátum
-            
             // Teljesítettség ellenőrzése: 'T' = teljesített, egyébként várakozó
             $is_completed = ($row['status'] === 'T');
             
@@ -58,7 +56,7 @@ try {
                 'description' => $row['description'],
                 'class_code' => $row['class_code'],
                 'class_name' => $row['class_name'],
-                'request_date' => $request_date,
+                'request_date' => $row['request_date'],
                 'is_completed' => $is_completed
             ];
         }
@@ -82,7 +80,8 @@ try {
                     r.neptun_k as requester_neptun,
                     usr.nickname as requester_nickname,
                     r.class_code,
-                    ur.status
+                    ur.status,
+                    r.request_date
                   FROM request r
                   INNER JOIN user usr ON r.neptun_k = usr.neptun_k
                   LEFT JOIN upload_request ur ON r.request_id = ur.request_id
@@ -96,9 +95,6 @@ try {
         
         $requests = [];
         while ($row = $result->fetch_assoc()) {
-            // Statikus értékek (később implementálandók)
-            $request_date = "2025-01-10"; // Statikus dátum
-            
             // Ellenőrizzük, hogy a felhasználó saját kérelme-e
             $is_own = ($row['requester_neptun'] === $user_neptun);
             
@@ -111,7 +107,7 @@ try {
                 'description' => $row['description'],
                 'requester_neptun' => $row['requester_neptun'],
                 'requester_nickname' => $row['requester_nickname'],
-                'request_date' => $request_date,
+                'request_date' => $row['request_date'],
                 'is_own' => $is_own,
                 'is_completed' => $is_completed,
                 'class_code' => $row['class_code']

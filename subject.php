@@ -157,7 +157,6 @@ $conn->close();
             <h3>Feltöltő:<span class="data-file-uploader">Felhasználó neve</span></h3>
             <h3>Fájlnév:<span class="data-file-name">fajl_neve.pdf</span></h3>
             <h3>Feltöltés dátuma:<span class="data-file-date">2025-01-01</span></h3>
-            <h3>Fájl mérete:<span class="data-file-size">1.5 MB</span></h3>
             <h3>Letöltések:<span class="data-file-downloads">42</span></h3>
             <h3 class="voting_section">
                 <span>Értékelés:</span>
@@ -285,7 +284,6 @@ $conn->close();
             <h3>Fájlnév:<span class="data-file-name">fajl_neve.pdf</span></h3>
             <h3>Tárgy:<span class="data-file-subject">Tárgy neve</span></h3>
             <h3>Feltöltés dátuma:<span class="data-file-date">2025-01-01</span></h3>
-            <h3>Fájl mérete:<span class="data-file-size">1.5 MB</span></h3>
             <h3>Letöltések:<span class="data-file-downloads">42</span></h3>
             <h3>Értékelés:<span class="data-file-rating">17</span></h3>
             <h3>Leírás:</h3>
