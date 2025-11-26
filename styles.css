@@ -1607,6 +1607,7 @@ form .modal_footer {
     position: relative;
     grid-area: side;
     padding: 1rem 0.25rem;
+    padding-right: 0;
     border-right: 4px solid var(--primary-color);
     overflow-y: auto;
     width: 100%;
@@ -1639,22 +1640,24 @@ form .modal_footer {
     flex-direction: column;
     border: none;
     border-radius: 10px;
-    padding: 10px;
+    padding: 10px 0;
 }
 
 #sidebar ul li {
     color: var(--primary-color);
+    background: var(--background-primary);
     text-align: center;
     text-decoration: none;
     font-weight: bold;
     transition: color 0.3s ease;
-    border-radius: 10px;
     padding: 0.5rem 0.5rem;
     transition: background-color 0.3s ease, color 0.3s ease;
     width: 100%;
-    margin-bottom: 6px;
+    margin-bottom: 10px;
     box-shadow: 0 1px 4px var(--shadow-light);
-    border: 1px solid transparent;
+    border-left: 4px solid var(--primary-color);
+    border-top-left-radius: 10px;
+    border-bottom-left-radius: 10px;
     word-break: break-word;
     overflow-wrap: break-word;
 }
@@ -1663,15 +1666,20 @@ form .modal_footer {
     background-color: var(--hover-overlay);
     color: var(--secondary-color);
     cursor: pointer;
-     box-shadow: 0 2px 8px var(--shadow-medium);
-     border: 1px solid var(--primary-color);
+    box-shadow: 0 2px 8px var(--shadow-medium);
+
 }
 
 #sidebar ul li.active {
     background-color: var(--primary-color);
+    border-left: 4px solid var(--secondary-color);
     color: var(--text-secondary);
-     box-shadow: 0 2px 8px var(--shadow-medium);
-     border: 1px solid var(--secondary-color);
+    box-shadow: 0 2px 8px var(--shadow-medium);
+}
+
+.dark_mode #sidebar ul li.active {
+    border-left: 4px solid #1e3a8a;
+    color: #1e3a8a;
 }
 
 #chatBody #chatszobak {
@@ -1688,6 +1696,10 @@ form .modal_footer {
   display: flex;
   flex-direction: column;
   min-height: calc(100vh - 100px);
+}
+
+#sidebar-close {
+    display: none;
 }
 
 @media (max-width: 600px) {
@@ -1768,20 +1780,48 @@ form .modal_footer {
         opacity: 0.5;
     }
     #sidebar-toggle {
-        position: absolute;
+        position: fixed !important;
         top: 1.5rem;
         left: 1rem;
         background: transparent;
         border: none;
         cursor: pointer;
         padding: 0.5rem;
-        display: flex;
+        display: flex !important;
         align-items: center;
         justify-content: center;
-        z-index: 1001;
+        z-index: 9999 !important;
+    }
+    #sidebar-close {
+        display: block;
+        position: absolute;
+        top: 1rem;
+        left: 1rem;
+        background: transparent;
+        border: none;
+        cursor: pointer;
+        padding: 0.5rem;
+    }
+    .dark_mode #sidebar-close img, .dark_mode #sidebar-toggle img {
+        filter: brightness(0) invert(1);
+    }
+    #sidebar .dark-mode-toggle {
+        transform: translateY(-2px);
     }
 }
 
+#chat_text {
+    background: var(--background-primary);
+    color: var(--primary-color);
+}
+
+#chat_text::placeholder {
+    color: var(--primary-color);
+}
+
+.dark_mode .send_message_button img {
+    filter: brightness(0) invert(1);
+}
 
 .chat_layout {
   display: flex;

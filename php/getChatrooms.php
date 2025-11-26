@@ -54,11 +54,11 @@ try {
         
         $chatrooms = [];
         while ($row = $result->fetch_assoc()) {
-            // Statikus értékek (később implementálandók)
-            $create_date = "2025-01-15"; // Statikus dátum
-            
             // Ha a létrehozó NULL, akkor "Adminisztrátor"
             $creater_nickname = $row['creater_neptun'] ? $row['creater_nickname'] : 'Adminisztrátor';
+            
+            // Formázzuk a dátumot, ha nem NULL
+            $create_date = $row['create_date'] ? date('Y-m-d', strtotime($row['create_date'])) : null;
             
             $chatrooms[] = [
                 'room_id' => $row['room_id'],
@@ -108,9 +108,6 @@ try {
         
         $chatrooms = [];
         while ($row = $result->fetch_assoc()) {
-            // Statikus értékek (később implementálandók)
-            $create_date = "2025-01-15"; // Statikus dátum
-            
             // Ellenőrizzük, hogy a felhasználó saját chatszobája-e
             $is_own = ($row['creater_neptun'] === $user_neptun);
             
@@ -119,6 +116,9 @@ try {
             
             // Ha a létrehozó NULL, akkor "Adminisztrátor"
             $creater_nickname = $row['creater_neptun'] ? $row['creater_nickname'] : 'Adminisztrátor';
+            
+            // Formázzuk a dátumot, ha nem NULL
+            $create_date = $row['create_date'] ? date('Y-m-d', strtotime($row['create_date'])) : null;
             
             $chatrooms[] = [
                 'room_id' => $row['room_id'],

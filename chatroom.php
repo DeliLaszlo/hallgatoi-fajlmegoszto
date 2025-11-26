@@ -69,6 +69,9 @@ if (isset($_SESSION['last_activity']) && (time() - $_SESSION['last_activity'] > 
       <a href="php/logout.php" class="sidebar-logout-button">
         <img src="icons/logout.svg" alt="Kijelentkezés" class="logout-icon">
       </a>
+      <button id="sidebar-close" aria-label="Oldalsáv bezárása">
+        <img src="icons/close.svg" alt="Bezárás">
+      </button>
     </div>
     <div id="chatszobak">
       <div class="chat_layout">
