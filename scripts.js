@@ -1438,7 +1438,17 @@ document.addEventListener('DOMContentLoaded', function() {
                 const searchInput = searchContainer.querySelector('input[type="text"]');
                 if (searchInput) {
                     searchInput.value = '';
-                    searchInput.dispatchEvent(new Event('input'));
+                    
+                    // Admin modal keresés visszaállítása
+                    if (searchInput.classList.contains('admin_search_input')) {
+                        const containers = modal.querySelectorAll('.admin_container');
+                        containers.forEach(function(container) {
+                            container.style.display = '';
+                        });
+                    } else {
+                        // Egyéb keresések esetén az input event kiváltása
+                        searchInput.dispatchEvent(new Event('input'));
+                    }
                 }
             }
             
@@ -1512,7 +1522,7 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     // Modal bezárás gombra kattintáskor
-    const allCloseButtons = document.querySelectorAll('.modal_close_button, .edit_close_button, .upload_close_button, .request_close_button, .report_close_button, .chatroom_close_button');
+    const allCloseButtons = document.querySelectorAll('.modal_close_button, .edit_close_button, .upload_close_button, .request_close_button, .report_close_button, .chatroom_close_button, .add_close_button');
     allCloseButtons.forEach(function(button) {
         button.addEventListener('click', function(e) {
             e.preventDefault();
@@ -3574,3 +3584,184 @@ document.addEventListener('click', function(e) {
         }
     }
 });
+
+// Admin felület
+(() => {
+    // Csak akkor fut le, ha admin oldalon vagyunk
+    const admin = document.getElementById('admin');
+    if (!admin) return;
+    
+    // Felhasználók kezelése modal megnyitása (később felhasználók betöltése)
+    const manageUsersButton = document.getElementById('manageUsersButton');
+    if (manageUsersButton) {
+        manageUsersButton.addEventListener('click', function(e) {
+            e.preventDefault();
+            showLoading("Felhasználók betöltése...");
+            // Felhasználók betöltése később
+            /*generateUsers().then(() => {*/
+                setTimeout(() => {
+                    hideLoading();
+                    const adminUsersModal = document.querySelector('.admin_user_modal');
+                    if (adminUsersModal) {
+                        adminUsersModal.classList.remove('hidden');
+                    }  
+                }, 500);
+            /*});*/
+        });
+    }
+
+    // Tárgyak kezelése modal megnyitása (később tárgyak betöltése)
+    const manageSubjectsButton = document.getElementById('manageSubjectsButton');
+    if (manageSubjectsButton) {
+        manageSubjectsButton.addEventListener('click', function(e) {
+            e.preventDefault();
+            showLoading("Tárgyak betöltése...");
+            // Tárgyak betöltése később
+            /*generateAdminSubjects().then(() => {*/
+                setTimeout(() => {
+                    hideLoading();
+                    const adminSubjectsModal = document.querySelector('.admin_subject_modal');
+                    if (adminSubjectsModal) {
+                        adminSubjectsModal.classList.remove('hidden');
+                    }  
+                }, 500);
+            /*});*/
+        });
+    }
+
+    // Új tárgy hozzáadása modal megnyitása
+    const newSubjectButton = document.getElementsByClassName('new_subject_button')[0];
+    if (newSubjectButton) {
+        newSubjectButton.addEventListener('click', function(e) {
+            e.preventDefault();
+            const newSubjectModal = document.querySelector('.admin_add_subject_modal');
+            if (newSubjectModal) {
+                newSubjectModal.classList.remove('hidden');
+            }  
+        });
+    }
+
+    // Tárgy szerkesztés modal megnyitása delegált eseménykezelővel
+    document.addEventListener('click', function(e) {
+        const editSubjectButton = e.target.closest('.admin_subject_container .subject_edit_button');
+        if (editSubjectButton) {
+            e.preventDefault();
+            e.stopPropagation();
+            const editModal = document.querySelector('.admin_edit_subject_modal');
+            if (editModal) {
+                // Tárgy adatok betöltése a modal-ba később
+                editModal.classList.remove('hidden');
+            }
+        }
+    });
+
+    // Fájlok kezelése modal megnyitása (később fájlok betöltése)
+    const manageFilesButton = document.getElementById('manageFilesButton');
+    if (manageFilesButton) {
+        manageFilesButton.addEventListener('click', function(e) {
+            e.preventDefault();
+            showLoading("Fájlok betöltése...");
+            // Fájlok betöltése később
+            /*generateAdminFiles().then(() => {*/
+                setTimeout(() => {
+                    hideLoading();
+                    const adminFilesModal = document.querySelector('.admin_files_modal');
+                    if (adminFilesModal) {
+                        adminFilesModal.classList.remove('hidden');
+                    }  
+                }, 500);
+            /*});*/
+        });
+    }
+
+    // Kérelmek kezelése modal megnyitása (később kérelmek betöltése)
+    const manageRequestsButton = document.getElementById('manageRequestsButton');
+    if (manageRequestsButton) {
+        manageRequestsButton.addEventListener('click', function(e) {
+            e.preventDefault();
+            showLoading("Kérelmek betöltése...");
+            // Kérelmek betöltése később
+            /*generateAdminRequests().then(() => {*/
+                setTimeout(() => {
+                    hideLoading();
+                    const adminRequestsModal = document.querySelector('.admin_requests_modal');
+                    if (adminRequestsModal) {
+                        adminRequestsModal.classList.remove('hidden');
+                    }  
+                }, 500);
+            /*});*/
+        });
+    }
+
+    // Chatszobák kezelése modal megnyitása (később chatszobák betöltése)
+    const manageChatroomsButton = document.getElementById('manageChatroomsButton');
+    if (manageChatroomsButton) {
+        manageChatroomsButton.addEventListener('click', function(e) {
+            e.preventDefault();
+            showLoading("Chatszobák betöltése...");
+            // Chatszobák betöltése később
+            /*generateAdminChatrooms().then(() => {*/
+                setTimeout(() => {
+                    hideLoading();
+                    const adminChatroomsModal = document.querySelector('.admin_chatrooms_modal');
+                    if (adminChatroomsModal) {
+                        adminChatroomsModal.classList.remove('hidden');
+                    }  
+                }, 500);
+            /*});*/
+        });
+    }
+
+    // Admin modal keresés - univerzális keresési funkció minden admin modalhoz
+    document.addEventListener('input', function(e) {
+        const searchInput = e.target;
+        
+        // Ellenőrizzük, hogy az input elem admin modal keresőmező-e
+        if (!searchInput.classList.contains('admin_search_input')) return;
+        
+        const searchTerm = searchInput.value.toLowerCase().trim();
+        
+        // Megkeressük a modal-t
+        const modal = searchInput.closest('.modal');
+        if (!modal) return;
+        
+        // Megkeressük az összes admin_container elemet
+        const containers = modal.querySelectorAll('.admin_container');
+        
+        containers.forEach(function(container) {
+            // Lekérjük az összes h2, h3 és p elemet a konténerben
+            const h2Elements = container.querySelectorAll('h2');
+            const h3Elements = container.querySelectorAll('h3');
+            const pElements = container.querySelectorAll('p');
+            
+            // Ha nincs keresési kifejezés, mindent megjelenítünk
+            if (searchTerm === '') {
+                container.style.display = '';
+                return;
+            }
+            
+            // Összegyűjtjük a szöveges tartalmakat
+            let textContent = '';
+            
+            h2Elements.forEach(function(h2) {
+                textContent += ' ' + h2.textContent.toLowerCase();
+            });
+            
+            h3Elements.forEach(function(h3) {
+                textContent += ' ' + h3.textContent.toLowerCase();
+            });
+            
+            pElements.forEach(function(p) {
+                textContent += ' ' + p.textContent.toLowerCase();
+            });
+            
+            // Ellenőrizzük, hogy a keresési kifejezés megtalálható-e
+            if (textContent.includes(searchTerm)) {
+                container.style.display = '';
+            } else {
+                container.style.display = 'none';
+            }
+        });
+    });
+
+})();

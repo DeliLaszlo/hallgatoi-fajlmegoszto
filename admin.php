@@ -33,143 +33,319 @@ if (isset($_SESSION['last_activity']) && (time() - $_SESSION['last_activity'] > 
     <header>
         <img src="icons/IVK_logo.png" alt="IVK logo" class="ivk_logo header_img" width="1920" height="586">
         <h1 id="adminh1">Admin felület</h1>
+        <a href="php/logout.php" class="logout_button header_button top_right_button">
+            <img src="icons/logout.svg" alt="Kijelentkezés" class="logout-icon">
+            <span class="hideable_text">Kijelentkezés</span>
+        </a>
     </header>
     <section id="admin">
-            <!-- ====== Áttekintés ====== -->
-            <h2>Statisztika</h2>
-            <div class="content_container">
-                <p>Összes felhasználó: 124</p>
-                <p>Aktív tárgyak: 18</p>
-                <p>Feltöltött fájlok: 672</p>
-             <p>Függő kérelmek: 9</p>
-            </div>
+        <!-- Kezelőgombok -->
+        <div class="admin_buttons">
+            <button id="manageUsersButton">
+                <img src="icons/users.svg" alt="Felhasználók kezelése ikon">
+                <span >Felhasználók kezelése</span>
+            </button>
+            <button id="manageSubjectsButton">
+                <img src="icons/subjects.svg" alt="Tárgyak kezelése ikon">
+                <span >Tárgyak kezelése</span>
+            </button>
+            <button id="manageFilesButton">
+                <img src="icons/file.svg" alt="Fájlok kezelése ikon">
+                <span >Fájlok kezelése</span>
+            </button>
+            <button id="manageRequestsButton">
+                <img src="icons/request.svg" alt="Kérelmek kezelése ikon">
+                <span >Kérelmek kezelése</span>
+            </button>
+            <button id="manageChatroomsButton">
+                <img src="icons/chat.svg" alt="Chatszobák kezelése ikon">
+                <span >Chatszobák kezelése</span>
+            </button>
+        </div>
 
-            <!-- ====== Legutóbbi aktivitások ====== -->
-            <h2>Legutóbbi aktivitások</h2>
-            <div class="content_container">
-                <p>ZH_megoldas.pdf feltöltve<br>Analízis 1 • kiss.anna • 2025.11.11. 17:52</p>
-                <hr>
-                <p>Új felhasználó: kovacs.bence<br>Regisztráció • 2025.11.11. 17:40</p>
-                <hr>
-                <p>Jogosultság módosítva<br>matek1 tárgy admin jogosultság frissítve</p>
-            </div>
+        <!-- ====== Áttekintés ====== --> 
+        <div class="content_container">
+            <h2><img src="icons/statistics.svg" alt="Statisztika ikon">Statisztika</h2>
+            <p>Összes felhasználó: 124</p>
+            <p>Aktív tárgyak: 18</p>
+            <p>Feltöltött fájlok: 672</p>
+            <p>Függő kérelmek: 9</p>
+            <p>Aktív chatszobák: 5</p>
+        </div>
 
-            <!-- ================== FÁJLOK ================== -->
-            <h2>Fájlok kezelése</h2>
-            <div class="content_container">
-                <div class="search_container content_search_container" style="max-width:350px; margin-bottom:14px;">
-                    <input type="text" id="fileSearch" placeholder="Fájl keresése...">
-                    <button><img src="icons/search.svg" alt="Keresés"></button>
+        <!-- ====== Legutóbbi aktivitások ====== -->
+        <details>
+            <summary>
+                <img src="icons/hourglass.svg" alt="Óra ikon">
+                <h2>Legutóbbi aktivitások</h2>
+            </summary>
+            <div class="filterButtons">
+                <div class="filterItem">
+                    <input type="radio" name="latestFilter" id="latestFiles" checked>
+                    <label for="latestFiles" class="filterLabel">Fájlok</label>
                 </div>
-
-                <div class="list-card admin-list" id="fileList">
-                    <div class="list-row">
-                        <div class="list-main">
-                            <div class="list-title">ZH_megoldas.pdf</div>
-                            <div class="list-subtitle">
-                                Analízis 1 • feltöltő: kiss.anna • Letöltések: 42
-                                <span class="badge badge-red">Jelentve</span>
-                            </div>
-                        </div>
-                        <div class="list-actions">
-                            <button class="link-btn">Megnyitás</button>
-                            <button class="link-btn">Törlés</button>
-                        </div>
-                    </div>
-
-                    <hr>
-
-                    <div class="list-row">
-                        <div class="list-main">
-                            <div class="list-title">EA_diak.pdf</div>
-                            <div class="list-subtitle">
-                                Programozás alapjai • nagy.peter • Letöltések: 17
-                                <span class="badge badge-green">OK</span>
-                            </div>
-                        </div>
-                        <div class="list-actions">
-                            <button class="link-btn">Megnyitás</button>
-                            <button class="link-btn">Törlés</button>
-                        </div>
-                    </div>
+                <div class="filterItem">
+                    <input type="radio" name="latestFilter" id="latestRequests">
+                    <label for="latestRequests" class="filterLabel">Kérelmek</label>
+                </div>
+                <div class="filterItem">
+                    <input type="radio" name="latestFilter" id="latestChatrooms">
+                    <label for="latestChatrooms" class="filterLabel">Chatszobák</label>
                 </div>
             </div>
-
-            <!-- ================== ÚJ TÁRGY LÉTREHOZÁSA ================== -->
-            <h2>Új tárgy létrehozása</h2>
+            <!-- Kinézet még változni fog -->
             <div class="content_container">
-                    <p>
-                        <label for="new_subject_name">Tárgy neve</label>
-                        <div class="search_container content_search_container">
-                            <input type="text" id="new_subject_name" name="new_subject_name" placeholder="pl. Matematika 1.">
-                        </div>
-                    </p>
-
-                    <p>
-                        <label for="new_subject_code">Tárgy kódja</label>
-                        <div class="search_container content_search_container">
-                            <input type="text" id="new_subject_code" name="new_subject_code" placeholder="pl. GKNB_MSTM001">
-                        </div>
-                    </p>
-
-                    <p>
-                        <label for="new_subject_desc">Leírás (opcionális)</label>
-                        <div class="search_container content_search_container">
-                            <textarea id="new_subject_desc"
-                                    name="new_subject_desc"
-                                    rows="3"
-                                    placeholder="Rövid leírás a tárgyról..."
-                                    style="background:transparent; border:none; width:100%; padding:10px 14px; resize:vertical;"></textarea>
-                        </div>
-                    </p>
-
-                    <p>
-                        <button type="button" class="large_button">
-                            <span class="icon_text">Tárgy létrehozása</span>
-                        </button>
-                    </p>
+                <h3>Elem neve</h3>
+                <p>Leírás</p>
+                <p>Létrehozó, dátum</p>
             </div>
-
-            <!-- ================== KÉRELMEK ================== -->
+            <!-- -->
+        </details>
+        <!-- ================== Jelentések ================== -->
+        <details>
+            <summary>
+                <img src="icons/report.svg" alt="Jelentés ikon">
+                <h2>Jelentések kezelése</h2>
+            </summary>
+            <div class="filterButtons">
+                <div class="filterItem">
+                    <input type="radio" name="reportFilter" id="reportedAll" checked>
+                    <label for="reportedAll" class="filterLabel">Összes</label>
+                </div>
+                <div class="filterItem">
+                    <input type="radio" name="reportFilter" id="reportedFiles">
+                    <label for="reportedFiles" class="filterLabel">Fájlok</label>
+                </div>
+                <div class="filterItem">
+                    <input type="radio" name="reportFilter" id="reportedRequests">
+                    <label for="reportedRequests" class="filterLabel">Kérelmek</label>
+                </div>
+                <div class="filterItem">
+                    <input type="radio" name="reportFilter" id="reportedChatrooms">
+                    <label for="reportedChatrooms" class="filterLabel">Chatszobák</label>
+                </div>
+            </div>
+            <!-- Kinézet még változni fog -->
+            <div class="content_container">
+                <h3>Elem neve</h3>
+                <p>Jelentés oka</p>
+                <p>Jelentő, dátum</p>
+            </div>
+            <!-- -->
+        </details>
+    </section>
+    <!-- Felhasználók kezelése modal -->
+    <div class="modal admin_user_modal">
+        <div class="modal_content">
+            <button class="button small_button modal_close_button" aria-label="Bezárás">
+                <img src="icons/close.svg" alt="Bezárás">
+            </button>
+            <h2>Felhasználók</h2>
+            <hr>
+            <div class="search_container admin_search modal_search_container">
+                <input type="text" id="user_search_input" class="admin_search_input" placeholder="Felhasználó keresése..." aria-label="Felhasználó keresése">
+                <button id="user_search_button" aria-label="Keresés">
+                    <img src="icons/search.svg" alt="Keresés">
+                </button>
+            </div>
+            <hr>
+            <div id="user_list_container">
+                <div class="content_container admin_container admin_user_container">
+                    <h3>Név, neptun kód</h3>
+                    <button class="button small_button admin_button user_delete_button" data-neptun="" aria-label="Felhasználó törlése">
+                        <img src="icons/delete.svg" alt="Törlés">
+                        <span class="icon_text">Törlés</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Tárgyak kezelése modal -->
+    <div class="modal admin_subject_modal">
+        <div class="modal_content">
+            <button class="button small_button modal_close_button" aria-label="Bezárás">
+                <img src="icons/close.svg" alt="Bezárás">
+            </button>
+            <h2>Tárgyak</h2>
+            <hr>
+            <div class="admin_modal_header">
+                <button class="large_button new_subject_button" aria-label="Tárgy hozzáadása">
+                    <img src="icons/add.svg" alt="Tárgy hozzáadása">
+                    <span>Új tárgy</span>
+                </button>
+                <div class="search_container modal_search_container">
+                    <input type="text" id="subject_search_input" class="admin_search_input" placeholder="Tárgy keresése..." aria-label="Tárgy keresése">
+                    <button id="subject_search_button" aria-label="Keresés">
+                        <img src="icons/search.svg" alt="Keresés">
+                    </button>
+                </div>
+            </div>
+            <hr>
+            <div id="subject_list_container">
+                <div class="content_container admin_container admin_subject_container">
+                    <a href="#" class="container_link subject_link" aria-label="Tárgy megnyitása"></a>
+                    <h2>Tárgy neve</h2>
+                    <button class="button small_button admin_button subject_edit_button" data-class-code="" aria-label="Tárgy szerkesztése">
+                        <img src="icons/edit.svg" alt="Szerkesztés">
+                        <span class="icon_text">Szerkesztés</span>
+                    </button>
+                    <p>Tárgy kódja</p>
+                    <button class="button small_button admin_button subject_delete_button" data-class-code="" aria-label="Tárgy törlése">
+                        <img src="icons/delete.svg" alt="Törlés">
+                        <span class="icon_text">Törlés</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Új tárgy hozzáadása modal -->
+    <div class="modal small_modal admin_add_subject_modal">
+        <div class="modal_content small_modal_content">
+            <button class="button small_button modal_close_button" aria-label="Bezárás">
+                <img src="icons/close.svg" alt="Bezárás">
+            </button>
+            <h2>Tárgy hozzáadása</h2>
+            <hr>
+            <form id="addSubjectForm" action="" method="post">
+                <label for="subjectName">Tárgy neve:</label>
+                <input type="text" id="subjectName" name="subject_name" placeholder="Tárgy neve" required>
+                <label for="subjectCode">Tárgy kódja:</label>
+                <input type="text" id="subjectCode" name="subject_code" placeholder="Tárgy kódja" required>
+                <hr>
+                <div class="modal_footer">
+                    <button type="button" class="button add_close_button" aria-label="Mégse">
+                        <img src="icons/close.svg" alt="Mégse">
+                        <span>Mégse</span>
+                    </button>
+                    <button type="submit" class="button modal_add_button" aria-label="Hozzáadás">
+                        <img src="icons/add.svg" alt="Hozzáadás">
+                        <span>Hozzáadás</span>
+                    </button>
+                </div>
+            </form>
+            <!-- Generálandó rész vége -->
+        </div>
+    </div>
+    <!-- Tárgy szerkesztése modal -->
+    <div class="modal small_modal admin_edit_subject_modal">
+        <div class="modal_content small_modal_content">
+            <button class="button small_button modal_close_button" aria-label="Bezárás">
+                <img src="icons/close.svg" alt="Bezárás">
+            </button>
+            <h2>Tárgy szerkesztése</h2>
+            <hr>
+            <!-- Tárgy szerkesztő űrlap, később PHP-vel generálandó az alapértelmezett érték -->
+            <form id="editSubjectForm" action="" method="post">
+                <label for="subjectName">Tárgy neve:</label>
+                <input type="text" id="editSubjectName" name="subject_name" value="Tárgy neve" required>
+                <label for="subjectCode">Tárgy kódja:</label>
+                <input type="text" id="editSubjectCode" name="subject_code" value="Tárgy kódja" required>
+                <hr>
+                <div class="modal_footer">
+                    <button type="button" class="button edit_close_button" aria-label="Mégse">
+                        <img src="icons/close.svg" alt="Mégse">
+                        <span>Mégse</span>
+                    </button>
+                    <button type="submit" class="button modal_save_button" aria-label="Mentés">
+                        <img src="icons/save.svg" alt="Mentés">
+                        <span>Mentés</span>
+                    </button>
+                </div>
+            </form>
+            <!-- Generálandó rész vége -->
+        </div>
+    </div>
+    <!-- Fájlok kezelése modal -->
+    <div class="modal admin_files_modal">
+        <div class="modal_content">
+            <button class="button small_button modal_close_button" aria-label="Bezárás">
+                <img src="icons/close.svg" alt="Bezárás">
+            </button>
+            <h2>Fájlok</h2>
+            <hr>
+            <div class="search_container admin_search modal_search_container">
+                <input type="text" id="admin_file_search_input" class="admin_search_input" placeholder="Fájl keresése..." aria-label="Fájl keresése">
+                <button id="admin_file_search_button" aria-label="Keresés">
+                    <img src="icons/search.svg" alt="Keresés">
+                </button>
+            </div>
+            <hr>
+            <div id="file_list_container">
+                <div class="content_container admin_container admin_file_container">
+                    <h2>Fájl neve</h2>
+                    <button class="button small_button admin_button file_download_button" data-file-id="" aria-label="Fájl letöltése">
+                        <img src="icons/download.svg" alt="Letöltés">
+                        <span class="icon_text">Letöltés</span>
+                    </button>
+                    <p>Feltöltő, dátum</p>
+                    <button class="button small_button admin_button file_delete_button" data-file-id="" aria-label="Fájl törlése">
+                        <img src="icons/delete.svg" alt="Törlés">
+                        <span class="icon_text">Törlés</span>
+                    </button>
+                    <p>Leírás</p>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Kérelmek kezelése modal -->
+    <div class="modal admin_requests_modal">
+        <div class="modal_content">
+            <button class="button small_button modal_close_button" aria-label="Bezárás">
+                <img src="icons/close.svg" alt="Bezárás">
+            </button>
             <h2>Kérelmek</h2>
-            <div class="content_container">
-                <div class="search_container content_search_container" style="max-width:350px; margin-bottom:14px;">
-                    <input type="text" id="requestSearch" placeholder="Kérelem keresése...">
-                    <button><img src="icons/search.svg" alt="Keresés"></button>
-                </div>
-
-                <div class="list-card admin-list" id="requestList">
-                    <div class="list-row">
-                        <div class="list-main">
-                            <div class="list-title">#91 • horvath.mate</div>
-                            <div class="list-subtitle">
-                                Admin jog tárgyra • Indok: Matek2 segítő tanár
-                                <span class="badge badge-yellow">Függőben</span>
-                            </div>
-                        </div>
-                        <div class="list-actions">
-                            <button class="link-btn">Elfogadás</button>
-                            <button class="link-btn">Elutasítás</button>
-                        </div>
-                    </div>
-
-                    <hr>
-
-                    <div class="list-row">
-                        <div class="list-main">
-                            <div class="list-title">#92 • szabo.lili</div>
-                            <div class="list-subtitle">
-                                Tárgy létrehozás • „Adatbázis rendszerek gyakorló”
-                                <span class="badge badge-green">Elfogadva</span>
-                            </div>
-                        </div>
-                        <div class="list-actions">
-                            <button class="link-btn">Részletek</button>
-                        </div>
-                    </div>
+            <hr>
+            <div class="search_container admin_search modal_search_container">
+                <input type="text" id="admin_request_search_input" class="admin_search_input" placeholder="Kérelem keresése..." aria-label="Kérelem keresése">
+                <button id="admin_request_search_button" aria-label="Keresés">
+                    <img src="icons/search.svg" alt="Keresés">
+                </button>
+            </div>
+            <hr>
+            <div id="request_list_container">
+                <div class="content_container admin_container admin_request_container">
+                    <h2>Kérelem neve</h2>
+                    <button class="button small_button admin_button request_delete_button" data-file-id="" aria-label="Kérelem törlése">
+                        <img src="icons/delete.svg" alt="Törlés">
+                        <span class="icon_text">Törlés</span>
+                    </button>
+                    <p>Feltöltő, dátum</p>
+                    <p></p> <!-- Üres hely a jó elrendezés miatt -->
+                    <p>Leírás</p>
                 </div>
             </div>
-        </section>
+        </div>
+    </div>
+    <!-- Chatszobák kezelése modal -->
+    <div class="modal admin_chatrooms_modal">
+        <div class="modal_content">
+            <button class="button small_button modal_close_button" aria-label="Bezárás">
+                <img src="icons/close.svg" alt="Bezárás">
+            </button>
+            <h2>Chatszobák</h2>
+            <hr>
+            <div class="search_container admin_search modal_search_container">
+                <input type="text" id="admin_chatroom_search_input" class="admin_search_input" placeholder="Chatszoba keresése..." aria-label="Chatszoba keresése">
+                <button id="admin_chatroom_search_button" aria-label="Keresés">
+                    <img src="icons/search.svg" alt="Keresés">
+                </button>
+            </div>
+            <hr>
+            <div id="chatroom_list_container">
+                <div class="content_container admin_container admin_chatroom_container">
+                    <a href="#" class="container_link chatroom_link" aria-label="Chatszoba megnyitása"></a>
+                    <h2>Chatszoba neve</h2>
+                    <button class="button small_button admin_button chatroom_delete_button" data-chatroom-id="" aria-label="Chatszoba törlése">
+                        <img src="icons/delete.svg" alt="Törlés">
+                        <span class="icon_text">Törlés</span>
+                    </button>
+                    <p>Létrehozó, dátum</p>
+                    <p></p> <!-- Üres hely a jó elrendezés miatt -->
+                    <p>Leírás</p>
+                </div>
+            </div>
+        </div>
+    </div>
     <script src="scripts.js"></script>
 </body>
 </html>
