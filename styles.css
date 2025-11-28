@@ -2161,3 +2161,15 @@ details label {
 .admin_user_modal h3, #admin_page .content_container h3 {
     color: #1e3a8a;
 }
+
+.report_modal_footer {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+}
+
+.report_modal_footer button {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.5rem;
+}

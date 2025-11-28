@@ -13,4 +13,4 @@ III. Admin oldal
 - Felhasználók, Tárgyak, Fájlok (felugró ablakon is), Kérelmek, Chatszobák, Legutóbbi események törlés gombok működtetése
 - Új tárgy hozzáadás kezelése, tárgy szerkesztés kezelése
 - Fájl letöltés kezelése (felugró ablakon is)
-- Jelentések menü kezelése
+- Jelentések felugró ablakainak kezelése

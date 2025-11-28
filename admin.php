@@ -119,13 +119,7 @@ if (isset($_SESSION['last_activity']) && (time() - $_SESSION['last_activity'] > 
                     <label for="reportedChatrooms" class="filterLabel">Chatszobák</label>
                 </div>
             </div>
-            <!-- Kinézet még változni fog -->
-            <div class="content_container">
-                <h3>Elem neve</h3>
-                <p>Jelentés oka</p>
-                <p>Jelentő, dátum</p>
-            </div>
-            <!-- -->
+            <div id="reported_items_container"></div>
         </details>
     </section>
     <!-- Felhasználók kezelése modal -->
@@ -318,6 +312,114 @@ if (isset($_SESSION['last_activity']) && (time() - $_SESSION['last_activity'] > 
                 <button class="button modal_download_button" aria-label="Letöltés">
                     <img src="icons/download.svg" alt="Letöltés">
                     <span>Letöltés</span>
+                </button>
+            </div>
+        </div>
+    </div>
+    <!-- Jelentett fájl részletei modal -->
+    <div class="modal reported_file_details_modal">
+        <div class="modal_content">
+            <button class="button small_button modal_close_button" aria-label="Bezárás">
+                <img src="icons/close.svg" alt="Bezárás">
+            </button>
+            <h2>Jelentés részletei</h2>
+            <hr>
+            <h3>Fájl címe:<span class="data-report-title">Fájl címe</span></h3>
+            <h3>Fájlnév:<span class="data-report-name">Fájl neve</span></h3>
+            <h3>Feltöltő:<span class="data-report-uploader">Felhasználó neve (Neptun kód)</span></h3>
+            <h3>Leírás:</h3>
+            <p class="data-report-description">Itt van a fájl részletes leírása. Ez a szöveg több soros is lehet, és részletes információkat tartalmazhat a fájlról.</p>
+            <hr>
+            <h3>Jelentő:<span class="data-report-reporter">Felhasználó neve (Neptun kód)</span></h3>
+            <h3>Jelentés oka:</h3>
+            <p class="data-report-reason">Itt van a jelentés részletes oka. Ez a szöveg több soros is lehet, és részletes információkat tartalmazhat a jelentésről.</p>
+            <hr>
+            <div class="modal_footer report_modal_footer">
+                <button class="button delete_button" aria-label="Elem törlése">
+                    <img src="icons/delete.svg" alt="Törlés">
+                    <span>Fájl törlése</span>
+                </button>
+                <button class="button modal_download_button" aria-label="Letöltés">
+                    <img src="icons/download.svg" alt="Letöltés">
+                    <span>Letöltés</span>
+                </button>
+                <button class="button user_delete_button" aria-label="Felhasználó törlése">
+                    <img src="icons/user_delete.svg" alt="Felhasználó törlése">
+                    <span>Felhasználó törlése</span>
+                </button>
+                <button class="button finish_report_button" aria-label="Jelentés lezárása">
+                    <img src="icons/tick.svg" alt="Lezárás">
+                    <span>Jelentés lezárása</span>
+                </button>
+            </div>
+        </div>
+    </div>
+    <!-- Jelentett chatszoba részletei modal -->
+    <div class="modal reported_chatroom_details_modal">
+        <div class="modal_content">
+            <button class="button small_button modal_close_button" aria-label="Bezárás">
+                <img src="icons/close.svg" alt="Bezárás">
+            </button>
+            <h2>Jelentés részletei</h2>
+            <hr>
+            <h3>Chatszoba neve:<span class="data-report-title">Chatszoba neve</span></h3>
+            <h3>Létrehozó:<span class="data-report-creator">Felhasználó neve (Neptun kód)</span></h3>
+            <h3>Leírás:</h3>
+            <p class="data-report-description">Itt van a chatszoba részletes leírása. Ez a szöveg több soros is lehet, és részletes információkat tartalmazhat a chatszobáról.</p>
+            <hr>
+            <h3>Jelentő:<span class="data-report-reporter">Felhasználó neve (Neptun kód)</span></h3>
+            <h3>Jelentés oka:</h3>
+            <p class="data-report-reason">Itt van a jelentés részletes oka. Ez a szöveg több soros is lehet, és részletes információkat tartalmazhat a jelentésről.</p>
+            <hr>
+            <div class="modal_footer report_modal_footer">
+                <button class="button delete_button" aria-label="Elem törlése">
+                    <img src="icons/delete.svg" alt="Törlés">
+                    <span>Szoba törlése</span>
+                </button>
+                <button class="button view_button" aria-label="Megtekintés">
+                    <img src="icons/follow.svg" alt="Megtekintés">
+                    <span>Szoba megtekintése</span>
+                </button>
+                <button class="button user_delete_button" aria-label="Felhasználó törlése">
+                    <img src="icons/user_delete.svg" alt="Felhasználó törlése">
+                    <span>Felhasználó törlése</span>
+                </button>
+                <button class="button finish_report_button" aria-label="Jelentés lezárása">
+                    <img src="icons/tick.svg" alt="Lezárás">
+                    <span>Jelentés lezárása</span>
+                </button>
+            </div>
+        </div>
+    </div>
+    <!-- Jelentett kérelem részletei modal -->
+    <div class="modal reported_request_details_modal">
+        <div class="modal_content">
+            <button class="button small_button modal_close_button" aria-label="Bezárás">
+                <img src="icons/close.svg" alt="Bezárás">
+            </button>
+            <h2>Jelentés részletei</h2>
+            <hr>
+            <h3>Kérelem címe:<span class="data-report-title">Kérelem címe</span></h3>
+            <h3>Kérelmező:<span class="data-report-requester">Felhasználó neve (Neptun kód)</span></h3>
+            <h3>Leírás:</h3>
+            <p class="data-report-description">Itt van a kérelem részletes leírása. Ez a szöveg több soros is lehet, és részletes információkat tartalmazhat a kérelemről.</p>
+            <hr>
+            <h3>Jelentő:<span class="data-report-reporter">Felhasználó neve (Neptun kód)</span></h3>
+            <h3>Jelentés oka:</h3>
+            <p class="data-report-reason">Itt van a jelentés részletes oka. Ez a szöveg több soros is lehet, és részletes információkat tartalmazhat a jelentésről.</p>
+            <hr>
+            <div class="modal_footer">
+                <button class="button delete_button" aria-label="Elem törlése">
+                    <img src="icons/delete.svg" alt="Törlés">
+                    <span>Kérelem törlése</span>
+                </button>
+                <button class="button user_delete_button" aria-label="Felhasználó törlése">
+                    <img src="icons/user_delete.svg" alt="Felhasználó törlése">
+                    <span>Felhasználó törlése</span>
+                </button>
+                <button class="button finish_report_button" aria-label="Jelentés lezárása">
+                    <img src="icons/tick.svg" alt="Lezárás">
+                    <span>Jelentés lezárása</span>
                 </button>
             </div>
         </div>

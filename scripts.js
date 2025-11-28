@@ -3748,6 +3748,155 @@ document.addEventListener('click', function(e) {
             }
         });
     }
+
+    // Jelentések betöltése és megjelenítése
+    let reportsData = null;
+
+    async function loadReports() {
+        try {
+            const response = await fetch('php/getReports.php');
+            if (!response.ok) {
+                throw new Error('Nem sikerült betölteni a jelentéseket');
+            }
+            const data = await response.json();
+            if (data.success) {
+                reportsData = data.reports;
+                displayReports('all');
+            }
+        } catch (error) {
+            console.error('Hiba a jelentések betöltésekor:', error);
+        }
+    }
+
+    function displayReports(filter) {
+        const container = document.getElementById('reported_items_container');
+        if (!container || !reportsData) return;
+
+        container.innerHTML = '';
+        
+        const filteredReports = filter === 'all' 
+            ? reportsData 
+            : reportsData.filter(report => report.reported_table === filter);
+
+        if (filteredReports.length === 0) {
+            container.innerHTML = '<p style="text-align: center; padding: 20px;">Nincs megjeleníthető jelentés</p>';
+            return;
+        }
+
+        filteredReports.forEach(report => {
+            const reportDiv = document.createElement('div');
+            reportDiv.className = 'content_container';
+            
+            const link = document.createElement('a');
+            link.href = '#';
+            link.className = 'container_link reported_item_link';
+            link.setAttribute('data-report-id', report.report_id);
+            link.setAttribute('data-report-type', report.reported_table);
+            link.setAttribute('aria-label', 'Jelentés részletei');
+            reportDiv.appendChild(link);
+
+            const title = document.createElement('h3');
+            title.textContent = report.item_name || 'Törölt elem';
+
+            const reason = document.createElement('p');
+            reason.textContent = report.report_description;
+
+            const meta = document.createElement('p');
+            meta.textContent = `${report.reporter_name} (${report.reported_neptun})`;
+
+            reportDiv.appendChild(title);
+            reportDiv.appendChild(reason);
+            reportDiv.appendChild(meta);
+
+            container.appendChild(reportDiv);
+        });
+    }
+
+    loadReports();
+
+    // Jelentések szűrés kezelése
+    const reportedAllRadio = document.getElementById('reportedAll');
+    const reportedFilesRadio = document.getElementById('reportedFiles');
+    const reportedRequestsRadio = document.getElementById('reportedRequests');
+    const reportedChatroomsRadio = document.getElementById('reportedChatrooms');
+
+    if (reportedAllRadio) {
+        reportedAllRadio.addEventListener('change', () => {
+            if (reportedAllRadio.checked) {
+                displayReports('all');
+            }
+        });
+    }
+
+    if (reportedFilesRadio) {
+        reportedFilesRadio.addEventListener('change', () => {
+            if (reportedFilesRadio.checked) {
+                displayReports('upload');
+            }
+        });
+    }
+
+    if (reportedRequestsRadio) {
+        reportedRequestsRadio.addEventListener('change', () => {
+            if (reportedRequestsRadio.checked) {
+                displayReports('request');
+            }
+        });
+    }
+
+    if (reportedChatroomsRadio) {
+        reportedChatroomsRadio.addEventListener('change', () => {
+            if (reportedChatroomsRadio.checked) {
+                displayReports('chatroom');
+            }
+        });
+    }
+
+    // Jelentett elem megnyitása
+    document.addEventListener('click', async (e) => {
+        const reportLink = e.target.closest('.reported_item_link');
+        if (!reportLink) return;
+        
+        e.preventDefault();
+        const reportId = reportLink.getAttribute('data-report-id');
+        const reportType = reportLink.getAttribute('data-report-type');
+        
+        const report = reportsData.find(r => r.report_id == reportId);
+        if (!report) return;
+
+        if (reportType === 'upload') {
+            const modal = document.querySelector('.reported_file_details_modal');
+            if (modal) {
+                modal.querySelector('.data-report-title').textContent = report.item_name || 'Nincs megadva';
+                modal.querySelector('.data-report-name').textContent = report.file_name || 'Nincs megadva';
+                modal.querySelector('.data-report-uploader').textContent = `${report.item_creator_name} (${report.item_creator_neptun})`;
+                modal.querySelector('.data-report-description').textContent = report.item_description || 'Nincs leírás';
+                modal.querySelector('.data-report-reporter').textContent = `${report.reporter_name} (${report.reporter_neptun})`;
+                modal.querySelector('.data-report-reason').textContent = report.report_description;
+                modal.classList.remove('hidden');
+            }
+        } else if (reportType === 'chatroom') {
+            const modal = document.querySelector('.reported_chatroom_details_modal');
+            if (modal) {
+                modal.querySelector('.data-report-title').textContent = report.item_name || 'Nincs megadva';
+                modal.querySelector('.data-report-creator').textContent = `${report.item_creator_name} (${report.item_creator_neptun || 'N/A'})`;
+                modal.querySelector('.data-report-description').textContent = report.item_description || 'Nincs leírás';
+                modal.querySelector('.data-report-reporter').textContent = `${report.reporter_name} (${report.reporter_neptun})`;
+                modal.querySelector('.data-report-reason').textContent = report.report_description;
+                modal.classList.remove('hidden');
+            }
+        } else if (reportType === 'request') {
+            const modal = document.querySelector('.reported_request_details_modal');
+            if (modal) {
+                modal.querySelector('.data-report-title').textContent = report.item_name || 'Nincs megadva';
+                modal.querySelector('.data-report-requester').textContent = `${report.item_creator_name} (${report.item_creator_neptun})`;
+                modal.querySelector('.data-report-description').textContent = report.item_description || 'Nincs leírás';
+                modal.querySelector('.data-report-reporter').textContent = `${report.reporter_name} (${report.reporter_neptun})`;
+                modal.querySelector('.data-report-reason').textContent = report.report_description;
+                modal.classList.remove('hidden');
+            }
+        }
+    });
     
     // Felhasználók betöltése és megjelenítése
     async function loadUsers() {
