@@ -135,6 +135,52 @@ try {
         
         echo json_encode(['success' => true, 'chatrooms' => $chatrooms]);
         
+    } elseif ($mode === 'all') {
+        // 3. Mód: Összes chatszoba lekérdezése admin számára
+        
+        $query = "SELECT 
+                    ch.room_id,
+                    ch.title,
+                    ch.description,
+                    ch.class_code,
+                    ch.creater_neptun,
+                    ch.create_date,
+                    c.class_name,
+                    usr.nickname as creater_nickname
+                  FROM chatroom ch
+                  LEFT JOIN class c ON ch.class_code = c.class_code
+                  LEFT JOIN user usr ON ch.creater_neptun = usr.neptun_k
+                  ORDER BY ch.create_date DESC";
+        
+        $result = $conn->query($query);
+        
+        if ($result->num_rows === 0) {
+            echo json_encode(['success' => true, 'chatrooms' => []]);
+            exit();
+        }
+        
+        $chatrooms = [];
+        while ($row = $result->fetch_assoc()) {
+            // Ha a létrehozó NULL, akkor "Adminisztrátor"
+            $creater_nickname = $row['creater_neptun'] ? $row['creater_nickname'] : 'Adminisztrátor';
+            
+            // Formázzuk a dátumot, ha nem NULL
+            $create_date = $row['create_date'] ? date('Y-m-d', strtotime($row['create_date'])) : null;
+            
+            $chatrooms[] = [
+                'room_id' => $row['room_id'],
+                'title' => $row['title'],
+                'description' => $row['description'],
+                'class_code' => $row['class_code'],
+                'class_name' => $row['class_name'],
+                'creater_neptun' => $row['creater_neptun'],
+                'creater_nickname' => $creater_nickname,
+                'create_date' => $create_date
+            ];
+        }
+        
+        echo json_encode(['success' => true, 'chatrooms' => $chatrooms]);
+        
     } else {
         echo json_encode(['success' => false, 'message' => 'Ismeretlen mode']);
     }

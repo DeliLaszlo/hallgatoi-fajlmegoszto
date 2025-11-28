@@ -116,6 +116,51 @@ try {
         
         echo json_encode(['success' => true, 'requests' => $requests]);
         
+    } elseif ($mode === 'all') {
+        // 3. Mód: Összes kérelem lekérdezése admin számára
+        
+        $query = "SELECT 
+                    r.request_id,
+                    r.request_name,
+                    r.description,
+                    r.class_code,
+                    c.class_name,
+                    r.neptun_k as requester_neptun,
+                    usr.nickname as requester_nickname,
+                    r.request_date,
+                    ur.status
+                  FROM request r
+                  INNER JOIN user usr ON r.neptun_k = usr.neptun_k
+                  INNER JOIN class c ON r.class_code = c.class_code
+                  LEFT JOIN upload_request ur ON r.request_id = ur.request_id
+                  ORDER BY r.request_date DESC";
+        
+        $result = $conn->query($query);
+        
+        if ($result->num_rows === 0) {
+            echo json_encode(['success' => true, 'requests' => []]);
+            exit();
+        }
+        
+        $requests = [];
+        while ($row = $result->fetch_assoc()) {
+            $is_completed = ($row['status'] === 'T');
+            
+            $requests[] = [
+                'request_id' => $row['request_id'],
+                'request_name' => $row['request_name'],
+                'description' => $row['description'],
+                'class_code' => $row['class_code'],
+                'class_name' => $row['class_name'],
+                'requester_neptun' => $row['requester_neptun'],
+                'requester_nickname' => $row['requester_nickname'],
+                'request_date' => $row['request_date'],
+                'is_completed' => $is_completed
+            ];
+        }
+        
+        echo json_encode(['success' => true, 'requests' => $requests]);
+        
     } else {
         echo json_encode(['success' => false, 'message' => 'Ismeretlen mode']);
     }

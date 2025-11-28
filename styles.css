@@ -2106,10 +2106,16 @@ details label {
     background-color: #3b82f6;
 }
 
-.top_right_button {
+.top_middle_button {
     top: 50%;
     transform: translateY(-50%);
     right: 1rem;
+}
+
+.top_right_button {
+    top: 1rem;
+    right: 1rem;
+    position: absolute;
 }
 
 .admin_modal_header {
@@ -2142,12 +2148,16 @@ details label {
     overflow-wrap: break-word;
 }
 
+.admin_subject_container h2{
+    font-size: 1.25rem;
+}
+
 @media (max-width: 600px) {
     .admin_container {
         grid-template-columns: 1fr 50px;
     }
 }
 
-.admin_user_modal h3 {
+.admin_user_modal h3, #admin_page .content_container h3 {
     color: #1e3a8a;
 }

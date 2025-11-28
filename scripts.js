@@ -3588,17 +3588,239 @@ document.addEventListener('click', function(e) {
 // Admin felület
 (() => {
     // Csak akkor fut le, ha admin oldalon vagyunk
-    const admin = document.getElementById('admin');
+    const admin = document.getElementById('admin_page');
     if (!admin) return;
+
+    // Statisztikák betöltése
+    async function loadStatistics() {
+        try {
+            const response = await fetch('php/getStatistics.php');
+            if (!response.ok) {
+                throw new Error('Nem sikerült betölteni a statisztikákat');
+            }
+            const data = await response.json();
+            
+            // Frissítjük a HTML elemeket
+            const allUsersElem = document.getElementById('allUsers');
+            const allSubjectsElem = document.getElementById('allSubjects');
+            const allFilesElem = document.getElementById('allFiles');
+            const allRequestsElem = document.getElementById('allRequests');
+            const allChatroomsElem = document.getElementById('allChatrooms');
+            
+            if (allUsersElem) allUsersElem.textContent = `Összes felhasználó: ${data.allUsers || 0}`;
+            if (allSubjectsElem) allSubjectsElem.textContent = `Aktív tárgyak: ${data.allSubjects || 0}`;
+            if (allFilesElem) allFilesElem.textContent = `Feltöltött fájlok: ${data.allFiles || 0}`;
+            if (allRequestsElem) allRequestsElem.textContent = `Függő kérelmek: ${data.allRequests || 0}`;
+            if (allChatroomsElem) allChatroomsElem.textContent = `Aktív chatszobák: ${data.allChatrooms || 0}`;
+        } catch (error) {
+            console.error('Hiba a statisztikák betöltésekor:', error);
+        }
+    }
+
+    // Statisztikák betöltése oldal betöltésekor
+    loadStatistics();
+
+    // Legutóbbi aktivitások betöltése és megjelenítése
+    let latestActivitiesData = null;
+
+    async function loadLatestActivities() {
+        try {
+            const response = await fetch('php/getLatestActivities.php');
+            if (!response.ok) {
+                throw new Error('Nem sikerült betölteni a legutóbbi aktivitásokat');
+            }
+            latestActivitiesData = await response.json();
+            displayLatestActivities('files');
+        } catch (error) {
+            console.error('Hiba a legutóbbi aktivitások betöltésekor:', error);
+        }
+    }
+
+    function displayLatestActivities(type) {
+        const container = document.getElementById('latest_activities_container');
+        if (!container || !latestActivitiesData) return;
+
+        container.innerHTML = '';
+        const activities = latestActivitiesData[type] || [];
+
+        if (activities.length === 0) {
+            container.innerHTML = '<p style="text-align: center; padding: 20px;">Nincs megjeleníthető aktivitás</p>';
+            return;
+        }
+
+        activities.forEach(activity => {
+            const activityDiv = document.createElement('div');
+            activityDiv.className = 'content_container';
+            
+            // Link hozzáadása típus alapján
+            if (type === 'files') {
+                const link = document.createElement('a');
+                link.href = '#';
+                link.className = 'container_link file_details_link';
+                link.setAttribute('data-up-id', activity.id);
+                link.setAttribute('aria-label', 'Fájl részletei');
+                activityDiv.appendChild(link);
+            } else if (type === 'chatrooms') {
+                const link = document.createElement('a');
+                link.href = `chatroom.php?room_id=${activity.id}`;
+                link.className = 'container_link chatroom_link';
+                link.setAttribute('aria-label', 'Chatszoba megnyitása');
+                activityDiv.appendChild(link);
+            }
+
+            // Törlés gomb hozzáadása
+            const deleteButton = document.createElement('button');
+            deleteButton.className = 'button small_button top_right_button';
+            deleteButton.setAttribute('aria-label', 'Törlés');
+            if (type === 'files') {
+                deleteButton.classList.add('file_delete_button');
+                deleteButton.setAttribute('data-file-id', activity.id);
+            } else if (type === 'requests') {
+                deleteButton.classList.add('request_delete_button');
+                deleteButton.setAttribute('data-request-id', activity.id);
+            } else if (type === 'chatrooms') {
+                deleteButton.classList.add('chatroom_delete_button');
+                deleteButton.setAttribute('data-chatroom-id', activity.id);
+            }
+            
+            const deleteImg = document.createElement('img');
+            deleteImg.src = 'icons/delete.svg';
+            deleteImg.alt = 'Törlés';
+            
+            const deleteSpan = document.createElement('span');
+            deleteSpan.className = 'icon_text';
+            deleteSpan.textContent = 'Törlés';
+            
+            deleteButton.appendChild(deleteImg);
+            deleteButton.appendChild(deleteSpan);
+            activityDiv.appendChild(deleteButton);
+            
+            const title = document.createElement('h3');
+            title.textContent = activity.title;
+            
+            const description = document.createElement('p');
+            description.textContent = activity.description;
+            
+            const meta = document.createElement('p');
+            if (activity.create_date) {
+                const dateFormatted = new Date(activity.create_date).toLocaleDateString('hu-HU');
+                meta.textContent = `${activity.creator}, ${dateFormatted}`;
+            } else {
+                meta.textContent = activity.creator;
+            }
+            
+            activityDiv.appendChild(title);
+            activityDiv.appendChild(description);
+            activityDiv.appendChild(meta);
+            
+            container.appendChild(activityDiv);
+        });
+    }
+
+    // Legutóbbi aktivitások betöltése
+    loadLatestActivities();
+
+    // Radio gombok szűrés kezelése
+    const latestFilesRadio = document.getElementById('latestFiles');
+    const latestRequestsRadio = document.getElementById('latestRequests');
+    const latestChatroomsRadio = document.getElementById('latestChatrooms');
+
+    if (latestFilesRadio) {
+        latestFilesRadio.addEventListener('change', () => {
+            if (latestFilesRadio.checked) {
+                displayLatestActivities('files');
+            }
+        });
+    }
+
+    if (latestRequestsRadio) {
+        latestRequestsRadio.addEventListener('change', () => {
+            if (latestRequestsRadio.checked) {
+                displayLatestActivities('requests');
+            }
+        });
+    }
+
+    if (latestChatroomsRadio) {
+        latestChatroomsRadio.addEventListener('change', () => {
+            if (latestChatroomsRadio.checked) {
+                displayLatestActivities('chatrooms');
+            }
+        });
+    }
     
-    // Felhasználók kezelése modal megnyitása (később felhasználók betöltése)
+    // Felhasználók betöltése és megjelenítése
+    async function loadUsers() {
+        const container = document.getElementById('user_list_container');
+        if (!container) return;
+
+        try {
+            const response = await fetch('php/getUsers.php');
+            if (!response.ok) {
+                throw new Error('Nem sikerült betölteni a felhasználókat');
+            }
+            const users = await response.json();
+
+            container.innerHTML = '';
+
+            if (users.length === 0) {
+                container.innerHTML = '<p style="text-align: center; padding: 20px;">Nincsenek felhasználók</p>';
+                return;
+            }
+
+            users.forEach(user => {
+                const userDiv = document.createElement('div');
+                userDiv.className = 'content_container admin_container admin_user_container';
+
+                const title = document.createElement('h3');
+                title.textContent = `${user.full_name} (${user.nickname})`;
+
+                const neptun = document.createElement('p');
+                neptun.textContent = user.neptun;
+
+                const placeholder = document.createElement('p');
+                placeholder.textContent = "";
+
+                const email = document.createElement('p');
+                email.textContent = user.email;
+
+                const deleteButton = document.createElement('button');
+                deleteButton.className = 'button small_button admin_button user_delete_button';
+                deleteButton.setAttribute('data-neptun', user.neptun);
+                deleteButton.setAttribute('aria-label', 'Felhasználó törlése');
+
+                const deleteImg = document.createElement('img');
+                deleteImg.src = 'icons/delete.svg';
+                deleteImg.alt = 'Törlés';
+
+                const deleteSpan = document.createElement('span');
+                deleteSpan.className = 'icon_text';
+                deleteSpan.textContent = 'Törlés';
+
+                deleteButton.appendChild(deleteImg);
+                deleteButton.appendChild(deleteSpan);
+
+                userDiv.appendChild(title);
+                userDiv.appendChild(deleteButton);
+                userDiv.appendChild(neptun);
+                userDiv.appendChild(placeholder);
+                userDiv.appendChild(email);
+
+                container.appendChild(userDiv);
+            });
+        } catch (error) {
+            console.error('Hiba a felhasználók betöltésekor:', error);
+            container.innerHTML = '<p style="text-align: center; padding: 20px;">Hiba történt a betöltés során</p>';
+        }
+    }
+
+    // Felhasználók kezelése modal megnyitása
     const manageUsersButton = document.getElementById('manageUsersButton');
     if (manageUsersButton) {
         manageUsersButton.addEventListener('click', function(e) {
             e.preventDefault();
             showLoading("Felhasználók betöltése...");
-            // Felhasználók betöltése később
-            /*generateUsers().then(() => {*/
+            loadUsers().then(() => {
                 setTimeout(() => {
                     hideLoading();
                     const adminUsersModal = document.querySelector('.admin_user_modal');
@@ -3606,18 +3828,97 @@ document.addEventListener('click', function(e) {
                         adminUsersModal.classList.remove('hidden');
                     }  
                 }, 500);
-            /*});*/
+            });
         });
     }
 
-    // Tárgyak kezelése modal megnyitása (később tárgyak betöltése)
+    // Tárgyak betöltése és megjelenítése
+    async function loadAllSubjects() {
+        const container = document.getElementById('subject_list_container');
+        if (!container) return;
+
+        try {
+            const response = await fetch('php/getAllSubjects.php');
+            if (!response.ok) {
+                throw new Error('Nem sikerült betölteni a tárgyakat');
+            }
+            const subjects = await response.json();
+
+            container.innerHTML = '';
+
+            if (subjects.length === 0) {
+                container.innerHTML = '<p style="text-align: center; padding: 20px;">Nincsenek tárgyak</p>';
+                return;
+            }
+
+            subjects.forEach(subject => {
+                const subjectDiv = document.createElement('div');
+                subjectDiv.className = 'content_container admin_container admin_subject_container';
+
+                const link = document.createElement('a');
+                link.href = `subject.php?class_code=${encodeURIComponent(subject.class_code)}`;
+                link.className = 'container_link subject_link';
+                link.setAttribute('aria-label', 'Tárgy megnyitása');
+                subjectDiv.appendChild(link);
+
+                const title = document.createElement('h2');
+                title.textContent = subject.class_name;
+
+                const editButton = document.createElement('button');
+                editButton.className = 'button small_button admin_button subject_edit_button';
+                editButton.setAttribute('data-class-code', subject.class_code);
+                editButton.setAttribute('aria-label', 'Tárgy szerkesztése');
+
+                const editImg = document.createElement('img');
+                editImg.src = 'icons/edit.svg';
+                editImg.alt = 'Szerkesztés';
+
+                const editSpan = document.createElement('span');
+                editSpan.className = 'icon_text';
+                editSpan.textContent = 'Szerkesztés';
+
+                editButton.appendChild(editImg);
+                editButton.appendChild(editSpan);
+
+                const code = document.createElement('p');
+                code.textContent = subject.class_code;
+
+                const deleteButton = document.createElement('button');
+                deleteButton.className = 'button small_button admin_button subject_delete_button';
+                deleteButton.setAttribute('data-class-code', subject.class_code);
+                deleteButton.setAttribute('aria-label', 'Tárgy törlése');
+
+                const deleteImg = document.createElement('img');
+                deleteImg.src = 'icons/delete.svg';
+                deleteImg.alt = 'Törlés';
+
+                const deleteSpan = document.createElement('span');
+                deleteSpan.className = 'icon_text';
+                deleteSpan.textContent = 'Törlés';
+
+                deleteButton.appendChild(deleteImg);
+                deleteButton.appendChild(deleteSpan);
+
+                subjectDiv.appendChild(title);
+                subjectDiv.appendChild(editButton);
+                subjectDiv.appendChild(code);
+                subjectDiv.appendChild(deleteButton);
+
+                container.appendChild(subjectDiv);
+            });
+        } catch (error) {
+            console.error('Hiba a tárgyak betöltésekor:', error);
+            container.innerHTML = '<p style="text-align: center; padding: 20px;">Hiba történt a betöltés során</p>';
+        }
+    }
+
+    // Tárgyak kezelése modal megnyitása
     const manageSubjectsButton = document.getElementById('manageSubjectsButton');
     if (manageSubjectsButton) {
         manageSubjectsButton.addEventListener('click', function(e) {
             e.preventDefault();
             showLoading("Tárgyak betöltése...");
-            // Tárgyak betöltése később
-            /*generateAdminSubjects().then(() => {*/
+            loadAllSubjects().then(() => {
                 setTimeout(() => {
                     hideLoading();
                     const adminSubjectsModal = document.querySelector('.admin_subject_modal');
@@ -3625,7 +3926,7 @@ document.addEventListener('click', function(e) {
                         adminSubjectsModal.classList.remove('hidden');
                     }  
                 }, 500);
-            /*});*/
+            });
         });
     }
 
@@ -3647,22 +3948,126 @@ document.addEventListener('click', function(e) {
         if (editSubjectButton) {
             e.preventDefault();
             e.stopPropagation();
+            
+            const container = editSubjectButton.closest('.admin_subject_container');
+            const subjectName = container.querySelector('h2')?.textContent || '';
+            const subjectCode = container.querySelector('p')?.textContent || '';
+            
             const editModal = document.querySelector('.admin_edit_subject_modal');
             if (editModal) {
-                // Tárgy adatok betöltése a modal-ba később
+                // Form mezők kitöltése
+                const nameInput = editModal.querySelector('#editSubjectName');
+                const codeInput = editModal.querySelector('#editSubjectCode');
+                
+                if (nameInput) nameInput.value = subjectName;
+                if (codeInput) codeInput.value = subjectCode;
+                
+                // Eredeti kód tárolása data attribútumban (a szerkesztés azonosításához)
+                editModal.setAttribute('data-original-code', subjectCode);
+                
                 editModal.classList.remove('hidden');
             }
         }
     });
 
-    // Fájlok kezelése modal megnyitása (később fájlok betöltése)
+    async function loadAllFiles() {
+        const container = document.getElementById('file_list_container');
+        if (!container) return;
+
+        try {
+            const response = await fetch('php/getFileDetails.php?mode=all');
+            if (!response.ok) {
+                throw new Error('Nem sikerült betölteni a fájlokat');
+            }
+            const data = await response.json();
+
+            if (!data.success) {
+                throw new Error(data.message || 'Hiba a fájlok betöltésekor');
+            }
+
+            container.innerHTML = '';
+
+            if (data.files.length === 0) {
+                container.innerHTML = '<p style="text-align: center; padding: 20px;">Nincsenek fájlok</p>';
+                return;
+            }
+
+            data.files.forEach(file => {
+                const fileDiv = document.createElement('div');
+                fileDiv.className = 'content_container admin_container admin_file_container';
+
+                const link = document.createElement('a');
+                link.href = '#';
+                link.className = 'container_link file_details_link';
+                link.setAttribute('data-up-id', file.up_id);
+                link.setAttribute('aria-label', 'Fájl részletei');
+                fileDiv.appendChild(link);
+
+                const title = document.createElement('h2');
+                title.textContent = file.title;
+
+                const downloadButton = document.createElement('button');
+                downloadButton.className = 'button small_button admin_button file_download_button';
+                downloadButton.setAttribute('data-file-id', file.up_id);
+                downloadButton.setAttribute('aria-label', 'Fájl letöltése');
+
+                const downloadImg = document.createElement('img');
+                downloadImg.src = 'icons/download.svg';
+                downloadImg.alt = 'Letöltés';
+
+                const downloadSpan = document.createElement('span');
+                downloadSpan.className = 'icon_text';
+                downloadSpan.textContent = 'Letöltés';
+
+                downloadButton.appendChild(downloadImg);
+                downloadButton.appendChild(downloadSpan);
+
+                const uploader = document.createElement('p');
+                uploader.textContent = file.upload_date ? `${file.uploader}, ${file.upload_date}` : file.uploader;
+
+                const emptyP = document.createElement('p');
+
+                const description = document.createElement('p');
+                description.textContent = file.description || 'Nincs leírás';
+
+                const deleteButton = document.createElement('button');
+                deleteButton.className = 'button small_button admin_button file_delete_button';
+                deleteButton.setAttribute('data-file-id', file.up_id);
+                deleteButton.setAttribute('aria-label', 'Fájl törlése');
+
+                const deleteImg = document.createElement('img');
+                deleteImg.src = 'icons/delete.svg';
+                deleteImg.alt = 'Törlés';
+
+                const deleteSpan = document.createElement('span');
+                deleteSpan.className = 'icon_text';
+                deleteSpan.textContent = 'Törlés';
+
+                deleteButton.appendChild(deleteImg);
+                deleteButton.appendChild(deleteSpan);
+
+                fileDiv.appendChild(title);
+                fileDiv.appendChild(downloadButton);
+                fileDiv.appendChild(uploader);
+                fileDiv.appendChild(emptyP);
+                fileDiv.appendChild(description);
+                fileDiv.appendChild(deleteButton);
+
+                container.appendChild(fileDiv);
+            });
+        } catch (error) {
+            console.error('Hiba a fájlok betöltésekor:', error);
+            container.innerHTML = '<p style="text-align: center; padding: 20px;">Hiba történt a betöltés során</p>';
+        }
+    }
+
+    // Fájlok kezelése modal megnyitása
     const manageFilesButton = document.getElementById('manageFilesButton');
     if (manageFilesButton) {
         manageFilesButton.addEventListener('click', function(e) {
             e.preventDefault();
             showLoading("Fájlok betöltése...");
-            // Fájlok betöltése később
-            /*generateAdminFiles().then(() => {*/
+            loadAllFiles().then(() => {
                 setTimeout(() => {
                     hideLoading();
                     const adminFilesModal = document.querySelector('.admin_files_modal');
@@ -3670,18 +4075,84 @@ document.addEventListener('click', function(e) {
                         adminFilesModal.classList.remove('hidden');
                     }  
                 }, 500);
-            /*});*/
+            });
         });
     }
 
-    // Kérelmek kezelése modal megnyitása (később kérelmek betöltése)
+    async function loadAllRequests() {
+        const container = document.getElementById('request_list_container');
+        if (!container) return;
+
+        try {
+            const response = await fetch('php/getRequests.php?mode=all');
+            if (!response.ok) {
+                throw new Error('Nem sikerült betölteni a kérelmeket');
+            }
+            const data = await response.json();
+
+            if (!data.success) {
+                throw new Error(data.message || 'Hiba a kérelmek betöltésekor');
+            }
+
+            container.innerHTML = '';
+
+            if (data.requests.length === 0) {
+                container.innerHTML = '<p style="text-align: center; padding: 20px;">Nincsenek kérelmek</p>';
+                return;
+            }
+
+            data.requests.forEach(request => {
+                const requestDiv = document.createElement('div');
+                requestDiv.className = 'content_container admin_container admin_request_container';
+
+                const title = document.createElement('h2');
+                title.textContent = request.request_name;
+
+                const deleteButton = document.createElement('button');
+                deleteButton.className = 'button small_button admin_button request_delete_button';
+                deleteButton.setAttribute('data-request-id', request.request_id);
+                deleteButton.setAttribute('aria-label', 'Kérelem törlése');
+
+                const deleteImg = document.createElement('img');
+                deleteImg.src = 'icons/delete.svg';
+                deleteImg.alt = 'Törlés';
+
+                const deleteSpan = document.createElement('span');
+                deleteSpan.className = 'icon_text';
+                deleteSpan.textContent = 'Törlés';
+
+                deleteButton.appendChild(deleteImg);
+                deleteButton.appendChild(deleteSpan);
+
+                const requester = document.createElement('p');
+                requester.textContent = request.request_date ? `${request.requester_nickname}, ${request.request_date}` : request.requester_nickname;
+
+                const emptyP = document.createElement('p');
+
+                const description = document.createElement('p');
+                description.textContent = request.description || 'Nincs leírás';
+
+                requestDiv.appendChild(title);
+                requestDiv.appendChild(deleteButton);
+                requestDiv.appendChild(requester);
+                requestDiv.appendChild(emptyP);
+                requestDiv.appendChild(description);
+
+                container.appendChild(requestDiv);
+            });
+        } catch (error) {
+            console.error('Hiba a kérelmek betöltésekor:', error);
+            container.innerHTML = '<p style="text-align: center; padding: 20px;">Hiba történt a betöltés során</p>';
+        }
+    }
+
+    // Kérelmek kezelése modal megnyitása
     const manageRequestsButton = document.getElementById('manageRequestsButton');
     if (manageRequestsButton) {
         manageRequestsButton.addEventListener('click', function(e) {
             e.preventDefault();
             showLoading("Kérelmek betöltése...");
-            // Kérelmek betöltése később
-            /*generateAdminRequests().then(() => {*/
+            loadAllRequests().then(() => {
                 setTimeout(() => {
                     hideLoading();
                     const adminRequestsModal = document.querySelector('.admin_requests_modal');
@@ -3689,18 +4160,90 @@ document.addEventListener('click', function(e) {
                         adminRequestsModal.classList.remove('hidden');
                     }  
                 }, 500);
-            /*});*/
+            });
         });
     }
 
-    // Chatszobák kezelése modal megnyitása (később chatszobák betöltése)
+    async function loadAllChatrooms() {
+        const container = document.getElementById('chatroom_list_container');
+        if (!container) return;
+
+        try {
+            const response = await fetch('php/getChatrooms.php?mode=all');
+            if (!response.ok) {
+                throw new Error('Nem sikerült betölteni a chatszobákat');
+            }
+            const data = await response.json();
+
+            if (!data.success) {
+                throw new Error(data.message || 'Hiba a chatszobák betöltésekor');
+            }
+
+            container.innerHTML = '';
+
+            if (data.chatrooms.length === 0) {
+                container.innerHTML = '<p style="text-align: center; padding: 20px;">Nincsenek chatszobák</p>';
+                return;
+            }
+
+            data.chatrooms.forEach(chatroom => {
+                const chatroomDiv = document.createElement('div');
+                chatroomDiv.className = 'content_container admin_container admin_chatroom_container';
+
+                const link = document.createElement('a');
+                link.href = `chatroom.php?room_id=${encodeURIComponent(chatroom.room_id)}`;
+                link.className = 'container_link chatroom_link';
+                link.setAttribute('aria-label', 'Chatszoba megnyitása');
+                chatroomDiv.appendChild(link);
+
+                const title = document.createElement('h2');
+                title.textContent = chatroom.title;
+
+                const deleteButton = document.createElement('button');
+                deleteButton.className = 'button small_button admin_button chatroom_delete_button';
+                deleteButton.setAttribute('data-chatroom-id', chatroom.room_id);
+                deleteButton.setAttribute('aria-label', 'Chatszoba törlése');
+
+                const deleteImg = document.createElement('img');
+                deleteImg.src = 'icons/delete.svg';
+                deleteImg.alt = 'Törlés';
+
+                const deleteSpan = document.createElement('span');
+                deleteSpan.className = 'icon_text';
+                deleteSpan.textContent = 'Törlés';
+
+                deleteButton.appendChild(deleteImg);
+                deleteButton.appendChild(deleteSpan);
+
+                const creator = document.createElement('p');
+                creator.textContent = chatroom.create_date ? `${chatroom.creater_nickname}, ${chatroom.create_date}` : chatroom.creater_nickname;
+
+                const emptyP = document.createElement('p');
+
+                const description = document.createElement('p');
+                description.textContent = chatroom.description || 'Nincs leírás';
+
+                chatroomDiv.appendChild(title);
+                chatroomDiv.appendChild(deleteButton);
+                chatroomDiv.appendChild(creator);
+                chatroomDiv.appendChild(emptyP);
+                chatroomDiv.appendChild(description);
+
+                container.appendChild(chatroomDiv);
+            });
+        } catch (error) {
+            console.error('Hiba a chatszobák betöltésekor:', error);
+            container.innerHTML = '<p style="text-align: center; padding: 20px;">Hiba történt a betöltés során</p>';
+        }
+    }
+
+    // Chatszobák kezelése modal megnyitása
     const manageChatroomsButton = document.getElementById('manageChatroomsButton');
     if (manageChatroomsButton) {
         manageChatroomsButton.addEventListener('click', function(e) {
             e.preventDefault();
             showLoading("Chatszobák betöltése...");
-            // Chatszobák betöltése később
-            /*generateAdminChatrooms().then(() => {*/
+            loadAllChatrooms().then(() => {
                 setTimeout(() => {
                     hideLoading();
                     const adminChatroomsModal = document.querySelector('.admin_chatrooms_modal');
@@ -3708,7 +4251,7 @@ document.addEventListener('click', function(e) {
                         adminChatroomsModal.classList.remove('hidden');
                     }  
                 }, 500);
-            /*});*/
+            });
         });
     }
 

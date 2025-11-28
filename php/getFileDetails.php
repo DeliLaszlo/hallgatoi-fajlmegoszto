@@ -16,7 +16,13 @@ if (!isset($_SESSION['user_neptun'])) {
 $mode = $_GET['mode'] ?? null;
 $id = $_GET['id'] ?? null;
 
-if (!$mode || !$id) {
+if (!$mode) {
+    echo json_encode(['success' => false, 'message' => 'Hiányzó paraméterek']);
+    exit();
+}
+
+// Ha mode=all, akkor nincs szükség id-re
+if ($mode !== 'all' && !$id) {
     echo json_encode(['success' => false, 'message' => 'Hiányzó paraméterek']);
     exit();
 }
@@ -140,6 +146,49 @@ try {
         ];
         
         echo json_encode($response);
+        
+    } elseif ($mode === 'all') {
+        // 3. Mód: Összes fájl lekérdezése admin számára
+        $query = "SELECT 
+                    u.up_id,
+                    u.upload_title,
+                    u.file_name,
+                    u.comment as description,
+                    u.neptun as uploader_neptun,
+                    usr.nickname as uploader_nickname,
+                    c.class_name,
+                    u.class_code,
+                    u.upload_date,
+                    u.downloads
+                  FROM upload u
+                  INNER JOIN user usr ON u.neptun = usr.neptun_k
+                  INNER JOIN class c ON u.class_code = c.class_code
+                  ORDER BY u.upload_date DESC";
+        
+        $result = $conn->query($query);
+        
+        if ($result->num_rows === 0) {
+            echo json_encode(['success' => true, 'files' => []]);
+            exit();
+        }
+        
+        $files = [];
+        while ($row = $result->fetch_assoc()) {
+            $files[] = [
+                'up_id' => $row['up_id'],
+                'title' => $row['upload_title'],
+                'file_name' => $row['file_name'],
+                'uploader' => $row['uploader_nickname'] . ' (' . $row['uploader_neptun'] . ')',
+                'uploader_neptun' => $row['uploader_neptun'],
+                'class_name' => $row['class_name'],
+                'class_code' => $row['class_code'],
+                'upload_date' => $row['upload_date'],
+                'downloads' => $row['downloads'],
+                'description' => $row['description']
+            ];
+        }
+        
+        echo json_encode(['success' => true, 'files' => $files]);
         
     } else {
         echo json_encode(['success' => false, 'message' => 'Ismeretlen mód']);

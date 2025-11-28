@@ -23,7 +23,7 @@ if (isset($_SESSION['last_activity']) && (time() - $_SESSION['last_activity'] > 
     <link rel="icon" type="image/x-icon" href="https://munkatars.sze.hu/core/templates/sze2018_bluerev/favicon.ico?v=2">
     <title>Admin felület</title>
 </head>
-<body>
+<body id="admin_page">
     <div id="loading-screen" class="loading-screen initial-loading">
         <div class="loading-spinner">
             <img src="icons/hourglass.svg" alt="Betöltés">
@@ -33,7 +33,7 @@ if (isset($_SESSION['last_activity']) && (time() - $_SESSION['last_activity'] > 
     <header>
         <img src="icons/IVK_logo.png" alt="IVK logo" class="ivk_logo header_img" width="1920" height="586">
         <h1 id="adminh1">Admin felület</h1>
-        <a href="php/logout.php" class="logout_button header_button top_right_button">
+        <a href="php/logout.php" class="logout_button header_button top_middle_button">
             <img src="icons/logout.svg" alt="Kijelentkezés" class="logout-icon">
             <span class="hideable_text">Kijelentkezés</span>
         </a>
@@ -66,11 +66,11 @@ if (isset($_SESSION['last_activity']) && (time() - $_SESSION['last_activity'] > 
         <!-- ====== Áttekintés ====== --> 
         <div class="content_container">
             <h2><img src="icons/statistics.svg" alt="Statisztika ikon">Statisztika</h2>
-            <p>Összes felhasználó: 124</p>
-            <p>Aktív tárgyak: 18</p>
-            <p>Feltöltött fájlok: 672</p>
-            <p>Függő kérelmek: 9</p>
-            <p>Aktív chatszobák: 5</p>
+            <p id="allUsers">Összes felhasználó: 124</p>
+            <p id="allSubjects">Aktív tárgyak: 18</p>
+            <p id="allFiles">Feltöltött fájlok: 672</p>
+            <p id="allRequests">Függő kérelmek: 9</p>
+            <p id="allChatrooms">Aktív chatszobák: 5</p>
         </div>
 
         <!-- ====== Legutóbbi aktivitások ====== -->
@@ -93,13 +93,7 @@ if (isset($_SESSION['last_activity']) && (time() - $_SESSION['last_activity'] > 
                     <label for="latestChatrooms" class="filterLabel">Chatszobák</label>
                 </div>
             </div>
-            <!-- Kinézet még változni fog -->
-            <div class="content_container">
-                <h3>Elem neve</h3>
-                <p>Leírás</p>
-                <p>Létrehozó, dátum</p>
-            </div>
-            <!-- -->
+            <div id="latest_activities_container"></div>
         </details>
         <!-- ================== Jelentések ================== -->
         <details>
@@ -149,15 +143,7 @@ if (isset($_SESSION['last_activity']) && (time() - $_SESSION['last_activity'] > 
                 </button>
             </div>
             <hr>
-            <div id="user_list_container">
-                <div class="content_container admin_container admin_user_container">
-                    <h3>Név, neptun kód</h3>
-                    <button class="button small_button admin_button user_delete_button" data-neptun="" aria-label="Felhasználó törlése">
-                        <img src="icons/delete.svg" alt="Törlés">
-                        <span class="icon_text">Törlés</span>
-                    </button>
-                </div>
-            </div>
+            <div id="user_list_container"></div>
         </div>
     </div>
     <!-- Tárgyak kezelése modal -->
@@ -181,21 +167,7 @@ if (isset($_SESSION['last_activity']) && (time() - $_SESSION['last_activity'] > 
                 </div>
             </div>
             <hr>
-            <div id="subject_list_container">
-                <div class="content_container admin_container admin_subject_container">
-                    <a href="#" class="container_link subject_link" aria-label="Tárgy megnyitása"></a>
-                    <h2>Tárgy neve</h2>
-                    <button class="button small_button admin_button subject_edit_button" data-class-code="" aria-label="Tárgy szerkesztése">
-                        <img src="icons/edit.svg" alt="Szerkesztés">
-                        <span class="icon_text">Szerkesztés</span>
-                    </button>
-                    <p>Tárgy kódja</p>
-                    <button class="button small_button admin_button subject_delete_button" data-class-code="" aria-label="Tárgy törlése">
-                        <img src="icons/delete.svg" alt="Törlés">
-                        <span class="icon_text">Törlés</span>
-                    </button>
-                </div>
-            </div>
+            <div id="subject_list_container"></div>
         </div>
     </div>
     <!-- Új tárgy hozzáadása modal -->
@@ -223,7 +195,6 @@ if (isset($_SESSION['last_activity']) && (time() - $_SESSION['last_activity'] > 
                     </button>
                 </div>
             </form>
-            <!-- Generálandó rész vége -->
         </div>
     </div>
     <!-- Tárgy szerkesztése modal -->
@@ -234,7 +205,6 @@ if (isset($_SESSION['last_activity']) && (time() - $_SESSION['last_activity'] > 
             </button>
             <h2>Tárgy szerkesztése</h2>
             <hr>
-            <!-- Tárgy szerkesztő űrlap, később PHP-vel generálandó az alapértelmezett érték -->
             <form id="editSubjectForm" action="" method="post">
                 <label for="subjectName">Tárgy neve:</label>
                 <input type="text" id="editSubjectName" name="subject_name" value="Tárgy neve" required>
@@ -252,7 +222,6 @@ if (isset($_SESSION['last_activity']) && (time() - $_SESSION['last_activity'] > 
                     </button>
                 </div>
             </form>
-            <!-- Generálandó rész vége -->
         </div>
     </div>
     <!-- Fájlok kezelése modal -->
@@ -270,21 +239,7 @@ if (isset($_SESSION['last_activity']) && (time() - $_SESSION['last_activity'] > 
                 </button>
             </div>
             <hr>
-            <div id="file_list_container">
-                <div class="content_container admin_container admin_file_container">
-                    <h2>Fájl neve</h2>
-                    <button class="button small_button admin_button file_download_button" data-file-id="" aria-label="Fájl letöltése">
-                        <img src="icons/download.svg" alt="Letöltés">
-                        <span class="icon_text">Letöltés</span>
-                    </button>
-                    <p>Feltöltő, dátum</p>
-                    <button class="button small_button admin_button file_delete_button" data-file-id="" aria-label="Fájl törlése">
-                        <img src="icons/delete.svg" alt="Törlés">
-                        <span class="icon_text">Törlés</span>
-                    </button>
-                    <p>Leírás</p>
-                </div>
-            </div>
+            <div id="file_list_container"></div>
         </div>
     </div>
     <!-- Kérelmek kezelése modal -->
@@ -302,18 +257,7 @@ if (isset($_SESSION['last_activity']) && (time() - $_SESSION['last_activity'] > 
                 </button>
             </div>
             <hr>
-            <div id="request_list_container">
-                <div class="content_container admin_container admin_request_container">
-                    <h2>Kérelem neve</h2>
-                    <button class="button small_button admin_button request_delete_button" data-file-id="" aria-label="Kérelem törlése">
-                        <img src="icons/delete.svg" alt="Törlés">
-                        <span class="icon_text">Törlés</span>
-                    </button>
-                    <p>Feltöltő, dátum</p>
-                    <p></p> <!-- Üres hely a jó elrendezés miatt -->
-                    <p>Leírás</p>
-                </div>
-            </div>
+            <div id="request_list_container"></div>
         </div>
     </div>
     <!-- Chatszobák kezelése modal -->
@@ -343,6 +287,38 @@ if (isset($_SESSION['last_activity']) && (time() - $_SESSION['last_activity'] > 
                     <p></p> <!-- Üres hely a jó elrendezés miatt -->
                     <p>Leírás</p>
                 </div>
+            </div>
+        </div>
+    </div>
+    <!-- Fájl részletei modal -->
+    <div class="modal file_details_modal">
+        <div class="modal_content">
+            <button class="button small_button modal_close_button" aria-label="Bezárás">
+                <img src="icons/close.svg" alt="Bezárás">
+            </button>
+            <h2 class="data-file-title">Fájl címe</h2>
+            <hr>
+            <h2>Fájl részletei</h2>
+            <h3>Feltöltő:<span class="data-file-uploader">Felhasználó neve</span></h3>
+            <h3>Fájlnév:<span class="data-file-name">fajl_neve.pdf</span></h3>
+            <h3>Feltöltés dátuma:<span class="data-file-date">2025-01-01</span></h3>
+            <h3>Letöltések:<span class="data-file-downloads">42</span></h3>
+            <h3 class="voting_section">
+                <span>Értékelés:</span>
+                <span class="data-file-rating">17</span>
+            </h3>
+            <h3>Leírás:</h3>
+            <p class="data-file-description">Itt van a fájl részletes leírása. Ez a szöveg több soros is lehet, és részletes információkat tartalmazhat a fájlról.</p>
+            <hr>
+            <div class="modal_footer">
+                <button class="button delete_button" aria-label="Törlés">
+                    <img src="icons/delete.svg" alt="Törlés">
+                    <span>Törlés</span>
+                </button>
+                <button class="button modal_download_button" aria-label="Letöltés">
+                    <img src="icons/download.svg" alt="Letöltés">
+                    <span>Letöltés</span>
+                </button>
             </div>
         </div>
     </div>

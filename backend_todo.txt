@@ -1,13 +1,16 @@
 I. Gombok
 - Dashboard kérelmek - törlés, szerkesztés, lezárás, újraküldés, értékelés
 - Dashboard chatszoba - törlés, szerkesztés, követés megszűntetés
-- Subject fájlok - értékelés, feltöltés
-- Subject kérelmek - feltöltés, szerkesztés, törlés, új kérelem
-- Subject chatszoba - új chatszoba, követés kezelése, szerkesztés, törlés
+- Subject fájlok - értékelés, feltöltés, jelentés
+- Subject kérelmek - feltöltés, szerkesztés, törlés, új kérelem, jelentés
+- Subject chatszoba - új chatszoba, követés kezelése, szerkesztés, törlés, jelentés
 
+II. Chatszoba
+- Küldött üzenetek mentése adatbázisba
+- Új üzenetek időszakos lekérése
 
-II. Később megoldandó dolgok
-- Chatszobák helyes chatszobához irányítsanak át
-- Chatszoba üzenetek kezelése
-- Jelentés gombok működtetése
-- Admin oldal kezelése
+III. Admin oldal
+- Felhasználók, Tárgyak, Fájlok (felugró ablakon is), Kérelmek, Chatszobák, Legutóbbi események törlés gombok működtetése
+- Új tárgy hozzáadás kezelése, tárgy szerkesztés kezelése
+- Fájl letöltés kezelése (felugró ablakon is)
+- Jelentések menü kezelése
