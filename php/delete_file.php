@@ -87,7 +87,8 @@ try {
     
     // Opcionális: Töröljük a fizikai fájlt a szerverről
     // Ha a path_to_file és file_name megfelelően van beállítva
-    $filePath = $file['path_to_file'] . '/' . $file['file_name'];
+    $pathToFile = ltrim($file['path_to_file'], '/'); // Eltávolítjuk a kezdő perjelet ha van
+    $filePath = __DIR__ . '/../' . $pathToFile . $file['file_name'];
     if (file_exists($filePath)) {
         @unlink($filePath); // @ elnyomja a figyelmeztetést, ha nem sikerül
     }

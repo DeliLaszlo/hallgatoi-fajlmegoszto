@@ -106,19 +106,33 @@ try {
             exit();
         }
         
-        // Töröljük a régi fájlt
-        $oldFilePath = $pathToFile . '/' . $existingFile['file_name'];
+        // Helyes útvonal meghatározása (projekt gyökérkönyvtár/files/)
+        $uploadDir = __DIR__ . '/../files/';
+        
+        // Töröljük a régi fájlt (a régi fájl útvonala a projekt gyökérből)
+        $oldFilePath = __DIR__ . '/../' . ltrim($existingFile['path_to_file'], '/') . $existingFile['file_name'];
         if (file_exists($oldFilePath)) {
             @unlink($oldFilePath);
         }
         
-        // Új fájlnév generálása (időbélyeg + eredeti név)
-        $newFileName = time() . '_' . basename($uploadedFile['name']);
-        $targetPath = $pathToFile . '/' . $newFileName;
+        // Eredeti fájlnév megtartása (csak a fájl neve, útvonal nélkül)
+        $newFileName = basename($uploadedFile['name']);
+        
+        // Ha már létezik ilyen nevű fájl, adjunk hozzá egy számot
+        $targetPath = $uploadDir . $newFileName;
+        if (file_exists($targetPath)) {
+            $fileInfo = pathinfo($newFileName);
+            $counter = 1;
+            do {
+                $newFileName = $fileInfo['filename'] . '_' . $counter . '.' . $fileInfo['extension'];
+                $targetPath = $uploadDir . $newFileName;
+                $counter++;
+            } while (file_exists($targetPath));
+        }
         
         // Feltöltés könyvtár létrehozása, ha nem létezik
-        if (!is_dir($pathToFile)) {
-            mkdir($pathToFile, 0755, true);
+        if (!is_dir($uploadDir)) {
+            mkdir($uploadDir, 0755, true);
         }
         
         // Fájl áthelyezése
@@ -132,21 +146,42 @@ try {
     }
     
     // Frissítjük az adatbázist
-    $updateStmt = $pdo->prepare("
-        UPDATE upload 
-        SET upload_title = :title, 
-            comment = :description,
-            file_name = :file_name
-        WHERE up_id = :up_id AND neptun = :neptun
-    ");
-    
-    $updateStmt->execute([
-        ':title' => $file_title,
-        ':description' => $file_description,
-        ':file_name' => $newFileName,
-        ':up_id' => $up_id,
-        ':neptun' => $neptun
-    ]);
+    // Ha új fájlt töltöttünk fel, frissítjük a path_to_file mezőt is
+    if ($replace_file && isset($_FILES['file_upload']) && $_FILES['file_upload']['error'] === UPLOAD_ERR_OK) {
+        $updateStmt = $pdo->prepare("
+            UPDATE upload 
+            SET upload_title = :title, 
+                comment = :description,
+                file_name = :file_name,
+                path_to_file = :path_to_file
+            WHERE up_id = :up_id AND neptun = :neptun
+        ");
+        
+        $updateStmt->execute([
+            ':title' => $file_title,
+            ':description' => $file_description,
+            ':file_name' => $newFileName,
+            ':path_to_file' => 'files/',
+            ':up_id' => $up_id,
+            ':neptun' => $neptun
+        ]);
+    } else {
+        $updateStmt = $pdo->prepare("
+            UPDATE upload 
+            SET upload_title = :title, 
+                comment = :description,
+                file_name = :file_name
+            WHERE up_id = :up_id AND neptun = :neptun
+        ");
+        
+        $updateStmt->execute([
+            ':title' => $file_title,
+            ':description' => $file_description,
+            ':file_name' => $newFileName,
+            ':up_id' => $up_id,
+            ':neptun' => $neptun
+        ]);
+    }
     
     echo json_encode([
         'success' => true,

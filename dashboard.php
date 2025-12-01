@@ -6,7 +6,7 @@ if (!isset($_SESSION['user_neptun'])) {
 }
 $inactive_limit = 1800; // 30 perc inaktivitás
 if (isset($_SESSION['last_activity']) && (time() - $_SESSION['last_activity'] > $inactive_limit)) {
-    header("Location: logout.php");
+    header("Location: php/logout.php");
     exit();
 } else {
     $_SESSION['last_activity'] = time();
@@ -59,6 +59,7 @@ if (isset($_SESSION['last_activity']) && (time() - $_SESSION['last_activity'] > 
     </header>
     <main>
         <section id="dashboard_targyak">
+            <!-- Tárgyaim szekció -->
             <div class="section_header subject_header">
                 <div class="header-div">
                     <img src="icons/subjects.svg" alt="Tárgyak ikon">
@@ -81,6 +82,7 @@ if (isset($_SESSION['last_activity']) && (time() - $_SESSION['last_activity'] > 
             <div id="user_subjects"></div>
         </section>
         <section id="dashboard_fajlok">
+            <!-- Feltöltött fájljaim szekció -->
             <div class="section_header subject_header">
                 <div class="header-div">
                     <img src="icons/file.svg" alt="Fájlok ikon">
@@ -99,6 +101,7 @@ if (isset($_SESSION['last_activity']) && (time() - $_SESSION['last_activity'] > 
             <div id="dashboard_file_container"></div>
         </section>
         <section id="dashboard_kerelemek">
+            <!-- Kérelmeim szekció -->
             <div class="section_header">
                 <div class="header-div">
                     <img src="icons/request.svg" alt="Kérelmek ikon">
@@ -117,6 +120,7 @@ if (isset($_SESSION['last_activity']) && (time() - $_SESSION['last_activity'] > 
             <div id="dashboard_request_container"></div>
         </section>
         <section id="dashboard_chatszobak">
+            <!-- Chatszobáim szekció -->
             <div class="section_header">
                 <div class="header-div">
                     <img src="icons/chat.svg" alt="Chatszobák ikon">
@@ -136,6 +140,7 @@ if (isset($_SESSION['last_activity']) && (time() - $_SESSION['last_activity'] > 
             <hr>
         </section>
         <section id="dashboard_profile">
+            <!-- Profilom szekció -->
             <div class="header-div">
                 <img src="icons/users.svg" alt="Profil ikon">
                 <h1>Profilom</h1>
@@ -143,7 +148,6 @@ if (isset($_SESSION['last_activity']) && (time() - $_SESSION['last_activity'] > 
             <hr>
             <form id="profile_form">
                 <div id="profile_info">
-                    <!-- Felhasználó profil adatai, később PHP-vel generálandó -->
                     <div class="profile_field">
                         <h3>Neptun kód:</h3>
                         <input type="text" id="profile_neptun" name="neptun" value="ABC123" readonly/>
@@ -164,7 +168,6 @@ if (isset($_SESSION['last_activity']) && (time() - $_SESSION['last_activity'] > 
                         <input type="text" id="profile_email" name="email" value="email@example.com" readonly/>
                         <span class="error-message" id="error_email"></span>
                     </div>
-                    <!-- Generálandó rész vége -->
                     <div id="password_fields" style="display: none;">
                         <div class="profile_field">
                             <h3>Jelenlegi jelszó:</h3>
@@ -203,6 +206,7 @@ if (isset($_SESSION['last_activity']) && (time() - $_SESSION['last_activity'] > 
         </section>
     </main>
     <div class="modal add_subject_modal">
+        <!-- Új tárgy felvétele modal -->
         <div class="modal_content">
             <button class="button small_button modal_close_button" aria-label="Bezárás">
                 <img src="icons/close.svg" alt="Bezárás">
@@ -220,11 +224,11 @@ if (isset($_SESSION['last_activity']) && (time() - $_SESSION['last_activity'] > 
         </div>
     </div>
     <div class="modal own_file_details_modal">
+        <!-- Saját fájl részletei modal -->
         <div class="modal_content">
             <button class="button small_button modal_close_button" aria-label="Bezárás">
                 <img src="icons/close.svg" alt="Bezárás">
             </button>
-            <!-- Saját fájl részletei, adatok később PHP-vel generálandó -->
             <h2 class="data-file-title">Fájl címe</h2>
             <hr>
             <h2>Fájl részletei</h2>
@@ -235,7 +239,6 @@ if (isset($_SESSION['last_activity']) && (time() - $_SESSION['last_activity'] > 
             <h3>Értékelés:<span class="data-file-rating">17</span></h3>
             <h3>Leírás:</h3>
             <p class="data-file-description">Itt van a fájl részletes leírása. Ez a szöveg több soros is lehet, és részletes információkat tartalmazhat a fájlról.</p>
-            <!-- Generálandó rész vége -->
             <hr>
             <div class="modal_footer">
                 <button class="button modal_delete_button" aria-label="Fájl törlése">
@@ -254,11 +257,11 @@ if (isset($_SESSION['last_activity']) && (time() - $_SESSION['last_activity'] > 
         </div>
     </div>
     <div class="modal own_uncompleted_requests_modal">
+        <!-- Saját teljesítetlen kérelem részletei modal -->
         <div class="modal_content">
             <button class="button small_button modal_close_button" aria-label="Bezárás">
                 <img src="icons/close.svg" alt="Bezárás">
             </button>
-            <!-- Saját teljesítetlen kérelem részletei, adatok később PHP-vel generálandó -->
             <h2 class="data-request-title">Kérelem címe</h2>
             <hr>
             <h2>Kérelem részletei</h2>
@@ -266,7 +269,6 @@ if (isset($_SESSION['last_activity']) && (time() - $_SESSION['last_activity'] > 
             <h3>Feltöltés dátuma:<span class="data-request-date">2025-01-01</span></h3>
             <h3>Leírás:</h3>
             <p class="data-request-description">Itt van a kérelem részletes leírása. Ez a szöveg több soros is lehet, és részletes információkat tartalmazhat a kérelemről.</p>
-            <!-- Generálandó rész vége -->
             <hr>
             <div class="modal_footer">
                 <button class="button modal_delete_button" aria-label="Kérelem törlése">
@@ -281,11 +283,11 @@ if (isset($_SESSION['last_activity']) && (time() - $_SESSION['last_activity'] > 
         </div>
     </div>
     <div class="modal own_completed_requests_modal">
+        <!-- Saját teljesített kérelem részletei modal -->
         <div class="modal_content">
             <button class="button small_button modal_close_button" aria-label="Bezárás">
                 <img src="icons/close.svg" alt="Bezárás">
             </button>
-            <!-- Saját teljesített kérelem részletei, adatok később PHP-vel generálandó -->
             <h2 class="data-request-title">Kérelem címe</h2>
             <hr>
             <h2>Kérelemhez feltöltött fájl részletei</h2>
@@ -309,7 +311,6 @@ if (isset($_SESSION['last_activity']) && (time() - $_SESSION['last_activity'] > 
             </h3>
             <h3>Leírás:</h3>
             <p class="data-file-description">Itt van a fájl részletes leírása. Ez a szöveg több soros is lehet, és részletes információkat tartalmazhat a fájlról.</p>
-            <!-- Generálandó rész vége -->
             <hr>
             <div class="modal_footer">
                 <button class="button modal_accept_button" aria-label="Kérelem lezárása">
@@ -328,13 +329,13 @@ if (isset($_SESSION['last_activity']) && (time() - $_SESSION['last_activity'] > 
         </div>
     </div>
     <div class="modal small_modal edit_file_modal">
+        <!-- Fájl szerkesztése modal -->
         <div class="modal_content small_modal_content">
             <button class="button small_button edit_close_button" aria-label="Bezárás">
                 <img src="icons/close.svg" alt="Bezárás">
             </button>
             <h2>Fájl szerkesztése</h2>
             <hr>
-            <!-- Fájl szerkesztő űrlap, később PHP-vel generálandó az alapértelmezett érték -->
             <form id="editFileForm" action="" method="post" enctype="multipart/form-data">
                 <label for="fileTitle">Fájl címe:</label>
                 <input type="text" id="fileTitle" name="file_title" value="Fájl címe" required>
@@ -346,7 +347,7 @@ if (isset($_SESSION['last_activity']) && (time() - $_SESSION['last_activity'] > 
                 </div>
                 <div id="file_upload_section" style="display: none;">
                     <label for="fileUpload">Fájl kiválasztása:</label>
-                    <input type="file" id="fileUpload" name="file_upload" accept=".pdf,.doc,.docx,.txt,.xls,.xlsx" required>
+                    <input type="file" id="fileUpload" name="file_upload" accept=".pdf,.doc,.docx,.txt,.xls,.xlsx">
                 </div>
                 <hr>
                 <div class="modal_footer">
@@ -360,17 +361,16 @@ if (isset($_SESSION['last_activity']) && (time() - $_SESSION['last_activity'] > 
                     </button>
                 </div>
             </form>
-            <!-- Generálandó rész vége -->
         </div>
     </div>
     <div class="modal small_modal edit_request_modal">
+        <!-- Kérelem szerkesztése modal -->
         <div class="modal_content small_modal_content">
             <button class="button small_button edit_close_button" aria-label="Bezárás">
                 <img src="icons/close.svg" alt="Bezárás">
             </button>
             <h2>Kérelem szerkesztése</h2>
             <hr>
-            <!-- Kérelem szerkesztő űrlap, később PHP-vel generálandó az alapértelmezett érték -->
             <form id="editRequestForm" action="" method="post">
                 <label for="requestTitle">Kérelem címe:</label>
                 <input type="text" id="requestTitle" name="request_title" value="Kérelem címe" required>
@@ -388,17 +388,16 @@ if (isset($_SESSION['last_activity']) && (time() - $_SESSION['last_activity'] > 
                     </button>
                 </div>
             </form>
-            <!-- Generálandó rész vége -->
         </div>
     </div>
     <div class="modal small_modal edit_chatroom_modal">
+        <!-- Chatszoba szerkesztése modal -->
         <div class="modal_content small_modal_content">
             <button class="button small_button edit_close_button" aria-label="Bezárás">
                 <img src="icons/close.svg" alt="Bezárás">
             </button>
             <h2>Chatszoba szerkesztése</h2>
             <hr>
-            <!-- Chatszoba szerkesztő űrlap, később PHP-vel generálandó az alapértelmezett érték -->
             <form id="editChatroomForm" action="" method="post">
                 <label for="chatroomTitle">Chatszoba címe:</label>
                 <input type="text" id="chatroomTitle" name="chatroom_title" value="Chatszoba címe" required>
@@ -416,7 +415,6 @@ if (isset($_SESSION['last_activity']) && (time() - $_SESSION['last_activity'] > 
                     </button>
                 </div>
             </form>
-            <!-- Generálandó rész vége -->
         </div>
     </div>
     <script type="text/javascript" src="scripts.js"></script>

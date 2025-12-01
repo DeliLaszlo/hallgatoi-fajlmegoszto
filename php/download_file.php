@@ -35,8 +35,9 @@ try {
         die('A fájl nem található!');
     }
     
-    // Fájl útvonal összeállítása
-    $filePath = $file['path_to_file'] . '/' . $file['file_name'];
+    // Fájl útvonal összeállítása (projekt gyökérkönyvtárhoz képest)
+    $pathToFile = ltrim($file['path_to_file'], '/'); // Eltávolítjuk a kezdő perjelet ha van
+    $filePath = __DIR__ . '/../' . $pathToFile . $file['file_name'];
     
     // Ellenőrizzük, hogy létezik-e a fájl
     if (!file_exists($filePath)) {
@@ -44,15 +45,8 @@ try {
         die('A fájl nem található a szerveren!');
     }
     
-    // Növeljük a letöltések számát (csak ha nem a saját fájlját tölti le)
-    if ($file['neptun'] !== $neptun) {
-        $updateStmt = $pdo->prepare("
-            UPDATE upload 
-            SET downloads = downloads + 1 
-            WHERE up_id = :up_id
-        ");
-        $updateStmt->execute([':up_id' => $up_id]);
-    }
+    // A letöltések számát az increment_download.php kezeli külön AJAX hívással
+    // így a frontend frissíteni tudja a UI-t is
     
     // Fájl típus meghatározása
     $finfo = finfo_open(FILEINFO_MIME_TYPE);

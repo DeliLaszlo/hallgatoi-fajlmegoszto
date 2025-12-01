@@ -31,6 +31,7 @@ try {
     if ($mode === 'upload') {
         // 1. Mód: up_id alapján
         $up_id = intval($id);
+        $user_neptun = $_SESSION['user_neptun'];
         
         $query = "SELECT 
                     u.up_id,
@@ -44,14 +45,16 @@ try {
                     u.class_code,
                     u.path_to_file,
                     u.upload_date,
-                    u.downloads
+                    u.downloads,
+                    uv.value as user_vote
                   FROM upload u
                   INNER JOIN user usr ON u.neptun = usr.neptun_k
                   INNER JOIN class c ON u.class_code = c.class_code
+                  LEFT JOIN user_votes uv ON u.up_id = uv.upload_id AND uv.neptun_k = ?
                   WHERE u.up_id = ?";
         
         $stmt = $conn->prepare($query);
-        $stmt->bind_param("i", $up_id);
+        $stmt->bind_param("si", $user_neptun, $up_id);
         $stmt->execute();
         $result = $stmt->get_result();
         
@@ -77,7 +80,8 @@ try {
                 'downloads' => $row['downloads'],
                 'rating' => $row['rating'],
                 'description' => $row['description'],
-                'path_to_file' => $row['path_to_file']
+                'path_to_file' => $row['path_to_file'],
+                'user_vote' => $row['user_vote']
             ]
         ];
         
@@ -86,6 +90,7 @@ try {
     } elseif ($mode === 'request') {
         // 2. Mód: request_id alapján
         $request_id = intval($id);
+        $user_neptun = $_SESSION['user_neptun'];
         
         $query = "SELECT 
                     u.up_id,
@@ -102,16 +107,18 @@ try {
                     r.request_name,
                     r.description as request_description,
                     u.upload_date,
-                    u.downloads
+                    u.downloads,
+                    uv.value as user_vote
                   FROM upload_request ur
                   INNER JOIN upload u ON ur.upload_id = u.up_id
                   INNER JOIN user usr ON u.neptun = usr.neptun_k
                   INNER JOIN class c ON u.class_code = c.class_code
                   INNER JOIN request r ON ur.request_id = r.request_id
+                  LEFT JOIN user_votes uv ON u.up_id = uv.upload_id AND uv.neptun_k = ?
                   WHERE ur.request_id = ?";
         
         $stmt = $conn->prepare($query);
-        $stmt->bind_param("i", $request_id);
+        $stmt->bind_param("si", $user_neptun, $request_id);
         $stmt->execute();
         $result = $stmt->get_result();
         
@@ -141,7 +148,8 @@ try {
                 'path_to_file' => $row['path_to_file'],
                 'status' => $row['status'],
                 'request_name' => $row['request_name'],
-                'request_description' => $row['request_description']
+                'request_description' => $row['request_description'],
+                'user_vote' => $row['user_vote']
             ]
         ];
         

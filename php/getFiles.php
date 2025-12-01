@@ -81,21 +81,23 @@ try {
                     u.rating,
                     u.class_code,
                     u.upload_date,
-                    u.downloads
+                    u.downloads,
+                    uv.value as user_vote
                   FROM upload u
                   INNER JOIN user usr ON u.neptun = usr.neptun_k
+                  LEFT JOIN user_votes uv ON u.up_id = uv.upload_id AND uv.neptun_k = ?
                   WHERE u.class_code = ?
                   ORDER BY u.up_id DESC";
         
         $stmt = $conn->prepare($query);
-        $stmt->bind_param("s", $class_code);
+        $stmt->bind_param("ss", $user_neptun, $class_code);
         $stmt->execute();
         $result = $stmt->get_result();
         
         $files = [];
         while ($row = $result->fetch_assoc()) {
             // Ellenőrizzük, hogy a felhasználó saját fájlja-e
-            $is_own = ($row['uploader_neptun'] === $user_neptun);
+            $is_own = (strtoupper($row['uploader_neptun']) === strtoupper($user_neptun));
             
             $files[] = [
                 'up_id' => $row['up_id'],
@@ -108,7 +110,8 @@ try {
                 'downloads' => $row['downloads'],
                 'rating' => $row['rating'],
                 'is_own' => $is_own,
-                'class_code' => $row['class_code']
+                'class_code' => $row['class_code'],
+                'user_vote' => $row['user_vote'] !== null ? (int)$row['user_vote'] : null
             ];
         }
         

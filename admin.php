@@ -7,7 +7,7 @@ if (!isset($_SESSION['user_neptun'])) {
 }
 $inactive_limit = 1800; // 30 perc inaktivitás
 if (isset($_SESSION['last_activity']) && (time() - $_SESSION['last_activity'] > $inactive_limit)) {
-    header("Location: logout.php");
+    header("Location: php/logout.php");
     exit();
 } else {
     $_SESSION['last_activity'] = time();
