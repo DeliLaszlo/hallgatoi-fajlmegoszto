@@ -33,7 +33,7 @@ $stmt->bind_param("ssss", $neptun, $class_code, $title, $comment);
 
 if ($stmt->execute()) {
     echo '<script>
-    alert("A kérvény ffeltöltése sikeres!");
+    alert("A kérvény feltöltése sikeres!");
     history.back();
     </script>';
 } 
@@ -41,3 +41,4 @@ else {
     echo '<script>alert("A kérvény feltöltése sikertelen!");history.back();</script>';
 }
 ?>
+
