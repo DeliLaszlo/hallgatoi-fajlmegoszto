@@ -138,6 +138,12 @@ try {
     } elseif ($mode === 'all') {
         // 3. Mód: Összes chatszoba lekérdezése admin számára
         
+        // Admin jogosultság ellenőrzése
+        if (!isset($_SESSION['isAdmin']) || $_SESSION['isAdmin'] !== true) {
+            echo json_encode(['success' => false, 'message' => 'Nincs admin jogosultság']);
+            exit();
+        }
+        
         $query = "SELECT 
                     ch.room_id,
                     ch.title,

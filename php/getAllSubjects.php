@@ -9,7 +9,12 @@ if (!isset($_SESSION['user_neptun'])) {
     exit();
 }
 
-// Később admin ellenőrzés
+// Admin jogosultság ellenőrzése
+if (!isset($_SESSION['isAdmin']) || $_SESSION['isAdmin'] !== true) {
+    http_response_code(403);
+    echo json_encode(['error' => 'Nincs admin jogosultság']);
+    exit();
+}
 
 require_once __DIR__ . '/../config.php';
 $conn = getMysqliConnection();

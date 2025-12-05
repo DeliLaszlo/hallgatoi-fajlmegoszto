@@ -55,7 +55,16 @@ try {
     if (password_verify($password, $row['password'])) {
         $_SESSION['user_neptun'] = $neptun;
         $_SESSION['last_activity'] = time();
-        echo json_encode(['success' => true, 'message' => 'Sikeres bejelentkezés!']);
+        
+        // Admin ellenőrzés
+        $isAdmin = ($neptun === 'admin1');
+        if ($isAdmin) {
+            $_SESSION['isAdmin'] = true;
+        } else {
+            unset($_SESSION['isAdmin']);
+        }
+        
+        echo json_encode(['success' => true, 'message' => 'Sikeres bejelentkezés!', 'isAdmin' => $isAdmin]);
     } else {
         echo json_encode(['success' => false, 'field' => '', 'error' => 'Helytelen Neptun kód vagy jelszó!']);
     }

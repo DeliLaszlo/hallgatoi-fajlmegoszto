@@ -10,7 +10,12 @@ if (!isset($_SESSION['user_neptun'])) {
     exit();
 }
 
-// Később admin ellenőrzés
+// Admin jogosultság ellenőrzése
+if (!isset($_SESSION['isAdmin']) || $_SESSION['isAdmin'] !== true) {
+    http_response_code(403);
+    echo json_encode(['success' => false, 'message' => 'Nincs admin jogosultság']);
+    exit();
+}
 
 try {
     $query = "SELECT 

@@ -1,8 +1,12 @@
 <?php
 session_start();
 if (!isset($_SESSION['user_neptun'])) {
-    // Később admin ellenőrzés hozzáadása
     header("Location: log_reg.php");
+    exit();
+}
+// Admin jogosultság ellenőrzése
+if (!isset($_SESSION['isAdmin']) || $_SESSION['isAdmin'] !== true) {
+    header("Location: dashboard.php");
     exit();
 }
 $inactive_limit = 1800; // 30 perc inaktivitás

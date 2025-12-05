@@ -119,6 +119,12 @@ try {
     } elseif ($mode === 'all') {
         // 3. Mód: Összes kérelem lekérdezése admin számára
         
+        // Admin jogosultság ellenőrzése
+        if (!isset($_SESSION['isAdmin']) || $_SESSION['isAdmin'] !== true) {
+            echo json_encode(['success' => false, 'message' => 'Nincs admin jogosultság']);
+            exit();
+        }
+        
         $query = "SELECT 
                     r.request_id,
                     r.request_name,

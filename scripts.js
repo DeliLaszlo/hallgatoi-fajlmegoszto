@@ -942,7 +942,12 @@ document.addEventListener('DOMContentLoaded', function() {
                     setTimeout(() => {
                         hideLoading();
                         // Sikeres bejelentkezés - átirányítás
-                        window.location.href = 'dashboard.php';
+                        // Admin átirányítás admin.php-ra, egyébként dashboard.php-ra
+                        if (result.isAdmin) {
+                            window.location.href = 'admin.php';
+                        } else {
+                            window.location.href = 'dashboard.php';
+                        }
                     }, 1250);
                 } else {
                     setTimeout(() => {
