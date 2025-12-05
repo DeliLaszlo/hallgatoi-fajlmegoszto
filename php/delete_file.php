@@ -35,28 +35,49 @@ if (!isset($data['up_id']) || empty($data['up_id'])) {
 
 $up_id = $data['up_id'];
 $neptun = $_SESSION['user_neptun'];
+$isAdmin = isset($_SESSION['isAdmin']) && $_SESSION['isAdmin'] === true;
+$adminMode = isset($data['admin_mode']) && $data['admin_mode'] === true;
+
+// Ha admin módban akarunk törölni, ellenőrizzük az admin jogosultságot
+if ($adminMode && !$isAdmin) {
+    echo json_encode([
+        'success' => false,
+        'error' => 'Nincs admin jogosultság!'
+    ]);
+    exit();
+}
 
 try {
     require_once __DIR__ . '/../config.php';
     $pdo = getPdoConnection();
     
-    // Ellenőrizzük, hogy a felhasználó feltöltötte-e ezt a fájlt
-    $stmt = $pdo->prepare("
-        SELECT up_id, path_to_file, file_name 
-        FROM upload 
-        WHERE up_id = :up_id AND neptun = :neptun
-    ");
-    $stmt->execute([
-        ':up_id' => $up_id,
-        ':neptun' => $neptun
-    ]);
+    // Admin módban bármely fájlt törölhetjük, egyébként csak a sajátunkat
+    if ($adminMode && $isAdmin) {
+        $stmt = $pdo->prepare("
+            SELECT up_id, path_to_file, file_name 
+            FROM upload 
+            WHERE up_id = :up_id
+        ");
+        $stmt->execute([':up_id' => $up_id]);
+    } else {
+        // Ellenőrizzük, hogy a felhasználó feltöltötte-e ezt a fájlt
+        $stmt = $pdo->prepare("
+            SELECT up_id, path_to_file, file_name 
+            FROM upload 
+            WHERE up_id = :up_id AND neptun = :neptun
+        ");
+        $stmt->execute([
+            ':up_id' => $up_id,
+            ':neptun' => $neptun
+        ]);
+    }
     
     $file = $stmt->fetch();
     
     if (!$file) {
         echo json_encode([
             'success' => false,
-            'error' => 'Nem te töltötted fel ezt a fájlt, vagy nem létezik!'
+            'error' => $adminMode ? 'A fájl nem létezik!' : 'Nem te töltötted fel ezt a fájlt, vagy nem létezik!'
         ]);
         exit();
     }
@@ -75,15 +96,30 @@ try {
     ");
     $deleteVotesStmt->execute([':up_id' => $up_id]);
     
-    // Töröljük a fájlt az upload táblából
-    $deleteStmt = $pdo->prepare("
-        DELETE FROM upload 
-        WHERE up_id = :up_id AND neptun = :neptun
+    // Töröljük a kapcsolódó jelentéseket a report táblából
+    $deleteReportsStmt = $pdo->prepare("
+        DELETE FROM report 
+        WHERE reported_table = 'upload' AND reported_id = :up_id
     ");
-    $deleteStmt->execute([
-        ':up_id' => $up_id,
-        ':neptun' => $neptun
-    ]);
+    $deleteReportsStmt->execute([':up_id' => $up_id]);
+    
+    // Töröljük a fájlt az upload táblából
+    if ($adminMode && $isAdmin) {
+        $deleteStmt = $pdo->prepare("
+            DELETE FROM upload 
+            WHERE up_id = :up_id
+        ");
+        $deleteStmt->execute([':up_id' => $up_id]);
+    } else {
+        $deleteStmt = $pdo->prepare("
+            DELETE FROM upload 
+            WHERE up_id = :up_id AND neptun = :neptun
+        ");
+        $deleteStmt->execute([
+            ':up_id' => $up_id,
+            ':neptun' => $neptun
+        ]);
+    }
     
     // Opcionális: Töröljük a fizikai fájlt a szerverről
     // Ha a path_to_file és file_name megfelelően van beállítva

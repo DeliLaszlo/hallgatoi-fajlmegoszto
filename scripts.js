@@ -4772,6 +4772,9 @@ document.addEventListener('click', function(e) {
         if (reportType === 'upload') {
             const modal = document.querySelector('.reported_file_details_modal');
             if (modal) {
+                modal.setAttribute('data-up-id', report.reported_id);
+                modal.setAttribute('data-report-id', report.report_id);
+                modal.setAttribute('data-creator-neptun', report.item_creator_neptun || '');
                 modal.querySelector('.data-report-title').textContent = report.item_name || 'Nincs megadva';
                 modal.querySelector('.data-report-name').textContent = report.file_name || 'Nincs megadva';
                 modal.querySelector('.data-report-uploader').textContent = `${report.item_creator_name} (${report.item_creator_neptun})`;
@@ -4783,6 +4786,9 @@ document.addEventListener('click', function(e) {
         } else if (reportType === 'chatroom') {
             const modal = document.querySelector('.reported_chatroom_details_modal');
             if (modal) {
+                modal.setAttribute('data-room-id', report.reported_id);
+                modal.setAttribute('data-report-id', report.report_id);
+                modal.setAttribute('data-creator-neptun', report.item_creator_neptun || '');
                 modal.querySelector('.data-report-title').textContent = report.item_name || 'Nincs megadva';
                 modal.querySelector('.data-report-creator').textContent = `${report.item_creator_name} (${report.item_creator_neptun || 'N/A'})`;
                 modal.querySelector('.data-report-description').textContent = report.item_description || 'Nincs leírás';
@@ -4793,6 +4799,9 @@ document.addEventListener('click', function(e) {
         } else if (reportType === 'request') {
             const modal = document.querySelector('.reported_request_details_modal');
             if (modal) {
+                modal.setAttribute('data-request-id', report.reported_id);
+                modal.setAttribute('data-report-id', report.report_id);
+                modal.setAttribute('data-creator-neptun', report.item_creator_neptun || '');
                 modal.querySelector('.data-report-title').textContent = report.item_name || 'Nincs megadva';
                 modal.querySelector('.data-report-requester').textContent = `${report.item_creator_name} (${report.item_creator_neptun})`;
                 modal.querySelector('.data-report-description').textContent = report.item_description || 'Nincs leírás';
@@ -5359,6 +5368,1183 @@ document.addEventListener('click', function(e) {
                 container.style.display = 'none';
             }
         });
+    });
+
+    // =========================
+    // ADMIN FÁJL LETÖLTÉSE
+    // =========================
+    document.addEventListener('click', function(e) {
+        const downloadButton = e.target.closest('.admin_file_container .file_download_button');
+        if (!downloadButton) return;
+        
+        e.preventDefault();
+        e.stopPropagation();
+        
+        const fileId = downloadButton.getAttribute('data-file-id');
+        if (!fileId) {
+            alert('Hiba: Nem található a fájl azonosító!');
+            return;
+        }
+        
+        // Letöltés indítása
+        downloadFile(fileId);
+    });
+
+    // =========================
+    // ADMIN FÁJL TÖRLÉSE
+    // =========================
+    document.addEventListener('click', async function(e) {
+        const deleteButton = e.target.closest('.admin_file_container .file_delete_button');
+        if (!deleteButton) return;
+        
+        e.preventDefault();
+        e.stopPropagation();
+        
+        const fileId = deleteButton.getAttribute('data-file-id');
+        if (!fileId) {
+            alert('Hiba: Nem található a fájl azonosító!');
+            return;
+        }
+        
+        if (!confirm('Biztosan törölni szeretnéd ezt a fájlt?')) {
+            return;
+        }
+        
+        try {
+            showLoading('Fájl törlése...');
+            
+            const response = await fetch('php/delete_file.php', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ 
+                    up_id: fileId,
+                    admin_mode: true
+                })
+            });
+            
+            const result = await response.json();
+            
+            setTimeout(() => {
+                hideLoading();
+                
+                if (result.success) {
+                    // Eltávolítjuk a fájl elemet a listából
+                    const fileContainer = deleteButton.closest('.admin_file_container');
+                    if (fileContainer) {
+                        fileContainer.remove();
+                    }
+                    // Frissítjük a latestActivitiesData-t és reportsData-t
+                    if (latestActivitiesData && latestActivitiesData.files) {
+                        latestActivitiesData.files = latestActivitiesData.files.filter(f => f.id != fileId);
+                        displayLatestActivities('files');
+                    }
+                    if (reportsData) {
+                        reportsData = reportsData.filter(r => !(r.reported_table === 'upload' && r.reported_id == fileId));
+                        displayReports('all');
+                    }
+                } else {
+                    alert(result.error || 'Hiba történt a törlés során!');
+                }
+            }, 1250);
+            
+        } catch (error) {
+            hideLoading();
+            console.error('Hiba:', error);
+            alert('Hiba történt a törlés során!');
+        }
+    });
+
+    // =========================
+    // ADMIN KÉRELEM TÖRLÉSE
+    // =========================
+    document.addEventListener('click', async function(e) {
+        const deleteButton = e.target.closest('.admin_request_container .request_delete_button');
+        if (!deleteButton) return;
+        
+        e.preventDefault();
+        e.stopPropagation();
+        
+        const requestId = deleteButton.getAttribute('data-request-id');
+        if (!requestId) {
+            alert('Hiba: Nem található a kérelem azonosító!');
+            return;
+        }
+        
+        if (!confirm('Biztosan törölni szeretnéd ezt a kérelmet?')) {
+            return;
+        }
+        
+        try {
+            showLoading('Kérelem törlése...');
+            
+            const response = await fetch('php/delete_request.php', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ 
+                    request_id: requestId,
+                    admin_mode: true
+                })
+            });
+            
+            const result = await response.json();
+            
+            setTimeout(() => {
+                hideLoading();
+                
+                if (result.success) {
+                    // Eltávolítjuk a kérelem elemet a listából
+                    const requestContainer = deleteButton.closest('.admin_request_container');
+                    if (requestContainer) {
+                        requestContainer.remove();
+                    }
+                    // Frissítjük a latestActivitiesData-t és reportsData-t
+                    if (latestActivitiesData && latestActivitiesData.requests) {
+                        latestActivitiesData.requests = latestActivitiesData.requests.filter(r => r.id != requestId);
+                        displayLatestActivities('requests');
+                    }
+                    if (reportsData) {
+                        reportsData = reportsData.filter(r => !(r.reported_table === 'request' && r.reported_id == requestId));
+                        displayReports('all');
+                    }
+                } else {
+                    alert(result.error || 'Hiba történt a törlés során!');
+                }
+            }, 1250);
+            
+        } catch (error) {
+            hideLoading();
+            console.error('Hiba:', error);
+            alert('Hiba történt a törlés során!');
+        }
+    });
+
+    // =========================
+    // ADMIN CHATSZOBA TÖRLÉSE
+    // =========================
+    document.addEventListener('click', async function(e) {
+        const deleteButton = e.target.closest('.admin_chatroom_container .chatroom_delete_button');
+        if (!deleteButton) return;
+        
+        e.preventDefault();
+        e.stopPropagation();
+        
+        const chatroomId = deleteButton.getAttribute('data-chatroom-id');
+        if (!chatroomId) {
+            alert('Hiba: Nem található a chatszoba azonosító!');
+            return;
+        }
+        
+        if (!confirm('Biztosan törölni szeretnéd ezt a chatszobát?')) {
+            return;
+        }
+        
+        try {
+            showLoading('Chatszoba törlése...');
+            
+            const response = await fetch('php/delete_chatroom.php', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ 
+                    room_id: chatroomId,
+                    admin_mode: true
+                })
+            });
+            
+            const result = await response.json();
+            
+            setTimeout(() => {
+                hideLoading();
+                
+                if (result.success) {
+                    // Eltávolítjuk a chatszoba elemet a listából
+                    const chatroomContainer = deleteButton.closest('.admin_chatroom_container');
+                    if (chatroomContainer) {
+                        chatroomContainer.remove();
+                    }
+                    // Frissítjük a latestActivitiesData-t és reportsData-t
+                    if (latestActivitiesData && latestActivitiesData.chatrooms) {
+                        latestActivitiesData.chatrooms = latestActivitiesData.chatrooms.filter(c => c.id != chatroomId);
+                        displayLatestActivities('chatrooms');
+                    }
+                    if (reportsData) {
+                        reportsData = reportsData.filter(r => !(r.reported_table === 'chatroom' && r.reported_id == chatroomId));
+                        displayReports('all');
+                    }
+                } else {
+                    alert(result.error || 'Hiba történt a törlés során!');
+                }
+            }, 1250);
+            
+        } catch (error) {
+            hideLoading();
+            console.error('Hiba:', error);
+            alert('Hiba történt a törlés során!');
+        }
+    });
+
+    // =========================
+    // ADMIN FELHASZNÁLÓ TÖRLÉSE
+    // =========================
+    document.addEventListener('click', async function(e) {
+        const deleteButton = e.target.closest('.admin_user_container .user_delete_button');
+        if (!deleteButton) return;
+        
+        e.preventDefault();
+        e.stopPropagation();
+        
+        const neptun = deleteButton.getAttribute('data-neptun');
+        if (!neptun) {
+            alert('Hiba: Nem található a felhasználó azonosító!');
+            return;
+        }
+        
+        if (!confirm('Biztosan törölni szeretnéd ezt a felhasználót? Ez törli az összes feltöltését, kérelmét, chatszobáját és üzenetét is!')) {
+            return;
+        }
+        
+        try {
+            showLoading('Felhasználó törlése...');
+            
+            const response = await fetch('php/delete_user.php', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ 
+                    neptun: neptun
+                })
+            });
+            
+            const result = await response.json();
+            
+            setTimeout(() => {
+                hideLoading();
+                
+                if (result.success) {
+                    // Eltávolítjuk a felhasználó elemet a listából
+                    const userContainer = deleteButton.closest('.admin_user_container');
+                    if (userContainer) {
+                        userContainer.remove();
+                    }
+                    // Frissítjük a latestActivitiesData-t és reportsData-t
+                    if (typeof loadLatestActivities === 'function') {
+                        loadLatestActivities();
+                    }
+                    if (typeof loadReports === 'function') {
+                        loadReports();
+                    }
+                } else {
+                    alert(result.error || 'Hiba történt a törlés során!');
+                }
+            }, 1250);
+            
+        } catch (error) {
+            hideLoading();
+            console.error('Hiba:', error);
+            alert('Hiba történt a törlés során!');
+        }
+    });
+
+    // =========================
+    // ADMIN TÁRGY TÖRLÉSE
+    // =========================
+    document.addEventListener('click', async function(e) {
+        const deleteButton = e.target.closest('.admin_subject_container .subject_delete_button');
+        if (!deleteButton) return;
+        
+        e.preventDefault();
+        e.stopPropagation();
+        
+        const classCode = deleteButton.getAttribute('data-class-code');
+        if (!classCode) {
+            alert('Hiba: Nem található a tárgy azonosító!');
+            return;
+        }
+        
+        if (!confirm('Biztosan törölni szeretnéd ezt a tárgyat? Ez törli az összes hozzá tartozó feltöltést, kérelmet, chatszobát és üzenetet is!')) {
+            return;
+        }
+        
+        try {
+            showLoading('Tárgy törlése...');
+            
+            const response = await fetch('php/delete_subject.php', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ 
+                    class_code: classCode,
+                    admin_mode: true
+                })
+            });
+            
+            const result = await response.json();
+            
+            setTimeout(() => {
+                hideLoading();
+                
+                if (result.success) {
+                    // Eltávolítjuk a tárgy elemet a listából
+                    const subjectContainer = deleteButton.closest('.admin_subject_container');
+                    if (subjectContainer) {
+                        subjectContainer.remove();
+                    }
+                    // Frissítjük a latestActivitiesData-t és reportsData-t
+                    if (typeof loadLatestActivities === 'function') {
+                        loadLatestActivities();
+                    }
+                    if (typeof loadReports === 'function') {
+                        loadReports();
+                    }
+                } else {
+                    alert(result.error || 'Hiba történt a törlés során!');
+                }
+            }, 1250);
+            
+        } catch (error) {
+            hideLoading();
+            console.error('Hiba:', error);
+            alert('Hiba történt a törlés során!');
+        }
+    });
+
+    // =========================
+    // LATEST ACTIVITIES TÖRLÉS
+    // =========================
+    
+    // Legutóbbi aktivitások - Fájl törlése
+    document.addEventListener('click', async function(e) {
+        const deleteButton = e.target.closest('#latest_activities_container .file_delete_button');
+        if (!deleteButton) return;
+        
+        e.preventDefault();
+        e.stopPropagation();
+        
+        const fileId = deleteButton.getAttribute('data-file-id');
+        if (!fileId) {
+            alert('Hiba: Nem található a fájl azonosító!');
+            return;
+        }
+        
+        if (!confirm('Biztosan törölni szeretnéd ezt a fájlt?')) {
+            return;
+        }
+        
+        try {
+            showLoading('Fájl törlése...');
+            
+            const response = await fetch('php/delete_file.php', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ 
+                    up_id: fileId,
+                    admin_mode: true
+                })
+            });
+            
+            const result = await response.json();
+            
+            setTimeout(() => {
+                hideLoading();
+                
+                if (result.success) {
+                    // Eltávolítjuk a fájlt a latestActivitiesData-ból is
+                    if (latestActivitiesData && latestActivitiesData.files) {
+                        latestActivitiesData.files = latestActivitiesData.files.filter(f => f.id != fileId);
+                    }
+                    // Eltávolítjuk a reportsData-ból is
+                    if (reportsData) {
+                        reportsData = reportsData.filter(r => !(r.reported_table === 'upload' && r.reported_id == fileId));
+                    }
+                    const container = deleteButton.closest('.content_container');
+                    if (container) {
+                        container.remove();
+                    }
+                } else {
+                    alert(result.error || 'Hiba történt a törlés során!');
+                }
+            }, 1250);
+            
+        } catch (error) {
+            hideLoading();
+            console.error('Hiba:', error);
+            alert('Hiba történt a törlés során!');
+        }
+    });
+
+    // Legutóbbi aktivitások - Kérelem törlése
+    document.addEventListener('click', async function(e) {
+        const deleteButton = e.target.closest('#latest_activities_container .request_delete_button');
+        if (!deleteButton) return;
+        
+        e.preventDefault();
+        e.stopPropagation();
+        
+        const requestId = deleteButton.getAttribute('data-request-id');
+        if (!requestId) {
+            alert('Hiba: Nem található a kérelem azonosító!');
+            return;
+        }
+        
+        if (!confirm('Biztosan törölni szeretnéd ezt a kérelmet?')) {
+            return;
+        }
+        
+        try {
+            showLoading('Kérelem törlése...');
+            
+            const response = await fetch('php/delete_request.php', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ 
+                    request_id: requestId,
+                    admin_mode: true
+                })
+            });
+            
+            const result = await response.json();
+            
+            setTimeout(() => {
+                hideLoading();
+                
+                if (result.success) {
+                    // Eltávolítjuk a kérelmet a latestActivitiesData-ból is
+                    if (latestActivitiesData && latestActivitiesData.requests) {
+                        latestActivitiesData.requests = latestActivitiesData.requests.filter(r => r.id != requestId);
+                    }
+                    // Eltávolítjuk a reportsData-ból is
+                    if (reportsData) {
+                        reportsData = reportsData.filter(r => !(r.reported_table === 'request' && r.reported_id == requestId));
+                    }
+                    const container = deleteButton.closest('.content_container');
+                    if (container) {
+                        container.remove();
+                    }
+                } else {
+                    alert(result.error || 'Hiba történt a törlés során!');
+                }
+            }, 1250);
+            
+        } catch (error) {
+            hideLoading();
+            console.error('Hiba:', error);
+            alert('Hiba történt a törlés során!');
+        }
+    });
+
+    // Legutóbbi aktivitások - Chatszoba törlése
+    document.addEventListener('click', async function(e) {
+        const deleteButton = e.target.closest('#latest_activities_container .chatroom_delete_button');
+        if (!deleteButton) return;
+        
+        e.preventDefault();
+        e.stopPropagation();
+        
+        const chatroomId = deleteButton.getAttribute('data-chatroom-id');
+        if (!chatroomId) {
+            alert('Hiba: Nem található a chatszoba azonosító!');
+            return;
+        }
+        
+        if (!confirm('Biztosan törölni szeretnéd ezt a chatszobát?')) {
+            return;
+        }
+        
+        try {
+            showLoading('Chatszoba törlése...');
+            
+            const response = await fetch('php/delete_chatroom.php', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ 
+                    room_id: chatroomId,
+                    admin_mode: true
+                })
+            });
+            
+            const result = await response.json();
+            
+            setTimeout(() => {
+                hideLoading();
+                
+                if (result.success) {
+                    // Eltávolítjuk a chatszobát a latestActivitiesData-ból is
+                    if (latestActivitiesData && latestActivitiesData.chatrooms) {
+                        latestActivitiesData.chatrooms = latestActivitiesData.chatrooms.filter(c => c.id != chatroomId);
+                    }
+                    // Eltávolítjuk a reportsData-ból is
+                    if (reportsData) {
+                        reportsData = reportsData.filter(r => !(r.reported_table === 'chatroom' && r.reported_id == chatroomId));
+                    }
+                    const container = deleteButton.closest('.content_container');
+                    if (container) {
+                        container.remove();
+                    }
+                } else {
+                    alert(result.error || 'Hiba történt a törlés során!');
+                }
+            }, 1250);
+            
+        } catch (error) {
+            hideLoading();
+            console.error('Hiba:', error);
+            alert('Hiba történt a törlés során!');
+        }
+    });
+
+    // =========================
+    // FILE DETAILS MODAL TÖRLÉS
+    // =========================
+    document.addEventListener('click', async function(e) {
+        const deleteButton = e.target.closest('.file_details_modal .delete_button');
+        if (!deleteButton) return;
+        
+        e.preventDefault();
+        e.stopPropagation();
+        
+        const modal = deleteButton.closest('.file_details_modal');
+        const fileId = modal ? modal.getAttribute('data-up-id') : null;
+        
+        if (!fileId) {
+            alert('Hiba: Nem található a fájl azonosító!');
+            return;
+        }
+        
+        if (!confirm('Biztosan törölni szeretnéd ezt a fájlt?')) {
+            return;
+        }
+        
+        try {
+            showLoading('Fájl törlése...');
+            
+            const response = await fetch('php/delete_file.php', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ 
+                    up_id: fileId,
+                    admin_mode: true
+                })
+            });
+            
+            const result = await response.json();
+            
+            setTimeout(() => {
+                hideLoading();
+                
+                if (result.success) {
+                    modal.classList.add('hidden');
+                    // Eltávolítjuk a fájlt a latestActivitiesData-ból is
+                    if (latestActivitiesData && latestActivitiesData.files) {
+                        latestActivitiesData.files = latestActivitiesData.files.filter(f => f.id != fileId);
+                    }
+                    // Eltávolítjuk a reportsData-ból is
+                    if (reportsData) {
+                        reportsData = reportsData.filter(r => !(r.reported_table === 'upload' && r.reported_id == fileId));
+                    }
+                    // Fríssítjük a legutóbbi aktivitásokat
+                    displayLatestActivities('files');
+                } else {
+                    alert(result.error || 'Hiba történt a törlés során!');
+                }
+            }, 1250);
+            
+        } catch (error) {
+            hideLoading();
+            console.error('Hiba:', error);
+            alert('Hiba történt a törlés során!');
+        }
+    });
+
+    // =========================
+    // REPORT MODAL - FÁJL TÖRLÉSE
+    // =========================
+    document.addEventListener('click', async function(e) {
+        const deleteButton = e.target.closest('.reported_file_details_modal .delete_button');
+        if (!deleteButton) return;
+        
+        e.preventDefault();
+        e.stopPropagation();
+        
+        const modal = deleteButton.closest('.reported_file_details_modal');
+        const fileId = modal ? modal.getAttribute('data-up-id') : null;
+        
+        if (!fileId) {
+            alert('Hiba: Nem található a fájl azonosító!');
+            return;
+        }
+        
+        if (!confirm('Biztosan törölni szeretnéd ezt a fájlt?')) {
+            return;
+        }
+        
+        try {
+            showLoading('Fájl törlése...');
+            
+            const response = await fetch('php/delete_file.php', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ 
+                    up_id: fileId,
+                    admin_mode: true
+                })
+            });
+            
+            const result = await response.json();
+            
+            setTimeout(() => {
+                hideLoading();
+                
+                if (result.success) {
+                    modal.classList.add('hidden');
+                    // Eltávolítjuk a fájlt a latestActivitiesData-ból is
+                    if (latestActivitiesData && latestActivitiesData.files) {
+                        latestActivitiesData.files = latestActivitiesData.files.filter(f => f.id != fileId);
+                    }
+                    // Eltávolítjuk a reportsData-ból is
+                    if (reportsData) {
+                        reportsData = reportsData.filter(r => !(r.reported_table === 'upload' && r.reported_id == fileId));
+                    }
+                    // Fríssítjük a jelentéseket
+                    displayReports('all');
+                } else {
+                    alert(result.error || 'Hiba történt a törlés során!');
+                }
+            }, 1250);
+            
+        } catch (error) {
+            hideLoading();
+            console.error('Hiba:', error);
+            alert('Hiba történt a törlés során!');
+        }
+    });
+
+    // =========================
+    // REPORT MODAL - KÉRELEM TÖRLÉSE
+    // =========================
+    document.addEventListener('click', async function(e) {
+        const deleteButton = e.target.closest('.reported_request_details_modal .delete_button');
+        if (!deleteButton) return;
+        
+        e.preventDefault();
+        e.stopPropagation();
+        
+        const modal = deleteButton.closest('.reported_request_details_modal');
+        const requestId = modal ? modal.getAttribute('data-request-id') : null;
+        
+        if (!requestId) {
+            alert('Hiba: Nem található a kérelem azonosító!');
+            return;
+        }
+        
+        if (!confirm('Biztosan törölni szeretnéd ezt a kérelmet?')) {
+            return;
+        }
+        
+        try {
+            showLoading('Kérelem törlése...');
+            
+            const response = await fetch('php/delete_request.php', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ 
+                    request_id: requestId,
+                    admin_mode: true
+                })
+            });
+            
+            const result = await response.json();
+            
+            setTimeout(() => {
+                hideLoading();
+                
+                if (result.success) {
+                    modal.classList.add('hidden');
+                    // Eltávolítjuk a kérelmet a latestActivitiesData-ból is
+                    if (latestActivitiesData && latestActivitiesData.requests) {
+                        latestActivitiesData.requests = latestActivitiesData.requests.filter(r => r.id != requestId);
+                    }
+                    // Eltávolítjuk a reportsData-ból is
+                    if (reportsData) {
+                        reportsData = reportsData.filter(r => !(r.reported_table === 'request' && r.reported_id == requestId));
+                    }
+                    // Fríssítjük a jelentéseket
+                    displayReports('all');
+                } else {
+                    alert(result.error || 'Hiba történt a törlés során!');
+                }
+            }, 1250);
+            
+        } catch (error) {
+            hideLoading();
+            console.error('Hiba:', error);
+            alert('Hiba történt a törlés során!');
+        }
+    });
+
+    // =========================
+    // REPORT MODAL - CHATSZOBA TÖRLÉSE
+    // =========================
+    document.addEventListener('click', async function(e) {
+        const deleteButton = e.target.closest('.reported_chatroom_details_modal .delete_button');
+        if (!deleteButton) return;
+        
+        e.preventDefault();
+        e.stopPropagation();
+        
+        const modal = deleteButton.closest('.reported_chatroom_details_modal');
+        const chatroomId = modal ? modal.getAttribute('data-room-id') : null;
+        
+        if (!chatroomId) {
+            alert('Hiba: Nem található a chatszoba azonosító!');
+            return;
+        }
+        
+        if (!confirm('Biztosan törölni szeretnéd ezt a chatszobát?')) {
+            return;
+        }
+        
+        try {
+            showLoading('Chatszoba törlése...');
+            
+            const response = await fetch('php/delete_chatroom.php', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ 
+                    room_id: chatroomId,
+                    admin_mode: true
+                })
+            });
+            
+            const result = await response.json();
+            
+            setTimeout(() => {
+                hideLoading();
+                
+                if (result.success) {
+                    modal.classList.add('hidden');
+                    // Eltávolítjuk a chatszobát a latestActivitiesData-ból is
+                    if (latestActivitiesData && latestActivitiesData.chatrooms) {
+                        latestActivitiesData.chatrooms = latestActivitiesData.chatrooms.filter(c => c.id != chatroomId);
+                    }
+                    // Eltávolítjuk a reportsData-ból is
+                    if (reportsData) {
+                        reportsData = reportsData.filter(r => !(r.reported_table === 'chatroom' && r.reported_id == chatroomId));
+                    }
+                    // Fríssítjük a jelentéseket
+                    displayReports('all');
+                } else {
+                    alert(result.error || 'Hiba történt a törlés során!');
+                }
+            }, 1250);
+            
+        } catch (error) {
+            hideLoading();
+            console.error('Hiba:', error);
+            alert('Hiba történt a törlés során!');
+        }
+    });
+
+    // =========================
+    // REPORT MODAL - FÁJL FELTÖLTŐ TÖRLÉSE
+    // =========================
+    document.addEventListener('click', async function(e) {
+        const deleteButton = e.target.closest('.reported_file_details_modal .user_delete_button');
+        if (!deleteButton) return;
+        
+        e.preventDefault();
+        e.stopPropagation();
+        
+        const modal = deleteButton.closest('.reported_file_details_modal');
+        const creatorNeptun = modal ? modal.getAttribute('data-creator-neptun') : null;
+        
+        if (!creatorNeptun) {
+            alert('Hiba: Nem található a feltöltő azonosítója!');
+            return;
+        }
+        
+        if (!confirm('Biztosan törölni szeretnéd ezt a felhasználót? Ez törli az összes feltöltését, kérelmét, chatszobáját és üzenetét is!')) {
+            return;
+        }
+        
+        try {
+            showLoading('Felhasználó törlése...');
+            
+            const response = await fetch('php/delete_user.php', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ 
+                    neptun: creatorNeptun
+                })
+            });
+            
+            const result = await response.json();
+            
+            setTimeout(() => {
+                hideLoading();
+                
+                if (result.success) {
+                    modal.classList.add('hidden');
+                    // Frissítjük az összes adatot
+                    if (typeof loadLatestActivities === 'function') {
+                        loadLatestActivities();
+                    }
+                    if (typeof loadReports === 'function') {
+                        loadReports();
+                    }
+                } else {
+                    alert(result.error || 'Hiba történt a törlés során!');
+                }
+            }, 1250);
+            
+        } catch (error) {
+            hideLoading();
+            console.error('Hiba:', error);
+            alert('Hiba történt a törlés során!');
+        }
+    });
+
+    // =========================
+    // REPORT MODAL - KÉRELMEZŐ TÖRLÉSE
+    // =========================
+    document.addEventListener('click', async function(e) {
+        const deleteButton = e.target.closest('.reported_request_details_modal .user_delete_button');
+        if (!deleteButton) return;
+        
+        e.preventDefault();
+        e.stopPropagation();
+        
+        const modal = deleteButton.closest('.reported_request_details_modal');
+        const creatorNeptun = modal ? modal.getAttribute('data-creator-neptun') : null;
+        
+        if (!creatorNeptun) {
+            alert('Hiba: Nem található a kérelmező azonosítója!');
+            return;
+        }
+        
+        if (!confirm('Biztosan törölni szeretnéd ezt a felhasználót? Ez törli az összes feltöltését, kérelmét, chatszobáját és üzenetét is!')) {
+            return;
+        }
+        
+        try {
+            showLoading('Felhasználó törlése...');
+            
+            const response = await fetch('php/delete_user.php', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ 
+                    neptun: creatorNeptun
+                })
+            });
+            
+            const result = await response.json();
+            
+            setTimeout(() => {
+                hideLoading();
+                
+                if (result.success) {
+                    modal.classList.add('hidden');
+                    // Frissítjük az összes adatot
+                    if (typeof loadLatestActivities === 'function') {
+                        loadLatestActivities();
+                    }
+                    if (typeof loadReports === 'function') {
+                        loadReports();
+                    }
+                } else {
+                    alert(result.error || 'Hiba történt a törlés során!');
+                }
+            }, 1250);
+            
+        } catch (error) {
+            hideLoading();
+            console.error('Hiba:', error);
+            alert('Hiba történt a törlés során!');
+        }
+    });
+
+    // =========================
+    // REPORT MODAL - CHATSZOBA LÉTREHOZÓ TÖRLÉSE
+    // =========================
+    document.addEventListener('click', async function(e) {
+        const deleteButton = e.target.closest('.reported_chatroom_details_modal .user_delete_button');
+        if (!deleteButton) return;
+        
+        e.preventDefault();
+        e.stopPropagation();
+        
+        const modal = deleteButton.closest('.reported_chatroom_details_modal');
+        const creatorNeptun = modal ? modal.getAttribute('data-creator-neptun') : null;
+        
+        if (!creatorNeptun) {
+            alert('Hiba: Nem található a létrehozó azonosítója!');
+            return;
+        }
+        
+        if (!confirm('Biztosan törölni szeretnéd ezt a felhasználót? Ez törli az összes feltöltését, kérelmét, chatszobáját és üzenetét is!')) {
+            return;
+        }
+        
+        try {
+            showLoading('Felhasználó törlése...');
+            
+            const response = await fetch('php/delete_user.php', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ 
+                    neptun: creatorNeptun
+                })
+            });
+            
+            const result = await response.json();
+            
+            setTimeout(() => {
+                hideLoading();
+                
+                if (result.success) {
+                    modal.classList.add('hidden');
+                    // Frissítjük az összes adatot
+                    if (typeof loadLatestActivities === 'function') {
+                        loadLatestActivities();
+                    }
+                    if (typeof loadReports === 'function') {
+                        loadReports();
+                    }
+                } else {
+                    alert(result.error || 'Hiba történt a törlés során!');
+                }
+            }, 1250);
+            
+        } catch (error) {
+            hideLoading();
+            console.error('Hiba:', error);
+            alert('Hiba történt a törlés során!');
+        }
+    });
+
+    // =========================
+    // REPORT MODAL - JELENTÉS LEZÁRÁSA (FÁJL)
+    // =========================
+    document.addEventListener('click', async function(e) {
+        const closeButton = e.target.closest('.reported_file_details_modal .finish_report_button');
+        if (!closeButton) return;
+        
+        e.preventDefault();
+        e.stopPropagation();
+        
+        const modal = closeButton.closest('.reported_file_details_modal');
+        const reportId = modal ? modal.getAttribute('data-report-id') : null;
+        
+        if (!reportId) {
+            alert('Hiba: Nem található a jelentés azonosítója!');
+            return;
+        }
+        
+        if (!confirm('Biztosan le szeretnéd zárni ezt a jelentést?')) {
+            return;
+        }
+        
+        try {
+            showLoading('Jelentés lezárása...');
+            
+            const response = await fetch('php/close_report.php', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ 
+                    report_id: reportId
+                })
+            });
+            
+            const result = await response.json();
+            
+            setTimeout(() => {
+                hideLoading();
+                
+                if (result.success) {
+                    modal.classList.add('hidden');
+                    // Eltávolítjuk a jelentést a reportsData-ból
+                    if (reportsData) {
+                        reportsData = reportsData.filter(r => r.report_id != reportId);
+                        displayReports('all');
+                    }
+                } else {
+                    alert(result.error || 'Hiba történt a lezárás során!');
+                }
+            }, 1250);
+            
+        } catch (error) {
+            hideLoading();
+            console.error('Hiba:', error);
+            alert('Hiba történt a lezárás során!');
+        }
+    });
+
+    // =========================
+    // REPORT MODAL - JELENTÉS LEZÁRÁSA (KÉRELEM)
+    // =========================
+    document.addEventListener('click', async function(e) {
+        const closeButton = e.target.closest('.reported_request_details_modal .finish_report_button');
+        if (!closeButton) return;
+        
+        e.preventDefault();
+        e.stopPropagation();
+        
+        const modal = closeButton.closest('.reported_request_details_modal');
+        const reportId = modal ? modal.getAttribute('data-report-id') : null;
+        
+        if (!reportId) {
+            alert('Hiba: Nem található a jelentés azonosítója!');
+            return;
+        }
+        
+        if (!confirm('Biztosan le szeretnéd zárni ezt a jelentést?')) {
+            return;
+        }
+        
+        try {
+            showLoading('Jelentés lezárása...');
+            
+            const response = await fetch('php/close_report.php', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ 
+                    report_id: reportId
+                })
+            });
+            
+            const result = await response.json();
+            
+            setTimeout(() => {
+                hideLoading();
+                
+                if (result.success) {
+                    modal.classList.add('hidden');
+                    // Eltávolítjuk a jelentést a reportsData-ból
+                    if (reportsData) {
+                        reportsData = reportsData.filter(r => r.report_id != reportId);
+                        displayReports('all');
+                    }
+                } else {
+                    alert(result.error || 'Hiba történt a lezárás során!');
+                }
+            }, 1250);
+            
+        } catch (error) {
+            hideLoading();
+            console.error('Hiba:', error);
+            alert('Hiba történt a lezárás során!');
+        }
+    });
+
+    // =========================
+    // REPORT MODAL - JELENTÉS LEZÁRÁSA (CHATSZOBA)
+    // =========================
+    document.addEventListener('click', async function(e) {
+        const closeButton = e.target.closest('.reported_chatroom_details_modal .finish_report_button');
+        if (!closeButton) return;
+        
+        e.preventDefault();
+        e.stopPropagation();
+        
+        const modal = closeButton.closest('.reported_chatroom_details_modal');
+        const reportId = modal ? modal.getAttribute('data-report-id') : null;
+        
+        if (!reportId) {
+            alert('Hiba: Nem található a jelentés azonosítója!');
+            return;
+        }
+        
+        if (!confirm('Biztosan le szeretnéd zárni ezt a jelentést?')) {
+            return;
+        }
+        
+        try {
+            showLoading('Jelentés lezárása...');
+            
+            const response = await fetch('php/close_report.php', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ 
+                    report_id: reportId
+                })
+            });
+            
+            const result = await response.json();
+            
+            setTimeout(() => {
+                hideLoading();
+                
+                if (result.success) {
+                    modal.classList.add('hidden');
+                    // Eltávolítjuk a jelentést a reportsData-ból
+                    if (reportsData) {
+                        reportsData = reportsData.filter(r => r.report_id != reportId);
+                        displayReports('all');
+                    }
+                } else {
+                    alert(result.error || 'Hiba történt a lezárás során!');
+                }
+            }, 1250);
+            
+        } catch (error) {
+            hideLoading();
+            console.error('Hiba:', error);
+            alert('Hiba történt a lezárás során!');
+        }
+    });
+
+    // =========================
+    // REPORT MODAL - CHATSZOBA MEGTEKINTÉSE
+    // =========================
+    document.addEventListener('click', function(e) {
+        const viewButton = e.target.closest('.reported_chatroom_details_modal .view_button');
+        if (!viewButton) return;
+        
+        e.preventDefault();
+        e.stopPropagation();
+        
+        const modal = viewButton.closest('.reported_chatroom_details_modal');
+        const roomId = modal ? modal.getAttribute('data-room-id') : null;
+        
+        if (!roomId) {
+            alert('Hiba: Nem található a chatszoba azonosítója!');
+            return;
+        }
+        
+        // Átirányítás a chatszoba oldalra
+        window.location.href = `chatroom.php?room_id=${roomId}`;
     });
 
 })();

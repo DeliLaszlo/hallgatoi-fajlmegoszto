@@ -35,28 +35,49 @@ if (!isset($data['request_id']) || empty($data['request_id'])) {
 
 $request_id = $data['request_id'];
 $neptun = $_SESSION['user_neptun'];
+$isAdmin = isset($_SESSION['isAdmin']) && $_SESSION['isAdmin'] === true;
+$adminMode = isset($data['admin_mode']) && $data['admin_mode'] === true;
+
+// Ha admin módban akarunk törölni, ellenőrizzük az admin jogosultságot
+if ($adminMode && !$isAdmin) {
+    echo json_encode([
+        'success' => false,
+        'error' => 'Nincs admin jogosultság!'
+    ]);
+    exit();
+}
 
 try {
     require_once __DIR__ . '/../config.php';
     $pdo = getPdoConnection();
     
-    // Ellenőrizzük, hogy a felhasználó hozta-e létre ezt a kérelmet
-    $stmt = $pdo->prepare("
-        SELECT request_id 
-        FROM request 
-        WHERE request_id = :request_id AND neptun_k = :neptun
-    ");
-    $stmt->execute([
-        ':request_id' => $request_id,
-        ':neptun' => $neptun
-    ]);
+    // Admin módban bármely kérelmet törölhetjük, egyébként csak a sajátunkat
+    if ($adminMode && $isAdmin) {
+        $stmt = $pdo->prepare("
+            SELECT request_id 
+            FROM request 
+            WHERE request_id = :request_id
+        ");
+        $stmt->execute([':request_id' => $request_id]);
+    } else {
+        // Ellenőrizzük, hogy a felhasználó hozta-e létre ezt a kérelmet
+        $stmt = $pdo->prepare("
+            SELECT request_id 
+            FROM request 
+            WHERE request_id = :request_id AND neptun_k = :neptun
+        ");
+        $stmt->execute([
+            ':request_id' => $request_id,
+            ':neptun' => $neptun
+        ]);
+    }
     
     $request = $stmt->fetch();
     
     if (!$request) {
         echo json_encode([
             'success' => false,
-            'error' => 'Nem te hoztad létre ezt a kérelmet, vagy nem létezik!'
+            'error' => $adminMode ? 'A kérelem nem létezik!' : 'Nem te hoztad létre ezt a kérelmet, vagy nem létezik!'
         ]);
         exit();
     }
@@ -68,15 +89,30 @@ try {
     ");
     $deleteUploadRequestStmt->execute([':request_id' => $request_id]);
     
-    // Töröljük a kérelmet a request táblából
-    $deleteStmt = $pdo->prepare("
-        DELETE FROM request 
-        WHERE request_id = :request_id AND neptun_k = :neptun
+    // Töröljük a kapcsolódó jelentéseket a report táblából
+    $deleteReportsStmt = $pdo->prepare("
+        DELETE FROM report 
+        WHERE reported_table = 'request' AND reported_id = :request_id
     ");
-    $deleteStmt->execute([
-        ':request_id' => $request_id,
-        ':neptun' => $neptun
-    ]);
+    $deleteReportsStmt->execute([':request_id' => $request_id]);
+    
+    // Töröljük a kérelmet a request táblából
+    if ($adminMode && $isAdmin) {
+        $deleteStmt = $pdo->prepare("
+            DELETE FROM request 
+            WHERE request_id = :request_id
+        ");
+        $deleteStmt->execute([':request_id' => $request_id]);
+    } else {
+        $deleteStmt = $pdo->prepare("
+            DELETE FROM request 
+            WHERE request_id = :request_id AND neptun_k = :neptun
+        ");
+        $deleteStmt->execute([
+            ':request_id' => $request_id,
+            ':neptun' => $neptun
+        ]);
+    }
     
     echo json_encode([
         'success' => true,
