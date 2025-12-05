@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Gép: 127.0.0.1
--- Létrehozás ideje: 2025. Nov 24. 23:58
+-- Létrehozás ideje: 2025. Dec 05. 11:47
 -- Kiszolgáló verziója: 10.4.32-MariaDB
 -- PHP verzió: 8.2.12
 
@@ -168,7 +168,8 @@ CREATE TABLE `report` (
 --
 
 INSERT INTO `report` (`report_id`, `reported_neptun`, `reported_type`, `reported_table`, `reported_id`, `description`) VALUES
-(10001, 'asd123', 'Feltöltés', 'upload', 1000001, 'Téves elnevezés. Nem uml, hanem folyamat diagram szerepel a feltöltésben');
+(10001, 'asd123', 'Feltöltés', 'upload', 1000001, 'Téves elnevezés. Nem uml, hanem folyamat diagram szerepel a feltöltésben'),
+(10002, 'asd123', 'Kérvény', 'request', 10013, 'Túl rövid és nem megfelelő elnevezés, és leírás');
 
 -- --------------------------------------------------------
 
@@ -177,7 +178,7 @@ INSERT INTO `report` (`report_id`, `reported_neptun`, `reported_type`, `reported
 --
 
 CREATE TABLE `request` (
-  `request_id` int(5) NOT NULL,
+  `request_id` int(11) NOT NULL,
   `neptun_k` varchar(6) CHARACTER SET utf8 COLLATE utf8_hungarian_ci NOT NULL,
   `class_code` varchar(50) CHARACTER SET utf8 COLLATE utf8_hungarian_ci NOT NULL,
   `request_name` varchar(50) CHARACTER SET utf8 COLLATE utf8_hungarian_ci NOT NULL,
@@ -191,7 +192,11 @@ CREATE TABLE `request` (
 
 INSERT INTO `request` (`request_id`, `neptun_k`, `class_code`, `request_name`, `request_date`, `description`) VALUES
 (10001, 'asd123', 'GKNB_INTM118', 'Uml diagram', '2025-11-20', '\"uml diagrammok elemei\"'),
-(10002, 'asd123', 'GKNB_INTM115', 'Op rendszer zh anyagai', '2025-11-20', 'Az elso zh-ban szereplő anyagok');
+(10002, 'asd123', 'GKNB_INTM115', 'Op rendszer zh anyagai', '2025-11-20', 'Az elso zh-ban szereplő anyagok'),
+(10003, 'qwe123', 'GKNB_MSTM065', 'Algoritmus változók', '2025-12-03', 'Milyen változókat használhatunk, és ezeket, hogy jelöljük.'),
+(10004, 'qwe123', 'GKNB_FKTM045', 'Tükrök', '2025-12-03', 'A domború, és homorú tükrök, jegyzetei'),
+(10010, 'asd123', 'GKNB_MSTM065', 'Buborék rendezés', '2025-12-03', 'Hogyan kell buborék rendezést készíteni az alkalmazásban?'),
+(10013, 'asd123', 'GKNB_INTM123', 'Adatb kerelem', '2025-12-03', 'Adatb kerelem leiras');
 
 -- --------------------------------------------------------
 
@@ -211,7 +216,9 @@ CREATE TABLE `room_access` (
 
 INSERT INTO `room_access` (`neptun`, `room_id`, `active`) VALUES
 ('asd123', 10013, 1),
-('asd123', 10010, 0);
+('asd123', 10010, 0),
+('qwe123', 10007, 1),
+('qwe123', 10020, 1);
 
 -- --------------------------------------------------------
 
@@ -237,9 +244,11 @@ CREATE TABLE `upload` (
 --
 
 INSERT INTO `upload` (`up_id`, `class_code`, `neptun`, `file_name`, `path_to_file`, `upload_title`, `upload_date`, `downloads`, `comment`, `rating`) VALUES
-(1000001, 'GKNB_INTM118', 'asd123', 'Uml.pdf', '/files/', 'Uml diagram', '2025-11-23', 0, 'Uml diagrammok elemei és azok szerepe', 0),
-(1000002, 'GKNB_INTM115', 'asd123', 'zh_qa.txt', 'Projektmunka\\xampp\\htdocs\\project\\files', 'Zh kérdések és válaszok', '2025-11-20', 0, 'Az elso zh-ban előforduló kérdések és válaszaik', 0),
-(1000006, 'GKNB_INTM115', 'asd123', 'name.txt', '/files/', 'Tesztfájl', '2025-11-23', 5, 'Teszt', 0);
+(1000001, 'GKNB_INTM118', 'asd123', 'Uml.pdf', 'files/', 'Uml diagram', '2025-11-23', 0, 'Uml diagrammok elemei és azok szerepe', 0),
+(1000002, 'GKNB_INTM115', 'asd123', 'zh_qa.txt', 'files/', 'Zh kérdések és válaszok', '2025-11-20', 0, 'Az elso zh-ban előforduló kérdések és válaszaik', 0),
+(1000006, 'GKNB_INTM115', 'asd123', 'name.txt', 'files/', 'Tesztfájl', '2025-11-23', 5, 'Teszt', 0),
+(1000007, 'GKNB_INTM123', 'asd123', 'adatb.txt', 'files/', 'adatbteszt', '2025-12-03', 0, 'Adatbáziskezelés teszt feltöltése', 0),
+(1000008, 'GKNB_MSTM065', 'qwe123', 'algo_teszt.txt', 'files/', 'Buborék rendezés', '2025-12-03', 0, 'Buborék rendezés, és példafeladat megoldás', 0);
 
 -- --------------------------------------------------------
 
@@ -259,7 +268,8 @@ CREATE TABLE `upload_request` (
 
 INSERT INTO `upload_request` (`request_id`, `upload_id`, `status`) VALUES
 (10001, 1000001, 'T'),
-(10002, 1000002, 'F');
+(10002, 1000002, 'F'),
+(10010, 0, 'F');
 
 -- --------------------------------------------------------
 
@@ -282,7 +292,8 @@ CREATE TABLE `user` (
 
 INSERT INTO `user` (`neptun_k`, `nickname`, `password`, `vnev`, `knev`, `email`) VALUES
 ('ASD123', 'teszt1', '$2y$10$jAbOZefHgUgUCB4F0bdQgevBtkGsbENuVliNLBrIJPBEpu3kDJi9S', 'Proba', 'Lajos', 'asd123@gmail.com'),
-('iokfp4', 'Sziszaat', '$2y$10$AmXof3YS5REZHEYIdw9r2u3//ulqKB9ij/RGJmgNEXUiyshC2V2Z6', 'asd', 'asd', 'szabolcsszigetvari2003@gmail.com');
+('iokfp4', 'Sziszaat', '$2y$10$AmXof3YS5REZHEYIdw9r2u3//ulqKB9ij/RGJmgNEXUiyshC2V2Z6', 'asd', 'asd', 'szabolcsszigetvari2003@gmail.com'),
+('qwe123', 'KJani', '$2y$10$NPq8E1M7Atr3QnPdW9XfLevglUd2xEiAHj8GTCTaZPC6bUA.8lGLK', 'Kiss', 'János', 'k.jani@gmail.com');
 
 -- --------------------------------------------------------
 
@@ -303,7 +314,11 @@ CREATE TABLE `user_classes` (
 INSERT INTO `user_classes` (`class_code`, `neptun`, `allapot`) VALUES
 ('GKNB_INTM118', 'asd123', 'F'),
 ('GKNB_INTM115', 'asd123', 'T'),
-('GKNB_INTM123', 'asd123', 'F');
+('GKNB_INTM123', 'asd123', 'F'),
+('GKNB_MSTM065', 'qwe123', 'F'),
+('GKNB_FKTM045', 'qwe123', 'F'),
+('GKNB_INTM087', 'qwe123', 'F'),
+('GKNB_MSTM065', 'asd123', 'F');
 
 -- --------------------------------------------------------
 
@@ -316,6 +331,14 @@ CREATE TABLE `user_votes` (
   `upload_id` int(11) NOT NULL,
   `value` tinyint(4) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- A tábla adatainak kiíratása `user_votes`
+--
+
+INSERT INTO `user_votes` (`neptun_k`, `upload_id`, `value`) VALUES
+('asd123', 1000008, 1),
+('asd123', 1000007, -1);
 
 --
 -- Indexek a kiírt táblákhoz
@@ -362,6 +385,16 @@ ALTER TABLE `upload`
 --
 ALTER TABLE `user`
   ADD PRIMARY KEY (`neptun_k`);
+
+--
+-- A kiírt táblák AUTO_INCREMENT értéke
+--
+
+--
+-- AUTO_INCREMENT a táblához `request`
+--
+ALTER TABLE `request`
+  MODIFY `request_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=10014;
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
