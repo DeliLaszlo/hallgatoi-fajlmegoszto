@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Gép: 127.0.0.1
--- Létrehozás ideje: 2025. Dec 05. 11:47
+-- Létrehozás ideje: 2025. Dec 05. 22:45
 -- Kiszolgáló verziója: 10.4.32-MariaDB
 -- PHP verzió: 8.2.12
 
@@ -156,7 +156,7 @@ CREATE TABLE `message` (
 
 CREATE TABLE `report` (
   `report_id` int(5) NOT NULL,
-  `reported_neptun` varchar(6) NOT NULL,
+  `report_neptun` varchar(6) NOT NULL,
   `reported_type` varchar(10) NOT NULL,
   `reported_table` varchar(25) NOT NULL,
   `reported_id` int(5) NOT NULL,
@@ -167,9 +167,11 @@ CREATE TABLE `report` (
 -- A tábla adatainak kiíratása `report`
 --
 
-INSERT INTO `report` (`report_id`, `reported_neptun`, `reported_type`, `reported_table`, `reported_id`, `description`) VALUES
-(10001, 'asd123', 'Feltöltés', 'upload', 1000001, 'Téves elnevezés. Nem uml, hanem folyamat diagram szerepel a feltöltésben'),
-(10002, 'asd123', 'Kérvény', 'request', 10013, 'Túl rövid és nem megfelelő elnevezés, és leírás');
+INSERT INTO `report` (`report_id`, `report_neptun`, `reported_type`, `reported_table`, `reported_id`, `description`) VALUES
+(10001, 'qwe123', 'Feltöltés', 'upload', 1000001, 'Téves elnevezés. Nem uml, hanem folyamat diagram szerepel a feltöltésben'),
+(10002, 'qwe123', 'Kérvény', 'request', 10013, 'Túl rövid és nem megfelelő elnevezés, és leírás'),
+(10003, 'admin1', 'Feltöltés', 'upload', 1000012, 'Lehetséges plágium'),
+(10004, 'admin1', 'feltöltés', 'upload', 1000013, 'Lehetséges plágium');
 
 -- --------------------------------------------------------
 
@@ -196,7 +198,13 @@ INSERT INTO `request` (`request_id`, `neptun_k`, `class_code`, `request_name`, `
 (10003, 'qwe123', 'GKNB_MSTM065', 'Algoritmus változók', '2025-12-03', 'Milyen változókat használhatunk, és ezeket, hogy jelöljük.'),
 (10004, 'qwe123', 'GKNB_FKTM045', 'Tükrök', '2025-12-03', 'A domború, és homorú tükrök, jegyzetei'),
 (10010, 'asd123', 'GKNB_MSTM065', 'Buborék rendezés', '2025-12-03', 'Hogyan kell buborék rendezést készíteni az alkalmazásban?'),
-(10013, 'asd123', 'GKNB_INTM123', 'Adatb kerelem', '2025-12-03', 'Adatb kerelem leiras');
+(10013, 'asd123', 'GKNB_INTM123', 'Adatb kerelem', '2025-12-03', 'Adatb kerelem leiras'),
+(10014, 'qwe123', 'GKNB_INTM123', 'Adattípusok', '2025-12-05', 'Mi a külonbség az int-ek között, és mikor melyiket kell használni?'),
+(10015, 'qwe123', 'GKNB_INTM123', 'Megfelelő scrpitelés', '2025-12-05', 'A zh-n 0 pontot kaptam, mert nem megfelelően mentettem. Hogyan kell scriptelni, és kimenteni az adatbázist?'),
+(10016, 'asd123', 'GKNB_MSTM065', 'Feladatok', '2025-12-05', 'Milyen feladatokban lehet buborékrendezés, kiíratás, és a for ciklus használata?'),
+(10017, 'asd123', 'GKNB_MSTM065', 'Utasítások', '2025-12-05', 'Milyen utasításkészlete van a pszeudokódnak?'),
+(10018, 'asd123', 'GKNB_INTM123', 'Megszorítások', '2025-12-05', 'Hogyan állítjuk be a megszorításokat, és melyek a gyakorlatban legtöbbet előforduló típusai'),
+(10019, 'asd123', 'GKNB_INTM118', 'Projekt menete', '2025-12-05', 'Milyen lépései vannak egy projekt megvalósításának?');
 
 -- --------------------------------------------------------
 
@@ -216,7 +224,7 @@ CREATE TABLE `room_access` (
 
 INSERT INTO `room_access` (`neptun`, `room_id`, `active`) VALUES
 ('asd123', 10013, 1),
-('asd123', 10010, 0),
+('asd123', 10010, 1),
 ('qwe123', 10007, 1),
 ('qwe123', 10020, 1);
 
@@ -248,7 +256,12 @@ INSERT INTO `upload` (`up_id`, `class_code`, `neptun`, `file_name`, `path_to_fil
 (1000002, 'GKNB_INTM115', 'asd123', 'zh_qa.txt', 'files/', 'Zh kérdések és válaszok', '2025-11-20', 0, 'Az elso zh-ban előforduló kérdések és válaszaik', 0),
 (1000006, 'GKNB_INTM115', 'asd123', 'name.txt', 'files/', 'Tesztfájl', '2025-11-23', 5, 'Teszt', 0),
 (1000007, 'GKNB_INTM123', 'asd123', 'adatb.txt', 'files/', 'adatbteszt', '2025-12-03', 0, 'Adatbáziskezelés teszt feltöltése', 0),
-(1000008, 'GKNB_MSTM065', 'qwe123', 'algo_teszt.txt', 'files/', 'Buborék rendezés', '2025-12-03', 0, 'Buborék rendezés, és példafeladat megoldás', 0);
+(1000008, 'GKNB_MSTM065', 'qwe123', 'algo_teszt.txt', 'files/', 'Buborék rendezés', '2025-12-03', 0, 'Buborék rendezés, és példafeladat megoldás', 0),
+(1000009, 'GKNB_INTM123', 'asd123', 'adatbazis_1.txt', 'files/', 'Adattípusok és használatuk', '2025-12-05', 0, 'Milyen adattípusokat tudunk használni, mik ezeknek a határaik és mikor melyiket használjuk?', 0),
+(1000010, 'GKNB_INTM123', 'asd123', 'kapcsolatok_joinok.txt', 'files/', 'Kapcsolatok', '2025-12-05', 0, 'Hogy kapcsoljuk össze a táblákat, hogy használjuk az azonosítókat. A különböző join-ok működése', 0),
+(1000011, 'GKNB_INTM123', 'asd123', 'script.txt', 'files/', 'Mentés', '2025-12-05', 0, 'Hogyan scripteljük az adatbázis, hogy minden adatot megfelelően kinyerjünk belőle', 0),
+(1000012, 'GKNB_MSTM065', 'qwe123', 'algo_parancsok.txt', 'files/', 'Algoritmus pszeudokód utasítások', '2025-12-05', 0, 'A pszeudokodban használt utasítások, és parancsok, illetve azok működése', 0),
+(1000013, 'GKNB_MSTM065', 'qwe123', 'algo_példafeladatok.txt', 'files/', 'Példafeladat megoldása', '2025-12-05', 0, 'Három típusú általam írt példafeladat és azok megoldása', 0);
 
 -- --------------------------------------------------------
 
@@ -268,8 +281,10 @@ CREATE TABLE `upload_request` (
 
 INSERT INTO `upload_request` (`request_id`, `upload_id`, `status`) VALUES
 (10001, 1000001, 'T'),
-(10002, 1000002, 'F'),
-(10010, 0, 'F');
+(10014, 1000009, 'T'),
+(10015, 1000011, 'T'),
+(10016, 1000013, 'T'),
+(10017, 1000012, 'T');
 
 -- --------------------------------------------------------
 
@@ -283,17 +298,19 @@ CREATE TABLE `user` (
   `password` varchar(255) NOT NULL,
   `vnev` varchar(50) CHARACTER SET utf8 COLLATE utf8_hungarian_ci NOT NULL,
   `knev` varchar(50) CHARACTER SET utf8 COLLATE utf8_hungarian_ci NOT NULL,
-  `email` varchar(100) CHARACTER SET utf8 COLLATE utf8_hungarian_ci NOT NULL
+  `email` varchar(100) CHARACTER SET utf8 COLLATE utf8_hungarian_ci NOT NULL,
+  `admin` tinyint(1) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- A tábla adatainak kiíratása `user`
 --
 
-INSERT INTO `user` (`neptun_k`, `nickname`, `password`, `vnev`, `knev`, `email`) VALUES
-('ASD123', 'teszt1', '$2y$10$jAbOZefHgUgUCB4F0bdQgevBtkGsbENuVliNLBrIJPBEpu3kDJi9S', 'Proba', 'Lajos', 'asd123@gmail.com'),
-('iokfp4', 'Sziszaat', '$2y$10$AmXof3YS5REZHEYIdw9r2u3//ulqKB9ij/RGJmgNEXUiyshC2V2Z6', 'asd', 'asd', 'szabolcsszigetvari2003@gmail.com'),
-('qwe123', 'KJani', '$2y$10$NPq8E1M7Atr3QnPdW9XfLevglUd2xEiAHj8GTCTaZPC6bUA.8lGLK', 'Kiss', 'János', 'k.jani@gmail.com');
+INSERT INTO `user` (`neptun_k`, `nickname`, `password`, `vnev`, `knev`, `email`, `admin`) VALUES
+('admin1', 'admin1', '$2y$10$f2v274aS9BorBTrpfv/MMeCkp6LqvjT5N100gHlT0wu9HVTeXqkbS', 'Erdős', 'András', 'adminferenc@gmail.com', 1),
+('ASD123', 'teszt1', '$2y$10$jAbOZefHgUgUCB4F0bdQgevBtkGsbENuVliNLBrIJPBEpu3kDJi9S', 'Proba', 'Lajos', 'asd123@gmail.com', NULL),
+('iokfp4', 'Sziszaat', '$2y$10$AmXof3YS5REZHEYIdw9r2u3//ulqKB9ij/RGJmgNEXUiyshC2V2Z6', 'asd', 'asd', 'szabolcsszigetvari2003@gmail.com', NULL),
+('qwe123', 'KJani', '$2y$10$NPq8E1M7Atr3QnPdW9XfLevglUd2xEiAHj8GTCTaZPC6bUA.8lGLK', 'Kiss', 'János', 'k.jani@gmail.com', NULL);
 
 -- --------------------------------------------------------
 
@@ -318,7 +335,8 @@ INSERT INTO `user_classes` (`class_code`, `neptun`, `allapot`) VALUES
 ('GKNB_MSTM065', 'qwe123', 'F'),
 ('GKNB_FKTM045', 'qwe123', 'F'),
 ('GKNB_INTM087', 'qwe123', 'F'),
-('GKNB_MSTM065', 'asd123', 'F');
+('GKNB_MSTM065', 'asd123', 'F'),
+('GKNB_INTM123', 'qwe123', 'F');
 
 -- --------------------------------------------------------
 
@@ -338,7 +356,11 @@ CREATE TABLE `user_votes` (
 
 INSERT INTO `user_votes` (`neptun_k`, `upload_id`, `value`) VALUES
 ('asd123', 1000008, 1),
-('asd123', 1000007, -1);
+('asd123', 1000007, -1),
+('qwe123', 1000008, 1),
+('qwe123', 1000007, -1),
+('asd123', 1000012, 1),
+('asd123', 1000013, 1);
 
 --
 -- Indexek a kiírt táblákhoz
@@ -394,7 +416,7 @@ ALTER TABLE `user`
 -- AUTO_INCREMENT a táblához `request`
 --
 ALTER TABLE `request`
-  MODIFY `request_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=10014;
+  MODIFY `request_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=10020;
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
