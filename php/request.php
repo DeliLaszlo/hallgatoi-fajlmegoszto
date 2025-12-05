@@ -31,14 +31,12 @@ $comment = $_POST['request_description'];
 $stmt = $conn->prepare("INSERT INTO request (neptun_k, class_code, request_name, description) VALUES (?, ?, ?, ?)");
 $stmt->bind_param("ssss", $neptun, $class_code, $title, $comment);
 
-if ($stmt->execute()) {
-    echo '<script>
-    alert("A kérvény feltöltése sikeres!");
-    history.back();
-    </script>';
+if ($stmt->execute()) {   
+    echo "<script>history.back();</script>";
 } 
 else {
     echo '<script>alert("A kérvény feltöltése sikertelen!");history.back();</script>';
 }
 ?>
+
 
