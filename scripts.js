@@ -6493,25 +6493,38 @@ document.addEventListener('click', function(e) {
 
 function showLoading(message = 'Betöltés...') {
     let loadingScreen = document.getElementById('loading-screen');
-    if (!loadingScreen) return;
     
-    const loadingText = loadingScreen.querySelector('.loading-text');
-    if (loadingText) loadingText.textContent = message;
+    if (!loadingScreen) {
+        loadingScreen = document.createElement('div');
+        loadingScreen.id = 'loading-screen';
+        loadingScreen.className = 'loading-screen';
+        loadingScreen.innerHTML = `
+            <div class="loading-spinner">
+                <img src="icons/hourglass.svg" alt="Betöltés">
+                <div class="loading-text">${message}</div>
+            </div>
+        `;
+        document.body.appendChild(loadingScreen);
+    } else {
+        const loadingText = loadingScreen.querySelector('.loading-text');
+        if (loadingText) loadingText.textContent = message;
+    }
     
-    loadingScreen.classList.add('active');
-    loadingScreen.classList.remove('hidden'); // Biztos ami biztos
+    setTimeout(() => {
+        loadingScreen.classList.add('active');
+    }, 10);
 }
 
 function hideLoading() {
     const loadingScreen = document.getElementById('loading-screen');
     if (loadingScreen) {
         setTimeout(() => {
-            loadingScreen.classList.remove('active');
-            // Ha ez az első betöltés (initial), vegyük ki a DOM-ból vagy rejtsük el
             if (loadingScreen.classList.contains('initial-loading')) {
-                loadingScreen.style.display = 'none'; 
+                loadingScreen.remove();
+                return;
             }
-        }, 500);
+            loadingScreen.classList.remove('active');
+        }, 10);
     }
 }
 
@@ -6702,7 +6715,6 @@ document.addEventListener('DOMContentLoaded', function() {
                 setTimeout(() => {
                     hideLoading();
                     if (result.success) {
-                        alert("Sikeres jelentés!");
                         // Bezárjuk a modalt
                         document.querySelector('.report_content_modal').classList.add('hidden');
                     } else {
@@ -6718,7 +6730,6 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
-});
     // ÚJ KÉRELEM KEZELÉSE
 
     // 1. Modal megnyitása
@@ -6767,13 +6778,44 @@ document.addEventListener('DOMContentLoaded', function() {
                 setTimeout(() => {
                     hideLoading();
                     if (result.success) {
-                        alert(result.message);
                         // Bezárjuk a modalt
                         document.querySelector('.request_close_button').click();
                         // Töröljük a mezőket
                         addRequestForm.reset();
-                        // Frissítjük az oldalt, hogy látszódjon az új kérelem
-                        location.reload();
+                        
+                        // Dinamikusan hozzáadjuk az új kártya
+                        const requestSection = document.getElementById('subject_request_container');
+                        if (requestSection && result.request) {
+                            // Eltávolítjuk a "nincs kérelem" üzenetet, ha van
+                            const noContentMsg = requestSection.querySelector('.no_content_message');
+                            if (noContentMsg) {
+                                noContentMsg.remove();
+                            }
+                            
+                            const escapeHtml = (text) => {
+                                const div = document.createElement('div');
+                                div.textContent = text;
+                                return div.innerHTML;
+                            };
+                            
+                            const newCard = `
+                                <div class="content_container request_container">
+                                    <a href="#" class="container_link own_uncompleted_requests_link" data-request-id="${result.request.request_id}" aria-label="Kérelem megnyitása"></a>
+                                    <button class="button small_button content_edit_button edit_request_button" aria-label="Szerkesztés">
+                                        <span class="icon_text">Szerkesztés</span>
+                                        <img src="icons/edit.svg" alt="Szerkesztés">
+                                    </button>
+                                    <button class="button small_button content_delete_button" aria-label="Törlés">
+                                        <span class="icon_text">Törlés</span>
+                                        <img src="icons/delete.svg" alt="Törlés">
+                                    </button>
+                                    <h2>${escapeHtml(result.request.request_name)}</h2>
+                                    <p>${escapeHtml(result.request.description)}</p>
+                                    <p>Én, ${escapeHtml(result.request.request_date)}</p>
+                                </div>
+                            `;
+                            requestSection.insertAdjacentHTML('beforeend', newCard);
+                        }
                     } else {
                         alert('Hiba: ' + result.error);
                     }
@@ -6831,10 +6873,42 @@ document.addEventListener('DOMContentLoaded', function() {
                 setTimeout(() => {
                     hideLoading();
                     if (result.success) {
-                        alert(result.message);
                         document.querySelector('.chatroom_close_button').click();
                         addChatroomForm.reset();
-                        location.reload();
+                        
+                        // Dinamikusan hozzáadjuk az új kártya
+                        const chatroomSection = document.getElementById('subject_chatszobak');
+                        if (chatroomSection && result.chatroom) {
+                            // Eltávolítjuk a "nincs chatszoba" üzenetet, ha van
+                            const noContentMsg = chatroomSection.querySelector('.no_content_message');
+                            if (noContentMsg) {
+                                noContentMsg.remove();
+                            }
+                            
+                            const escapeHtml = (text) => {
+                                const div = document.createElement('div');
+                                div.textContent = text;
+                                return div.innerHTML;
+                            };
+                            
+                            const newCard = `
+                                <div class="content_container chatroom_container" data-room-id="${escapeHtml(result.chatroom.room_id.toString())}">
+                                    <a href="chatroom.php?room_id=${escapeHtml(result.chatroom.room_id.toString())}" class="container_link chatroom_link" aria-label="Chatroom megnyitása"></a>
+                                    <button class="button small_button content_edit_button edit_chatroom_button" aria-label="Szerkesztés">
+                                        <span class="icon_text">Szerkesztés</span>
+                                        <img src="icons/edit.svg" alt="Szerkesztés">
+                                    </button>
+                                    <button class="button small_button content_delete_button" aria-label="Törlés">
+                                        <span class="icon_text">Törlés</span>
+                                        <img src="icons/delete.svg" alt="Törlés">
+                                    </button>
+                                    <h2>${escapeHtml(result.chatroom.title)}</h2>
+                                    <p>${escapeHtml(result.chatroom.description)}</p>
+                                    <p>Én${result.chatroom.create_date ? ', ' + escapeHtml(result.chatroom.create_date) : ''}</p>
+                                </div>
+                            `;
+                            chatroomSection.insertAdjacentHTML('beforeend', newCard);
+                        }
                     } else {
                         alert('Hiba: ' + result.error);
                     }
@@ -6853,6 +6927,64 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // Csak akkor fusson, ha az admin oldalon vagyunk
     if (document.getElementById('admin_page')) {
+
+        // Tárgy kártya létrehozó függvény
+        function createSubjectCard(classCode, className) {
+            const subjectDiv = document.createElement('div');
+            subjectDiv.className = 'content_container admin_container admin_subject_container';
+            subjectDiv.setAttribute('data-class-code', classCode);
+
+            const link = document.createElement('a');
+            link.href = `subject.php?class_code=${encodeURIComponent(classCode)}`;
+            link.className = 'container_link subject_link';
+            link.setAttribute('aria-label', 'Tárgy megnyitása');
+            subjectDiv.appendChild(link);
+
+            const title = document.createElement('h2');
+            title.textContent = className;
+
+            const editButton = document.createElement('button');
+            editButton.className = 'button small_button admin_button subject_edit_button';
+            editButton.setAttribute('data-class-code', classCode);
+            editButton.setAttribute('aria-label', 'Tárgy szerkesztése');
+
+            const editImg = document.createElement('img');
+            editImg.src = 'icons/edit.svg';
+            editImg.alt = 'Szerkesztés';
+
+            const editSpan = document.createElement('span');
+            editSpan.className = 'icon_text';
+            editSpan.textContent = 'Szerkesztés';
+
+            editButton.appendChild(editImg);
+            editButton.appendChild(editSpan);
+
+            const code = document.createElement('p');
+            code.textContent = classCode;
+
+            const deleteButton = document.createElement('button');
+            deleteButton.className = 'button small_button admin_button subject_delete_button';
+            deleteButton.setAttribute('data-class-code', classCode);
+            deleteButton.setAttribute('aria-label', 'Tárgy törlése');
+
+            const deleteImg = document.createElement('img');
+            deleteImg.src = 'icons/delete.svg';
+            deleteImg.alt = 'Törlés';
+
+            const deleteSpan = document.createElement('span');
+            deleteSpan.className = 'icon_text';
+            deleteSpan.textContent = 'Törlés';
+
+            deleteButton.appendChild(deleteImg);
+            deleteButton.appendChild(deleteSpan);
+
+            subjectDiv.appendChild(title);
+            subjectDiv.appendChild(editButton);
+            subjectDiv.appendChild(code);
+            subjectDiv.appendChild(deleteButton);
+
+            return subjectDiv;
+        }
 
         // 1. Új tárgy hozzáadása
         const addSubjectForm = document.getElementById('addSubjectForm');
@@ -6873,8 +7005,25 @@ document.addEventListener('DOMContentLoaded', function() {
                     setTimeout(() => {
                         hideLoading();
                         if (result.success) {
-                            alert(result.message);
-                            location.reload(); // Frissítés, hogy látsszon a listában
+                            // Modal bezárása
+                            const addModal = document.querySelector('.admin_add_subject_modal');
+                            if (addModal) {
+                                addModal.classList.add('hidden');
+                            }
+                            addSubjectForm.reset();
+                            
+                            // Dinamikusan hozzáadjuk az új kártyát
+                            const container = document.getElementById('subject_list_container');
+                            if (container && result.subject) {
+                                // Eltávolítjuk a "nincsenek tárgyak" üzenetet, ha van
+                                const noContentMsg = container.querySelector('p');
+                                if (noContentMsg && noContentMsg.textContent.includes('Nincsenek tárgyak')) {
+                                    noContentMsg.remove();
+                                }
+                                
+                                const newCard = createSubjectCard(result.subject.class_code, result.subject.class_name);
+                                container.appendChild(newCard);
+                            }
                         } else {
                             alert("Hiba: " + result.error);
                         }
@@ -6936,8 +7085,41 @@ document.addEventListener('DOMContentLoaded', function() {
                     setTimeout(() => {
                         hideLoading();
                         if (result.success) {
-                            alert(result.message);
-                            location.reload();
+                            modal.classList.add('hidden');
+                            
+                            // Dinamikusan frissítjük a kártyát
+                            if (result.subject) {
+                                const container = document.getElementById('subject_list_container');
+                                if (container) {
+                                    // Megkeressük a megfelelő kártyát az eredeti kód alapján
+                                    const cards = container.querySelectorAll('.admin_subject_container');
+                                    cards.forEach(card => {
+                                        const cardCode = card.querySelector('p').textContent;
+                                        if (cardCode === result.subject.original_code) {
+                                            // Frissítjük a kártya tartalmát
+                                            card.querySelector('h2').textContent = result.subject.class_name;
+                                            card.querySelector('p').textContent = result.subject.class_code;
+                                            card.setAttribute('data-class-code', result.subject.class_code);
+                                            
+                                            // Frissítjük a linket
+                                            const link = card.querySelector('.subject_link');
+                                            if (link) {
+                                                link.href = `subject.php?class_code=${encodeURIComponent(result.subject.class_code)}`;
+                                            }
+                                            
+                                            // Frissítjük a gombok adat attribútumait
+                                            const editBtn = card.querySelector('.subject_edit_button');
+                                            if (editBtn) {
+                                                editBtn.setAttribute('data-class-code', result.subject.class_code);
+                                            }
+                                            const deleteBtn = card.querySelector('.subject_delete_button');
+                                            if (deleteBtn) {
+                                                deleteBtn.setAttribute('data-class-code', result.subject.class_code);
+                                            }
+                                        }
+                                    });
+                                }
+                            }
                         } else {
                             alert("Hiba: " + result.error);
                         }
@@ -6949,3 +7131,4 @@ document.addEventListener('DOMContentLoaded', function() {
             });
         }
     }
+});

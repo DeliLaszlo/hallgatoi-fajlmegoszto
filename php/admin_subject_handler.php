@@ -35,7 +35,14 @@ try {
         $stmt = $pdo->prepare("INSERT INTO class (class_code, class_name) VALUES (:code, :name)");
         $stmt->execute([':code' => $code, ':name' => $name]);
         
-        echo json_encode(['success' => true, 'message' => 'Tárgy sikeresen hozzáadva!']);
+        echo json_encode([
+            'success' => true, 
+            'message' => 'Tárgy sikeresen hozzáadva!',
+            'subject' => [
+                'class_code' => $code,
+                'class_name' => $name
+            ]
+        ]);
     } 
     
     // --- TÁRGY SZERKESZTÉSE ---
@@ -52,7 +59,15 @@ try {
             ':orig_code' => $original_code
         ]);
 
-        echo json_encode(['success' => true, 'message' => 'Tárgy sikeresen frissítve!']);
+        echo json_encode([
+            'success' => true, 
+            'message' => 'Tárgy sikeresen frissítve!',
+            'subject' => [
+                'class_code' => $new_code,
+                'class_name' => $new_name,
+                'original_code' => $original_code
+            ]
+        ]);
     } 
     else {
         echo json_encode(['success' => false, 'error' => 'Ismeretlen művelet!']);

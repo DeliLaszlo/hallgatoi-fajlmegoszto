@@ -60,7 +60,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             ':room_id' => $nextId
         ]);
 
-        echo json_encode(['success' => true, 'message' => 'Chatszoba sikeresen létrehozva!']);
+        // Adatok visszaküldése siker esetén
+        echo json_encode([
+            'success' => true, 
+            'message' => 'Chatszoba sikeresen létrehozva!',
+            'chatroom' => [
+                'room_id' => $nextId,
+                'title' => $title,
+                'description' => $description,
+                'create_date' => date('Y-m-d')
+            ]
+        ]);
 
     } catch (PDOException $e) {
         echo json_encode(['success' => false, 'error' => 'Adatbázis hiba: ' . $e->getMessage()]);

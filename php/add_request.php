@@ -40,7 +40,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             ':desc' => $description
         ]);
 
-        echo json_encode(['success' => true, 'message' => 'Kérelem sikeresen létrehozva!']);
+        // Adatok visszaküldése siker esetén
+        echo json_encode([
+            'success' => true, 
+            'message' => 'Kérelem sikeresen létrehozva!',
+            'request' => [
+                'request_id' => $nextId,
+                'request_name' => $title,
+                'description' => $description,
+                'request_date' => date('Y-m-d')
+            ]
+        ]);
 
     } catch (PDOException $e) {
         echo json_encode(['success' => false, 'error' => 'Adatbázis hiba: ' . $e->getMessage()]);
