@@ -2709,187 +2709,192 @@ document.addEventListener('DOMContentLoaded', function() {
     const chatText = document.getElementById('chat_text');
     const chatComposer = document.getElementById('chat_composer');
     let activeChatroomId = null;
+    
+    // Polling változók
+    let chatPollingInterval = null;
+    let lastKnownMessageId = 0;
 
-    // Chatszobák generálása
+    // 1. Chatszobák listázása
     async function generateChatroomList() {
         const chatConvList = document.getElementById('chat_conv_list');
         if (!chatConvList) return;
         
         try {
             const response = await fetch('php/getChatrooms.php?mode=neptun');
-            
-            if (!response.ok) {
-                throw new Error('Nem sikerült betölteni a chatszobákat');
-            }
+            if (!response.ok) throw new Error('Hiba a listázáskor');
             
             const result = await response.json();
-            
-            if (!result.success) {
-                console.error('Hiba:', result.message);
-                return;
-            }
+            if (!result.success) return;
             
             const chatrooms = result.chatrooms;
             chatConvList.innerHTML = '';
             
             if (chatrooms && chatrooms.length > 0) {
                 chatrooms.forEach(room => {
+                    const safeTitle = room.title.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
                     chatConvList.insertAdjacentHTML('beforeend', `
-                        <li><a class="chat_list_item" data-room-id="${room.room_id}">${escapeHtml(room.title)}</a></li>
+                        <li><a class="chat_list_item" data-room-id="${room.room_id}">${safeTitle}</a></li>
                     `);
                 });
             }
             
-            // Chatszobák betöltése után inicializáljuk a chatszoba kezelést
-            initializeChatroom();
+            initializeChatroom(); // Lista kész, inicializálunk
         } catch (error) {
-            console.error('Hiba a chatszobák betöltése közben:', error);
+            console.error('Hiba a szobák betöltésekor:', error);
         }
     }
     
-    // Chatszoba inicializálása
+    // HTML tisztítás
+    function escapeHtml(text) {
+        if (!text) return "";
+        const div = document.createElement('div');
+        div.textContent = text;
+        return div.innerHTML;
+    }
+
+    // 2. Szobaválasztás kezelése
     function initializeChatroom() {
         const chatListItems = document.querySelectorAll('.chat_list_item');
-        
-        // Kezdeti chatszoba betöltése
         const urlParams = new URLSearchParams(window.location.search);
         const roomIdFromUrl = urlParams.get('room_id');
         
         if (roomIdFromUrl) {
             const roomInList = Array.from(chatListItems).find(item => item.dataset.roomId === roomIdFromUrl);
             if (roomInList) {
-                roomInList.parentElement.classList.add('active');
-                activeChatroomId = roomInList.dataset.roomId;
-                loadMessages(activeChatroomId);
+                selectRoom(roomInList);
             } else {
-                // Ha a felhasználó nem része a szobának, ellenőrizzük, hogy létezik-e
-                fetch(`php/checkChatroom.php?room_id=${roomIdFromUrl}`)
-                    .then(response => response.json())
-                    .then(result => {
-                        if (!result.success || !result.exists) {
-                            if (chatMessages) {
-                                chatMessages.innerHTML = '<h2 class="no_content_message">Nincs ilyen szoba.</h2>';
-                                // chatComposer ideiglenes letiltása
-                                if (chatComposer) chatComposer.style.display = 'none';
-                            }
-                        } else {
-                            activeChatroomId = roomIdFromUrl;
-                            loadMessages(activeChatroomId);
-                        }
-                    })
-                    .catch(error => {
-                        console.error('Hiba:', error);
-                    });
+                activeChatroomId = roomIdFromUrl;
+                startChat(activeChatroomId);
             }
-        } 
-        else if (chatListItems.length > 0) {
-            const firstRoom = chatListItems[0];
-            firstRoom.parentElement.classList.add('active');
-            activeChatroomId = firstRoom.dataset.roomId;
-            loadMessages(activeChatroomId);
+        } else if (chatListItems.length > 0) {
+            selectRoom(chatListItems[0]);
         }
 
-        // Chatszoba váltás event listener-ek hozzáadása
-        chatListItems.forEach((item) => {
-            const listItem = item.parentElement;   
-            const handleClick = function(e) {
-                // chatComposer megjelenítése, ha el van rejtve
-                if (chatComposer) chatComposer.style.display = 'flex';
+        // Kattintás események (delegálva a szülőre ha lehetne, de most így is jó)
+        chatListItems.forEach(item => {
+            // A linkre és a szülő <li>-re is teszünk figyelőt
+            const handler = (e) => {
                 e.preventDefault();
                 e.stopPropagation();
-                const selectedRoomId = item.dataset.roomId;
-                if (selectedRoomId === activeChatroomId) return;
-                chatListItems.forEach(li => li.parentElement.classList.remove('active'));
-                listItem.classList.add('active');      
-                const hamburger = document.querySelector('.hamburger');
-                const navMenu = document.querySelector('.nav-menu');
-                const header = document.querySelector('header');
-                if (hamburger && navMenu) {
-                    hamburger.classList.remove('active');
-                    navMenu.classList.remove('active');
-                    if (header) header.classList.remove('menu-open');
-                }
-                activeChatroomId = selectedRoomId;
-                loadMessages(activeChatroomId);
+                selectRoom(item);
             };
-            
-            item.addEventListener('click', handleClick);
-            listItem.addEventListener('click', handleClick);
+            item.addEventListener('click', handler);
+            item.parentElement.addEventListener('click', handler);
         });
-        
-        // Chatszoba keresés
-        const chatroomSearchInput = document.getElementById('chatroom_search_input');
-        if (chatroomSearchInput) {
-            chatroomSearchInput.addEventListener('input', function() {
-                const searchTerm = this.value.toLowerCase().trim();
-                chatListItems.forEach(function(item) {
-                    const chatroomName = item.textContent.toLowerCase();
-                    if (searchTerm === '' || chatroomName.includes(searchTerm)) {
-                        item.parentElement.style.display = 'block';
-                    } else {
-                        item.parentElement.style.display = 'none';
-                    }
-                });
-            });
-        }
     }
-    
-    // Chatszobák generálása
-    generateChatroomList();
 
-    // Üzenetek betöltése
-    async function loadMessages(roomId) {
-        if (!chatMessages || !roomId) return;
+    function selectRoom(itemElement) {
+        document.querySelectorAll('.chat_list_item').forEach(li => li.parentElement.classList.remove('active'));
+        itemElement.parentElement.classList.add('active');
         
-        try {
-            const response = await fetch(`php/getMessages.php?room_id=${roomId}`);
-            
-            if (!response.ok) {
-                throw new Error('Nem sikerült betölteni az üzeneteket');
+        // Mobilon bezárjuk a menüt
+        const sidebar = document.getElementById('sidebar');
+        if (sidebar && window.innerWidth <= 600) {
+            sidebar.classList.remove('visible');
+            sidebar.classList.add('hidden');
+            const overlay = document.getElementById('background-overlay');
+            if(overlay) overlay.style.display = 'none';
+        }
+
+        activeChatroomId = itemElement.dataset.roomId;
+        startChat(activeChatroomId);
+    }
+
+    // 3. Chat indítása (Polling)
+    function startChat(roomId) {
+        if (chatPollingInterval) clearInterval(chatPollingInterval);
+        lastKnownMessageId = 0;
+        chatMessages.innerHTML = ''; 
+        if (chatComposer) chatComposer.style.display = 'flex';
+
+        fetchNewMessages(roomId); // Azonnali lekérés
+
+        // 3 másodpercenként frissítés
+        chatPollingInterval = setInterval(() => {
+            if (activeChatroomId === roomId) {
+                fetchNewMessages(roomId);
             }
-            
+        }, 3000);
+    }
+
+    // 4. Üzenetek lekérése
+    async function fetchNewMessages(roomId) {
+        try {
+            const response = await fetch(`php/getMessages.php?room_id=${roomId}&last_id=${lastKnownMessageId}`);
             const result = await response.json();
             
-            if (!result.success) {
-                console.error('Hiba:', result.message);
-                chatMessages.innerHTML = '<h2 class="no_content_message">Hiba az üzenetek betöltése közben.</h2>';
-                return;
-            }
-            
-            // Üzenetek megjelenítése
-            chatMessages.innerHTML = '';
-            
-            if (!result.has_messages) {
-                // Ha nincs üzenet, rendszer üzenet jelenik meg
-                chatMessages.innerHTML = '<div class="chat_row other"><div class="chat_bubble"><div>Még nincs üzenet ebben a chatszobában! Légy te az első!</div><div class="chat_meta">Rendszer • ' + getCurrentTimestamp() + '</div></div></div>';
-            } else {
-                // Üzenetek megjelenítése
-                result.messages.forEach(message => {
-                    displayMessage(message.text, message.is_me, message.sender_nickname, message.send_time);
+            if (result.success && result.messages.length > 0) {
+                result.messages.forEach(msg => {
+                    displayMessage(msg.text, msg.is_me, msg.sender_nickname, msg.send_time);
+                    
+                    const msgId = parseInt(msg.msg_id);
+                    if (msgId > lastKnownMessageId) {
+                        lastKnownMessageId = msgId;
+                    }
                 });
+                
+                chatMessages.scrollTop = chatMessages.scrollHeight;
+            } else if (lastKnownMessageId === 0 && (!result.messages || result.messages.length === 0)) {
+                 chatMessages.innerHTML = '<div class="chat_row other"><div class="chat_bubble">Még nincs üzenet. Légy te az első!</div></div>';
             }
-            
         } catch (error) {
-            console.error('Hiba az üzenetek betöltése közben:', error);
-            chatMessages.innerHTML = '<h2 class="no_content_message">Hiba az üzenetek betöltése közben.</h2>';
+            console.error('Chat polling hiba:', error);
         }
     }
 
-    // Üzenet küldése
-    if (chatComposer && chatText) {
-        chatComposer.addEventListener('submit', function(e) {
+    // 5. Üzenet megjelenítése
+    function displayMessage(text, isMe, senderName, time) {
+        if (chatMessages.innerHTML.includes('Még nincs üzenet')) {
+            chatMessages.innerHTML = '';
+        }
+
+        const row = document.createElement('div');
+        row.className = `chat_row ${isMe ? 'me' : 'other'}`;
+        
+        const dateObj = new Date(time);
+        const timeStr = isNaN(dateObj.getTime()) ? time : dateObj.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+
+        row.innerHTML = `
+            <div class="chat_bubble ${isMe ? 'me' : ''}">
+                <div class="message_text">${escapeHtml(text)}</div>
+                <div class="chat_meta">${escapeHtml(isMe ? 'Én' : senderName)} • ${timeStr}</div>
+            </div>
+        `;
+        
+        chatMessages.appendChild(row);
+    }
+
+    // 6. Üzenet KÜLDÉSE
+    if (chatComposer) {
+        chatComposer.addEventListener('submit', async function(e) {
             e.preventDefault();
-            
-            const messageText = chatText.value.trim();
-            if (!messageText) return;
+            const text = chatText.value.trim();
+            if (!text || !activeChatroomId) return;
 
-            // TODO: Backend - Üzenet mentése adatbázisba (amennyiben a szoba létezik)
+            chatText.value = ''; // Mező törlése azonnal
 
-            displayMessage(messageText, true);
-            chatText.value = '';
+            try {
+                const response = await fetch('php/send_message.php', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        room_id: activeChatroomId,
+                        text: text
+                    })
+                });
+                
+                const result = await response.json();
+                if (result.success) {
+                    fetchNewMessages(activeChatroomId); // Frissítés
+                } else {
+                    alert('Hiba: ' + result.error);
+                }
+            } catch (err) {
+                console.error(err);
+                alert('Küldési hiba!');
+            }
         });
 
-        // Enter küldéshez
         chatText.addEventListener('keydown', function(e) {
             if (e.key === 'Enter' && !e.shiftKey) {
                 e.preventDefault();
@@ -2898,97 +2903,31 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
-    // Üzenet megjelenítése
-    function displayMessage(text, isMe = false, senderNickname = null, sendTime = null) {
-        if (!chatMessages) return;
-        
-        const messageDiv = document.createElement('div');
-        messageDiv.className = `chat_row ${isMe ? 'me' : 'other'}`;
-        
-        // Ha nincs megadva küldő és idő, akkor aktuális adatokat használunk (új üzenet esetén)
-        const displayName = isMe ? 'Én' : (senderNickname || 'Felhasználó');
-        const displayTime = sendTime ? formatTimestamp(sendTime) : getCurrentTimestamp();
-        
-        messageDiv.innerHTML = `
-            <div class="chat_bubble ${isMe ? 'me' : ''}">
-                <div>${escapeHtml(text)}</div>
-                <div class="chat_meta">${escapeHtml(displayName)} • ${displayTime}</div>
-            </div>
-        `;
-        chatMessages.appendChild(messageDiv);
-        chatMessages.scrollTop = chatMessages.scrollHeight;
-    }
-
-    // Időbélyeg formázása
-    function getCurrentTimestamp() {
-        const now = new Date();
-        return `${now.getFullYear()}-${pad(now.getMonth() + 1)}-${pad(now.getDate())} ${pad(now.getHours())}:${pad(now.getMinutes())}`;
-    }
-    
-    // Backend-ről érkező időbélyeg formázása (YYYY-MM-DD HH:MM:SS formátumból)
-    function formatTimestamp(timestamp) {
-        if (!timestamp) return getCurrentTimestamp();
-        
-        const date = new Date(timestamp);
-        return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())} ${pad(date.getHours())}:${pad(date.getMinutes())}`;
-    }
-
-    function pad(num) {
-        return String(num).padStart(2, '0');
-    }
-
-    // TODO: Backend - Új üzenetek időszakos lekérése (pl. AJAX segítségével)
-
-    // Oldalsáv kezelése
+    // Oldalsáv (Sidebar) kezelése mobilon
     const sidebarToggle = document.getElementById('sidebar-toggle');
     const sidebarClose = document.getElementById('sidebar-close');
     const sidebar = document.getElementById('sidebar');
     const backgroundOverlay = document.getElementById('background-overlay');
     
     if (sidebarToggle && sidebarClose && sidebar && backgroundOverlay) {
-        // Kezdeti állapot beállítása mobilon (600px alatt)
-        function handleSidebarResize() {
-            if (window.innerWidth <= 600) {
-                sidebar.classList.remove('visible');
-                sidebar.classList.add('hidden');
-                backgroundOverlay.style.display = 'none';
-            } else {
-                // Nagyobb képernyőn eltávolítjuk a mobilos osztályokat
-                sidebar.classList.remove('hidden');
-                sidebar.classList.remove('visible');
-                backgroundOverlay.style.display = 'none';
-            }
-        }
-        
-        // Kezdeti állapot beállítása
-        handleSidebarResize();
-        
-        // Ablak átméretezésekor újra ellenőrzés
-        window.addEventListener('resize', handleSidebarResize);
-        
-        // Sidebar megnyitása a toggle gombbal
-        sidebarToggle.addEventListener('click', function() {
-            if (sidebar.classList.contains('hidden')) {
-                sidebar.classList.remove('hidden');
-                sidebar.classList.add('visible');
-                backgroundOverlay.style.display = 'block';
-            }
+        sidebarToggle.addEventListener('click', () => {
+            sidebar.classList.remove('hidden');
+            sidebar.classList.add('visible');
+            backgroundOverlay.style.display = 'block';
         });
 
-        // Sidebar bezárása a close gombbal
-        sidebarClose.addEventListener('click', function() {
+        const closeSidebar = () => {
             sidebar.classList.remove('visible');
             sidebar.classList.add('hidden');
             backgroundOverlay.style.display = 'none';
-        });
-        
-        // Sidebar bezárása a háttérre kattintva
-        backgroundOverlay.addEventListener('click', function() {
-            sidebar.classList.remove('visible');
-            sidebar.classList.add('hidden');
-            backgroundOverlay.style.display = 'none';
-        });
+        };
+
+        sidebarClose.addEventListener('click', closeSidebar);
+        backgroundOverlay.addEventListener('click', closeSidebar);
     }
+
+    // Indítás
+    generateChatroomList();
 })();
 
 // Tárgy felvétele
@@ -6548,3 +6487,465 @@ document.addEventListener('click', function(e) {
     });
 
 })();
+// ==========================================
+// 1. ALAPVETŐ SEGÉDFÜGGVÉNYEK (Loading, stb.)
+// ==========================================
+
+function showLoading(message = 'Betöltés...') {
+    let loadingScreen = document.getElementById('loading-screen');
+    if (!loadingScreen) return;
+    
+    const loadingText = loadingScreen.querySelector('.loading-text');
+    if (loadingText) loadingText.textContent = message;
+    
+    loadingScreen.classList.add('active');
+    loadingScreen.classList.remove('hidden'); // Biztos ami biztos
+}
+
+function hideLoading() {
+    const loadingScreen = document.getElementById('loading-screen');
+    if (loadingScreen) {
+        setTimeout(() => {
+            loadingScreen.classList.remove('active');
+            // Ha ez az első betöltés (initial), vegyük ki a DOM-ból vagy rejtsük el
+            if (loadingScreen.classList.contains('initial-loading')) {
+                loadingScreen.style.display = 'none'; 
+            }
+        }, 500);
+    }
+}
+
+// Oldal betöltésekor eltüntetjük a töltőképernyőt
+window.onload = function() {
+    hideLoading();
+};
+
+// 2. FŐ LOGIKA (DOM BETÖLTÉS UTÁN)
+
+document.addEventListener('DOMContentLoaded', function() {
+    console.log("Scripts.js betöltve - Tiszta lap.");
+
+    // Globális változók a jelentéshez
+    let currentReportType = '';
+    let currentReportId = 0;
+
+    // A) Modal bezárás (X gombok és háttér)
+    
+    // Gombok
+    const closeButtons = document.querySelectorAll('.modal_close_button, .report_close_button');
+    closeButtons.forEach(btn => {
+        btn.addEventListener('click', (e) => {
+            e.preventDefault();
+            const modal = btn.closest('.modal');
+            if (modal) modal.classList.add('hidden');
+        });
+    });
+
+    // Háttérre kattintás
+    const modals = document.querySelectorAll('.modal');
+    modals.forEach(modal => {
+        modal.addEventListener('click', (e) => {
+            if (e.target === modal) modal.classList.add('hidden');
+        });
+    });
+
+    // B) Fájl részletek megnyitása
+
+    document.body.addEventListener('click', async function(e) {
+        // Keressük a fájl részletek linket/kártyát
+        const link = e.target.closest('.file_details_link') || e.target.closest('.uploaded_files_container a.container_link');
+        
+        // Csak akkor fut, ha NEM saját fájlra kattintasz (sajátnál 'own_details_link' van)
+        if (link && !link.classList.contains('own_details_link')) {
+            e.preventDefault();
+            
+            const upId = link.getAttribute('data-up-id');
+            if (!upId) return; // Ha nincs ID, nem csinálunk semmit
+
+            showLoading('Fájl adatok betöltése...');
+
+            try {
+                // PHP hívás a részletekért
+                const response = await fetch(`php/getFileDetails.php?mode=upload&id=${upId}`);
+                const result = await response.json();
+
+                if (result.success) {
+                    const data = result.data;
+                    const modal = document.querySelector('.file_details_modal');
+                    
+                    if (modal) {
+                        // BEÁLLÍTJUK AZ ID-T A MODALRA (Ez kritikus a jelentéshez!)
+                        modal.setAttribute('data-up-id', data.up_id);
+
+                        // Kitöltjük az adatokat (Cím, leírás, stb.)
+                        if(modal.querySelector('.data-file-title')) modal.querySelector('.data-file-title').textContent = data.title;
+                        if(modal.querySelector('.data-file-uploader')) modal.querySelector('.data-file-uploader').textContent = data.uploader;
+                        if(modal.querySelector('.data-file-name')) modal.querySelector('.data-file-name').textContent = data.file_name;
+                        if(modal.querySelector('.data-file-description')) modal.querySelector('.data-file-description').textContent = data.description;
+                        
+                        // Megnyitjuk a modalt
+                        setTimeout(() => {
+                            hideLoading();
+                            modal.classList.remove('hidden');
+                        }, 500);
+                    }
+                } else {
+                    hideLoading();
+                    alert("Hiba: " + result.message);
+                }
+            } catch (error) {
+                hideLoading();
+                console.error(error);
+                alert("Hálózati hiba a fájl megnyitásakor.");
+            }
+        }
+    });
+    // JELENTÉS FUNKCIÓ - Gombnyo
+   
+    document.body.addEventListener('click', function(e) {
+        const reportBtn = e.target.closest('.report_button');
+        
+        if (reportBtn) {
+            e.preventDefault();
+            console.log("Jelentés gomb megnyomva.");
+
+            // Reset
+            currentReportType = '';
+            currentReportId = 0;
+
+            // 1. Megnézzük, hogy MODAL-ban vagyunk-e (pl. Részletek ablak)
+            const parentModal = reportBtn.closest('.modal');
+            
+            if (parentModal) {
+                if (parentModal.hasAttribute('data-up-id')) {
+                    currentReportType = 'upload';
+                    currentReportId = parentModal.getAttribute('data-up-id');
+                } else if (parentModal.hasAttribute('data-request-id')) {
+                    currentReportType = 'request';
+                    currentReportId = parentModal.getAttribute('data-request-id');
+                } else if (parentModal.hasAttribute('data-room-id')) {
+                    currentReportType = 'chatroom';
+                    currentReportId = parentModal.getAttribute('data-room-id');
+                }
+            }
+
+            // 2. Ha nem modalban találtuk, megnézzük a KÁRTYÁT (Lista nézet)
+            if (!currentReportId) {
+                const card = reportBtn.closest('.content_container');
+                if (card) {
+                    // A) Kérelem (Request)
+                    // A kérelem ID-ja gyakran a benne lévő link attribútumában van
+                    const reqLink = card.querySelector('[data-request-id]');
+                    if (reqLink) {
+                        currentReportType = 'request';
+                        currentReportId = reqLink.getAttribute('data-request-id');
+                    }
+                    // B) Chatszoba (Chatroom)
+                    // A chatszoba ID-ja magán a konténeren szokott lenni
+                    else if (card.hasAttribute('data-room-id')) {
+                        currentReportType = 'chatroom';
+                        currentReportId = card.getAttribute('data-room-id');
+                    }
+                    // C) Fájl (Upload)
+                    // Ritka, de ha listából jelentjük
+                    else if (card.querySelector('[data-up-id]')) {
+                        currentReportType = 'upload';
+                        currentReportId = card.querySelector('[data-up-id]').getAttribute('data-up-id');
+                    }
+                }
+            }
+
+            console.log("Azonosítva:", currentReportType, currentReportId);
+            
+            // Ha sikerült azonosítani, nyitjuk a jelentés ablakot
+            if (currentReportType && currentReportId) {
+                const reportModal = document.querySelector('.report_content_modal');
+                if (reportModal) {
+                    // Töröljük az előző szöveget
+                    const textarea = reportModal.querySelector('#report_description');
+                    if(textarea) textarea.value = '';
+                    
+                    reportModal.classList.remove('hidden');
+                }
+            } else {
+                alert("Hiba: Nem sikerült azonosítani az elemet (ID nem található)!");
+            }
+        }
+    });
+
+    // JELENTÉS BEKÜLDÉSE
+    const reportForm = document.getElementById('reportContentForm');
+    
+    if (reportForm) {
+        reportForm.addEventListener('submit', async function(e) {
+            e.preventDefault(); // NE TÖLTSÖN ÚJRA AZ OLDAL!
+            
+            if (!currentReportType || !currentReportId) {
+                alert("Hiba: Hiányzó adatok! Indítsd újra a folyamatot.");
+                return;
+            }
+
+            const formData = new FormData(this);
+            formData.append('item_type', currentReportType);
+            formData.append('item_id', currentReportId);
+
+            try {
+                showLoading("Jelentés küldése...");
+                
+                const response = await fetch('php/submit_report.php', {
+                    method: 'POST',
+                    body: formData
+                });
+
+                const result = await response.json();
+                
+                setTimeout(() => {
+                    hideLoading();
+                    if (result.success) {
+                        alert("Sikeres jelentés!");
+                        // Bezárjuk a modalt
+                        document.querySelector('.report_content_modal').classList.add('hidden');
+                    } else {
+                        alert("Hiba: " + result.error);
+                    }
+                }, 500);
+
+            } catch (error) {
+                hideLoading();
+                console.error("Fetch hiba:", error);
+                alert("Szerver hiba történt!");
+            }
+        });
+    }
+
+});
+    // ÚJ KÉRELEM KEZELÉSE
+
+    // 1. Modal megnyitása
+    document.body.addEventListener('click', function(e) {
+        // Megkeressük a gombot (add_request_button)
+        const addBtn = e.target.closest('.add_request_button');
+        if (addBtn) {
+            e.preventDefault();
+            const modal = document.querySelector('.add_request_modal');
+            if (modal) {
+                modal.classList.remove('hidden');
+            }
+        }
+    });
+
+    // 2. Űrlap beküldése
+    const addRequestForm = document.getElementById('add_request_form');
+    
+    if (addRequestForm) {
+        addRequestForm.addEventListener('submit', async function(e) {
+            e.preventDefault(); // Megállítjuk az oldal újratöltést
+            
+            // Kiolvassuk a tárgy kódját az URL-ből 
+            const urlParams = new URLSearchParams(window.location.search);
+            const classCode = urlParams.get('class_code');
+            
+            if (!classCode) {
+                alert('Hiba: Nem található a tárgy kódja az URL-ben!');
+                return;
+            }
+
+            // Adatok összegyűjtése
+            const formData = new FormData(this);
+            formData.append('class_code', classCode); // Hozzácsapjuk a kódot
+
+            try {
+                showLoading('Kérelem létrehozása...');
+                
+                const response = await fetch('php/add_request.php', {
+                    method: 'POST',
+                    body: formData
+                });
+                
+                const result = await response.json();
+                
+                setTimeout(() => {
+                    hideLoading();
+                    if (result.success) {
+                        alert(result.message);
+                        // Bezárjuk a modalt
+                        document.querySelector('.request_close_button').click();
+                        // Töröljük a mezőket
+                        addRequestForm.reset();
+                        // Frissítjük az oldalt, hogy látszódjon az új kérelem
+                        location.reload();
+                    } else {
+                        alert('Hiba: ' + result.error);
+                    }
+                }, 500);
+                
+            } catch (error) {
+                hideLoading();
+                console.error('Hiba:', error);
+                alert('Hálózati hiba történt!');
+            }
+        });
+    }
+    // ÚJ CHATSZOBA KEZELÉSE
+
+
+    // 1. Modal megnyitása
+    document.body.addEventListener('click', function(e) {
+        const addBtn = e.target.closest('.add_chatroom_button');
+        if (addBtn) {
+            e.preventDefault();
+            const modal = document.querySelector('.add_chatroom_modal');
+            if (modal) {
+                modal.classList.remove('hidden');
+            }
+        }
+    });
+
+    // 2. Űrlap beküldése
+    const addChatroomForm = document.getElementById('add_chatroom_form');
+    if (addChatroomForm) {
+        addChatroomForm.addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const urlParams = new URLSearchParams(window.location.search);
+            const classCode = urlParams.get('class_code');
+            
+            if (!classCode) {
+                alert('Hiba: Nem található a tárgy kódja az URL-ben!');
+                return;
+            }
+
+            const formData = new FormData(this);
+            formData.append('class_code', classCode);
+
+            try {
+                showLoading('Chatszoba létrehozása...');
+                
+                const response = await fetch('php/add_chatroom.php', {
+                    method: 'POST',
+                    body: formData
+                });
+                
+                const result = await response.json();
+                
+                setTimeout(() => {
+                    hideLoading();
+                    if (result.success) {
+                        alert(result.message);
+                        document.querySelector('.chatroom_close_button').click();
+                        addChatroomForm.reset();
+                        location.reload();
+                    } else {
+                        alert('Hiba: ' + result.error);
+                    }
+                }, 500);
+                
+            } catch (error) {
+                hideLoading();
+                console.error('Hiba:', error);
+                alert('Hálózati hiba történt!');
+            }
+        });
+    }
+
+    // ADMIN: TÁRGYAK KEZELÉSE
+ 
+
+    // Csak akkor fusson, ha az admin oldalon vagyunk
+    if (document.getElementById('admin_page')) {
+
+        // 1. Új tárgy hozzáadása
+        const addSubjectForm = document.getElementById('addSubjectForm');
+        if (addSubjectForm) {
+            addSubjectForm.addEventListener('submit', async function(e) {
+                e.preventDefault();
+                const formData = new FormData(this);
+                formData.append('action', 'add');
+
+                try {
+                    showLoading("Mentés...");
+                    const response = await fetch('php/admin_subject_handler.php', {
+                        method: 'POST',
+                        body: formData
+                    });
+                    const result = await response.json();
+                    
+                    setTimeout(() => {
+                        hideLoading();
+                        if (result.success) {
+                            alert(result.message);
+                            location.reload(); // Frissítés, hogy látsszon a listában
+                        } else {
+                            alert("Hiba: " + result.error);
+                        }
+                    }, 500);
+                } catch (error) {
+                    hideLoading();
+                    console.error(error);
+                }
+            });
+        }
+
+        // 2. Tárgy szerkesztése - Modal megnyitása és adatok betöltése
+        // (Mivel a gombok dinamikusan jöhetnek létre, a document-re tesszük a figyelőt)
+        document.addEventListener('click', function(e) {
+            const editBtn = e.target.closest('.subject_edit_button');
+            if (editBtn) {
+                e.preventDefault();
+                
+                // Adatok kinyerése a kártyából
+                const container = editBtn.closest('.admin_subject_container');
+                const name = container.querySelector('h2').textContent;
+                const code = container.querySelector('p').textContent;
+
+                const modal = document.querySelector('.admin_edit_subject_modal');
+                if (modal) {
+                    // Mezők kitöltése
+                    modal.querySelector('#editSubjectName').value = name;
+                    modal.querySelector('#editSubjectCode').value = code;
+                    
+                    // Eredeti kód mentése (hogy tudjuk, mit módosítunk)
+                    modal.setAttribute('data-original-code', code);
+                    
+                    modal.classList.remove('hidden');
+                }
+            }
+        });
+
+        // 3. Szerkesztés mentése
+        const editSubjectForm = document.getElementById('editSubjectForm');
+        if (editSubjectForm) {
+            editSubjectForm.addEventListener('submit', async function(e) {
+                e.preventDefault();
+                
+                const modal = this.closest('.modal');
+                const originalCode = modal.getAttribute('data-original-code');
+
+                const formData = new FormData(this);
+                formData.append('action', 'edit');
+                formData.append('original_class_code', originalCode);
+
+                try {
+                    showLoading("Frissítés...");
+                    const response = await fetch('php/admin_subject_handler.php', {
+                        method: 'POST',
+                        body: formData
+                    });
+                    const result = await response.json();
+                    
+                    setTimeout(() => {
+                        hideLoading();
+                        if (result.success) {
+                            alert(result.message);
+                            location.reload();
+                        } else {
+                            alert("Hiba: " + result.error);
+                        }
+                    }, 500);
+                } catch (error) {
+                    hideLoading();
+                    console.error(error);
+                }
+            });
+        }
+    }
