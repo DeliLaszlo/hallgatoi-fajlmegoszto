@@ -4707,7 +4707,7 @@ document.addEventListener('click', function(e) {
             reason.textContent = report.report_description;
 
             const meta = document.createElement('p');
-            meta.textContent = `${report.reporter_name} (${report.reported_neptun})`;
+            meta.textContent = `${report.reporter_name} (${report.report_neptun})`;
 
             reportDiv.appendChild(title);
             reportDiv.appendChild(reason);

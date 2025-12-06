@@ -38,7 +38,7 @@ try {
 
     // Neptun kód kisbetűvel szerepel
     $neptun = strtolower(trim($neptun));
-    $stmt = $conn->prepare("SELECT password FROM user WHERE neptun_k = ?");
+    $stmt = $conn->prepare("SELECT password, admin FROM user WHERE neptun_k = ?");
     $stmt->bind_param("s", $neptun);
     $stmt->execute();
     $result = $stmt->get_result();
@@ -56,8 +56,8 @@ try {
         $_SESSION['user_neptun'] = $neptun;
         $_SESSION['last_activity'] = time();
         
-        // Admin ellenőrzés
-        $isAdmin = ($neptun === 'admin1');
+        // Admin ellenőrzés az adatbázisból
+        $isAdmin = ($row['admin'] == 1);
         if ($isAdmin) {
             $_SESSION['isAdmin'] = true;
         } else {

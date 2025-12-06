@@ -20,7 +20,7 @@ if (!isset($_SESSION['isAdmin']) || $_SESSION['isAdmin'] !== true) {
 try {
     $query = "SELECT 
                 r.report_id,
-                r.reported_neptun,
+                r.report_neptun,
                 r.reported_type,
                 r.reported_table,
                 r.reported_id,
@@ -29,7 +29,7 @@ try {
                 u.vnev,
                 u.knev
               FROM report r
-              JOIN user u ON r.reported_neptun = u.neptun_k
+              JOIN user u ON r.report_neptun = u.neptun_k
               ORDER BY r.report_id DESC";
     
     $stmt = $pdo->prepare($query);
@@ -97,7 +97,7 @@ try {
         }
         
         $report['reporter_name'] = $report['vnev'] . ' ' . $report['knev'];
-        $report['reporter_neptun'] = $report['reported_neptun'];
+        $report['reporter_neptun'] = $report['report_neptun'];
     }
     
     echo json_encode(['success' => true, 'reports' => $reports]);

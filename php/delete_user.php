@@ -77,7 +77,7 @@ try {
     // 1. Töröljük a felhasználó által beküldött jelentéseket
     $deleteReporterStmt = $pdo->prepare("
         DELETE FROM report 
-        WHERE reported_neptun = :neptun
+        WHERE report_neptun = :neptun
     ");
     $deleteReporterStmt->execute([':neptun' => $neptunToDelete]);
     

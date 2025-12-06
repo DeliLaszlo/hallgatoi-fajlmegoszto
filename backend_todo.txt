@@ -2,11 +2,11 @@ I. Gombok
 - Subject fájlok -  jelentés
 - Subject kérelmek - új kérelem, jelentés
 - Subject chatszoba - új chatszoba, jelentés
-(reported_id = jelentő, reported_table = típus, reported_id=jelentett dolog id-je alapján legyen)
+(report_id = jelentő, reported_table = típus, reported_id=jelentett dolog id-je alapján legyen)
 
 II. Chatszoba
 - Küldött üzenetek mentése adatbázisba
 - Új üzenetek időszakos lekérése
 
-III. Admin oldal (egyenlőre admin1 felhasználó létrehozásával lehet belépni rá)
+III. Admin oldal (admin1 felhasználó)
 - Új tárgy hozzáadás kezelése, tárgy szerkesztés kezelése
