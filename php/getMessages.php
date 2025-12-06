@@ -2,7 +2,6 @@
 session_start();
 header('Content-Type: application/json');
 
-// Adatbázis kapcsolat
 require_once __DIR__ . '/../config.php';
 $conn = getMysqliConnection();
 
@@ -14,6 +13,8 @@ if (!isset($_SESSION['user_neptun'])) {
 
 $user_neptun = $_SESSION['user_neptun'];
 $room_id = $_GET['room_id'] ?? null;
+
+$last_msg_id = isset($_GET['last_id']) ? intval($_GET['last_id']) : 0;
 
 if (!$room_id) {
     echo json_encode(['success' => false, 'message' => 'Hiányzó room_id paraméter']);
@@ -33,7 +34,7 @@ try {
         exit();
     }
     
-    // Üzenetek lekérdezése
+    // JAVÍTÁS: Csak az új üzeneteket kérjük le (m.msg_id > ?)
     $query = "SELECT 
                 m.msg_id,
                 m.sender_neptun,
@@ -42,11 +43,12 @@ try {
                 u.nickname as sender_nickname
               FROM message m
               LEFT JOIN user u ON m.sender_neptun = u.neptun_k
-              WHERE m.room_id = ?
+              WHERE m.room_id = ? AND m.msg_id > ?
               ORDER BY m.send_time ASC";
     
     $stmt = $conn->prepare($query);
-    $stmt->bind_param("i", $room_id);
+    // Két paramétert kötünk be: room_id (i) és last_msg_id (i)
+    $stmt->bind_param("ii", $room_id, $last_msg_id);
     $stmt->execute();
     $result = $stmt->get_result();
     
@@ -56,7 +58,7 @@ try {
             'msg_id' => $row['msg_id'],
             'sender_neptun' => $row['sender_neptun'],
             'sender_nickname' => $row['sender_nickname'],
-            'text' => $row['text'],
+            'text' => $row['text'], 
             'send_time' => $row['send_time'],
             'is_me' => ($row['sender_neptun'] === $user_neptun)
         ];
