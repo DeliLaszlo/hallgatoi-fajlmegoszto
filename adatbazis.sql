@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Gép: 127.0.0.1
--- Létrehozás ideje: 2025. Dec 05. 22:45
+-- Létrehozás ideje: 2025. Dec 08. 12:20
 -- Kiszolgáló verziója: 10.4.32-MariaDB
 -- PHP verzió: 8.2.12
 
@@ -28,7 +28,7 @@ SET time_zone = "+00:00";
 --
 
 CREATE TABLE `chatroom` (
-  `room_id` int(5) NOT NULL,
+  `room_id` int(11) NOT NULL,
   `class_code` varchar(50) CHARACTER SET utf8 COLLATE utf8_hungarian_ci DEFAULT NULL,
   `creater_neptun` varchar(6) CHARACTER SET utf8 COLLATE utf8_hungarian_ci DEFAULT NULL,
   `title` varchar(75) CHARACTER SET utf8 COLLATE utf8_hungarian_ci NOT NULL,
@@ -77,7 +77,14 @@ INSERT INTO `chatroom` (`room_id`, `class_code`, `creater_neptun`, `title`, `des
 (10034, 'GKNB_INTM129', NULL, 'Modern szofterfejlesztési eszközök', 'Modern szofterfejlesztési eszközök nevű tárgy chatszobája', NULL),
 (10035, 'GKNB_TATM038', NULL, 'Virtualizációs technológiák', 'Virtualizációs technológiák nevű tárgy chatszobája', NULL),
 (10036, 'GKNB_INTM008', NULL, 'IT-szolgáltatások', 'IT-szolgáltatások nevű tárgy chatszobája', NULL),
-(10037, 'GKNB_INTM097', NULL, 'Szakdolgozati konzultáció 2', 'Szakdolgozati konzultáció 2 nevű tárgy chatszobája', NULL);
+(10037, 'GKNB_INTM097', NULL, 'Szakdolgozati konzultáció 2', 'Szakdolgozati konzultáció 2 nevű tárgy chatszobája', NULL),
+(10038, 'GKNB_INTM123', 'asd123', 'Adatbázis 4. csoport', 'Közös projekt egyetemi feladat végrehajtására', NULL),
+(10069, 'GKNB_INTM123', 'asd123', 'uj adatbazis2', 'chat', NULL),
+(10070, 'GKNB_MSTM065', 'asd123', 'Algo gyakorló', 'Gyakorló chatszoba', NULL),
+(10071, 'GKNB_MSTM065', 'asd123', 'Algo gyakorló2', 'Gyakorló chatszoba', NULL),
+(10090, 'GKNB_MSTM065', 'asd123', 'check', 'check if its good', NULL),
+(10091, 'GKNB_INTM123', 'yxc123', 'Felhő tanuló csoport', 'Hajni tanuló csoportja, de szívesen látunk bárkit', NULL),
+(10092, 'GKNB_INTM115', 'yxc123', 'Igaz-Hamis', 'Ebbe a szobába gyűjtünk kérdéseket, melyeket mi írunk, hogy a vizsgára tudjunk gyakorolni.', NULL);
 
 -- --------------------------------------------------------
 
@@ -204,7 +211,15 @@ INSERT INTO `request` (`request_id`, `neptun_k`, `class_code`, `request_name`, `
 (10016, 'asd123', 'GKNB_MSTM065', 'Feladatok', '2025-12-05', 'Milyen feladatokban lehet buborékrendezés, kiíratás, és a for ciklus használata?'),
 (10017, 'asd123', 'GKNB_MSTM065', 'Utasítások', '2025-12-05', 'Milyen utasításkészlete van a pszeudokódnak?'),
 (10018, 'asd123', 'GKNB_INTM123', 'Megszorítások', '2025-12-05', 'Hogyan állítjuk be a megszorításokat, és melyek a gyakorlatban legtöbbet előforduló típusai'),
-(10019, 'asd123', 'GKNB_INTM118', 'Projekt menete', '2025-12-05', 'Milyen lépései vannak egy projekt megvalósításának?');
+(10019, 'asd123', 'GKNB_INTM118', 'Projekt menete', '2025-12-05', 'Milyen lépései vannak egy projekt megvalósításának?'),
+(10020, 'asd123', 'GKNB_INTM118', 'SWOT analízis', '2025-12-05', 'Hogy készítsek el egy swot analízist?'),
+(10021, 'asd123', 'GKNB_INTM115', 'A windows fejlődése', '2025-12-05', 'Hogyan fejlődött a windows és milyen újítások érkeztek az adott rendszerekkel?'),
+(10022, 'yxc123', 'GKNB_INTM123', 'Féléves feladat előadása', '2025-12-08', 'Miknek kell szerepelnie a féléves feladatot bemutató ppt-ben? Milyen hosszú kell, hogy legyen az előadásunk'),
+(10023, 'yxc123', 'GKNB_INTM123', 'Adatok feltöltése', '2025-12-08', 'Milyen adatok hitelesek és valóségszerűek egy fodrászat időpont foglaló adatbázisában. Milyen funkciókat igényelhet ennek weboldala?'),
+(10024, 'yxc123', 'GKNB_MSTM065', 'Impera bejelentkezés', '2025-12-08', 'Hogyan kell bejelentkezni az Imperaban, hogy a gyakorló feladatokat eltudjam végezni?'),
+(10025, 'yxc123', 'GKNB_FKTM045', 'Ferdehajítás', '2025-12-08', 'Hogyan kell leprogramozni a ferdehajítást jupyter notebookon belül'),
+(10026, 'asd123', 'GKNB_INTM115', 'Szálak és folyamatok', '2025-12-08', 'Hogyan működnek és mik a különbségek?'),
+(10027, 'qwe123', 'GKNB_INTM115', 'A windows NT alapú rendszerek', '2025-12-08', 'Egy rövid jegyzetek keresek az adott témában, esetleg pár helyen kifejtett részekkel');
 
 -- --------------------------------------------------------
 
@@ -226,7 +241,11 @@ INSERT INTO `room_access` (`neptun`, `room_id`, `active`) VALUES
 ('asd123', 10013, 1),
 ('asd123', 10010, 1),
 ('qwe123', 10007, 1),
-('qwe123', 10020, 1);
+('qwe123', 10020, 1),
+('asd123', 10090, 1),
+('yxc123', 10091, 1),
+('yxc123', 10092, 1),
+('asd123', 10092, 1);
 
 -- --------------------------------------------------------
 
@@ -261,7 +280,14 @@ INSERT INTO `upload` (`up_id`, `class_code`, `neptun`, `file_name`, `path_to_fil
 (1000010, 'GKNB_INTM123', 'asd123', 'kapcsolatok_joinok.txt', 'files/', 'Kapcsolatok', '2025-12-05', 0, 'Hogy kapcsoljuk össze a táblákat, hogy használjuk az azonosítókat. A különböző join-ok működése', 0),
 (1000011, 'GKNB_INTM123', 'asd123', 'script.txt', 'files/', 'Mentés', '2025-12-05', 0, 'Hogyan scripteljük az adatbázis, hogy minden adatot megfelelően kinyerjünk belőle', 0),
 (1000012, 'GKNB_MSTM065', 'qwe123', 'algo_parancsok.txt', 'files/', 'Algoritmus pszeudokód utasítások', '2025-12-05', 0, 'A pszeudokodban használt utasítások, és parancsok, illetve azok működése', 0),
-(1000013, 'GKNB_MSTM065', 'qwe123', 'algo_példafeladatok.txt', 'files/', 'Példafeladat megoldása', '2025-12-05', 0, 'Három típusú általam írt példafeladat és azok megoldása', 0);
+(1000013, 'GKNB_MSTM065', 'qwe123', 'algo_példafeladatok.txt', 'files/', 'Példafeladat megoldása', '2025-12-05', 0, 'Három típusú általam írt példafeladat és azok megoldása', 0),
+(1000014, 'GKNB_MSTM065', 'yxc123', 'Adatb_1_3ora_jegyzet.pdf', 'files/', 'Jegyzetek', '2025-12-08', 0, 'Az első három óra jegyzetei. Féléves feladat adattípusok és kapcsolatok.', 0),
+(1000015, 'GKNB_FKTM045', 'yxc123', 'raketa_ut_szamitas.pdf', 'files/', 'Rakéta', '2025-12-08', 0, 'Rakéta út és sebesség változásának számítása', 0),
+(1000016, 'GKNB_FKTM045', 'yxc123', 'szabadrugas_szamitas.pdf', 'files/', 'Szabadrúgás', '2025-12-08', 0, 'A szabdrúgás számítása. Milyen magasan és milyen sebességgel ér a kapuhoz', 0),
+(1000017, 'GKNB_INTM115', 'qwe123', '7eloadas.txt', 'files/', '7. óra', '2025-12-08', 0, 'A 7. tananyag jegyzete', 0),
+(1000018, 'GKNB_INTM115', 'yxc123', 'op.txt', 'files/', 'Fogalmak', '2025-12-08', 0, 'OP rendszerek tárgyhoz tartozó kulcsszavak, fogalmak és azok jelentései', 0),
+(1000019, 'GKNB_INTM118', 'admin1', 'bemutatas.docx', 'files/', 'Projekt bemutatása', '2025-12-08', 0, 'A féléves feladat bemutatásának módja', 0),
+(1000020, 'GKNB_INTM118', 'admin1', 'eloadas.docx', 'files/', 'Projekt minta', '2025-12-08', 0, 'Sablon megoldás a féléves feladathoz. Kérem ezt ne adják le mint saját projekt', 0);
 
 -- --------------------------------------------------------
 
@@ -310,7 +336,8 @@ INSERT INTO `user` (`neptun_k`, `nickname`, `password`, `vnev`, `knev`, `email`,
 ('admin1', 'admin1', '$2y$10$f2v274aS9BorBTrpfv/MMeCkp6LqvjT5N100gHlT0wu9HVTeXqkbS', 'Erdős', 'András', 'adminferenc@gmail.com', 1),
 ('ASD123', 'teszt1', '$2y$10$jAbOZefHgUgUCB4F0bdQgevBtkGsbENuVliNLBrIJPBEpu3kDJi9S', 'Proba', 'Lajos', 'asd123@gmail.com', NULL),
 ('iokfp4', 'Sziszaat', '$2y$10$AmXof3YS5REZHEYIdw9r2u3//ulqKB9ij/RGJmgNEXUiyshC2V2Z6', 'asd', 'asd', 'szabolcsszigetvari2003@gmail.com', NULL),
-('qwe123', 'KJani', '$2y$10$NPq8E1M7Atr3QnPdW9XfLevglUd2xEiAHj8GTCTaZPC6bUA.8lGLK', 'Kiss', 'János', 'k.jani@gmail.com', NULL);
+('qwe123', 'KJani', '$2y$10$NPq8E1M7Atr3QnPdW9XfLevglUd2xEiAHj8GTCTaZPC6bUA.8lGLK', 'Kiss', 'János', 'k.jani@gmail.com', NULL),
+('yxc123', 'Hajnika', '$2y$10$Ew7J9AM9nFbVEJipET3E7.t/kbBRnsrEtfxC0nARXpY6FDe3Idv3u', 'Felhő', 'Hajnalka', 'hajni.felho@gmail.com', NULL);
 
 -- --------------------------------------------------------
 
@@ -336,7 +363,16 @@ INSERT INTO `user_classes` (`class_code`, `neptun`, `allapot`) VALUES
 ('GKNB_FKTM045', 'qwe123', 'F'),
 ('GKNB_INTM087', 'qwe123', 'F'),
 ('GKNB_MSTM065', 'asd123', 'F'),
-('GKNB_INTM123', 'qwe123', 'F');
+('GKNB_INTM123', 'qwe123', 'F'),
+('GKNB_INTM123', 'yxc123', 'F'),
+('GKNB_MSTM065', 'yxc123', 'F'),
+('GKNB_MSTM064', 'yxc123', 'F'),
+('GKNB_AUTM077', 'yxc123', 'F'),
+('GKNB_FKTM045', 'yxc123', 'F'),
+('GKNB_MSTM001', 'yxc123', 'F'),
+('GKNB_INTM115', 'qwe123', 'F'),
+('GKNB_INTM115', 'yxc123', 'F'),
+('GKNB_INTM118', 'admin1', 'F');
 
 -- --------------------------------------------------------
 
@@ -413,10 +449,16 @@ ALTER TABLE `user`
 --
 
 --
+-- AUTO_INCREMENT a táblához `chatroom`
+--
+ALTER TABLE `chatroom`
+  MODIFY `room_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=10093;
+
+--
 -- AUTO_INCREMENT a táblához `request`
 --
 ALTER TABLE `request`
-  MODIFY `request_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=10020;
+  MODIFY `request_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=10028;
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
