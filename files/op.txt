@@ -1,0 +1,118 @@
+FAT, FAT12-16-32, exFAT
+FAT: Fila ALlocation Table
+Az egyik legelső fix méretű blokkolból álló, láncolt lista szerkezetű fájlrendszer
+FDD, és HDD technológiában ma is használt
+
+HPFS
+HPFS: High Performance File System
+IBM által fejlesztett
+200 mb. kapacitás felettmutat előnyöket
+Évekig nem kell töredezettségmentesíteni
+Főkönyvtár a lemez közepén, nem pedig az elején
+
+NTFS
+NTFS: New technology File System
+
+UFS
+UFS: Unix File System
+1984-ben a Berkley egyetemen fejlesztették ki
+Paraméterei az akkor FAT rendszereknél minden szempontból jobbak voltak
+Szuperblokk, ami "Magic numbert" tartalmazott a használt lemez geometriájával, statisztikáival finombeállításával
+A unix mindent (fizikai eszközöket, perifériákat is) fájlként kezel
+
+NFS
+NFS: Network File System
+Sun Microsystem fejlesztése
+Hálózatos rendszerek között biztosít transzparens állomány elérést
+Első verziója 1984-ben jelent meg
+Nem fizikai fájlrendszer hanem egy, a megosztést biztosító szoftverréteg
+Szerver-Kliens alapú működés
+Minden elosztott fájlrendszer alapja ilyen
+ 
+VFS
+VFS: Virtual File System
+Új absztrakciós réteget biztosítószoftveres virtualizációs megoldás
+1985-ben jelent megá
+Interfész a kernel, és a fizikai fájlrendszer között
+A futó alkalmazások anélkül érhetik el a fizikai tárolókat, hogy ismernék azok fájlrendszereit
+
+JFS
+JFS: Journal File System
+Az IBM fejlesztése, a HPFS továbbfejlesztése
+1990-ben jelent meg
+A naplózás segítségéval a rendszerösszeomlás, és áramkimaradás okozta adat konzisztencia problémák is szinte minden esetben autómatikusan javíthatók
+
+EXT, EXT2, EXT3, EXT4
+EXT: Extended File System
+1992-ben írta Rémy Card a Linus kerneléhez
+A Linux kernelben már a 0.96c verzió óta meglévő VFS első érdemi, és széles
+körben elterjedt felhasználása az EXT fájlrendszer
+EXT3 óta a jfsben megismert naplózási képesség is része a féjlrendszernek
+
+LTFS
+LTFS: Linear Tape File System
+LTO rendszerű mágnesszalagok jellemzóen archiválásra használt fájlrendszere
+HDD-hez hasonló adatszerkezetet, és adatkezelést biztosít
+2000-ben jelent meg
+
+CDFS, UDF
+CDFS: Conpact Disc File System
+UDF: Universal Disc Format
+Optikai lemezek lezárt, illetve nem lezárt fájlrendszerei
+
+Fájl (File) (Magyarul állomány)
+Összetartozó információkat értünk alatta
+Tartalma lehet program, szöveg, ábra vagy bármilyen kódolt információ
+Az OP rendszerek által használt fájlrendszereknek megfelelően, a perifériákon tárolódnak
+Jellemzően könyvtár struktúrában
+Egy fájlra egyedi azonosítója alapján hivatkozik a felhasználó
+Egy fálj használatához a felhasználónak - ha az elérési utat és a
+	fáljnevet ismeri – nem szükséges ismernie a fájl tárolásának fizikai paraméterei
+	Azaz hogy melyik fizikai eszközön
+	Az eszközön belül pontosan hol található a
+	fájl
+	Az eszköz milyen csatornán illeszkedik a rendszerhez
+	Mi a tárolás adategysége.
+
+A fájlrendszer tehát olyan szoftveres réteg amelky biztosítja, hogy a felhasználó a fizikai tárolót megfelelő jogosultsággal elérhesse
+Az abban használatos könyvtár struktúrákban adatokat tudjon tárolni
+A tárolt adatokat vissza tudja nyerni
+
+A fájlok a felhasználó igényei, illetve az OP rendszer szempontjai szerint könyvtárakba csoportosíthatók
+A könyvtárak és fájlok csoportosításának következő lépcsője a kötet
+A fájlkezelő rendszer a következő feladatokat kell, hogy ellássa:
+	Adatcsere, információátvitel, fájlok és foéyamatok tárterületei között
+	Műveletek a fájlokon, könyvtárakon, köteteken
+	Osztott fájlkezelés, egy fjlt egyszerre több folyamat rendelkezésére is bocsájtunk
+	Hozzáférések, jogosultságok szabályozása
+	Tárolt információ illetéktelen hozzáférés elleni védelme
+	Tárolt információ sérülések elleni védelme
+
+A fájlkezelő rendszer az OP rendszer I/O rendszerének szolgáltatásaira épül
+Gyakorlati megvalósítása további egymásra épülő szoftverek segítségével történik
+
+Az adatok az egyes rétegek szolgáltatásain keresztül,
+rétegenként kisebb-nagyobb átalakítások és konverziók során jutnak el a
+háttértárból az operatív tárba illetve az operatív tárból a háttértárba.
+
+A fájlkezelő rendszerek rétegei
+	Készülékkezelő
+		Közvetlenül a tárolóeszköz vezérlése
+		Operatív és háttértár közötti adatátvitel
+		Jellemző a megszakítások illetve a közvetlen memória elérés használata
+	Elemi átviteli műveletek réteg feladatai
+		Adott fájl leképzése optimális méretű blokkra
+		Háttértár és központi tár címrendszerei közötti konverzió
+		Az operatív és a háttértár sebesség különbségének kezelése gyorsítótárak(cache) igénybevételével
+	Állomáényszervező réteg feladatai
+	
+
+
+
+
+
+
+
+
+
+
