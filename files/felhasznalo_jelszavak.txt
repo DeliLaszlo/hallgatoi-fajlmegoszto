@@ -1,3 +1,4 @@
 asd123 jelszava 12345678
 qwe123 jelszava qwe123KissJanos
-admin1 jelszada adminFerenc123
+admin1 jelszava adminFerenc123
+yxc123 jelszava FelhoHyxc123
