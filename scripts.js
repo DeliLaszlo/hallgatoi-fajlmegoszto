@@ -1,4 +1,145 @@
-// Töltő képernyő kezelése
+/**
+ * ============================================================================
+ * HALLGATÓI FÁJLMEGOSZTÓ - MAIN JAVASCRIPT
+ * ============================================================================
+ * 
+ * Ez a fájl tartalmazza a hallgatói fájlmegosztó alkalmazás összes
+ * kliens oldali JavaScript funkcionalitását.
+ * 
+ * TARTALOM:
+ * 1. Globális konstansok és konfigurációk (TIMING, VALIDATION_PATTERNS, API)
+ * 2. Segédfüggvények (escapeHtml, showLoading, hideLoading, isPage, getUrlParam)
+ * 3. Oldal betöltés kezelése
+ * 4. Fő alkalmazás inicializálása (DOMContentLoaded)
+ *    4.1 Form váltás és téma kezelés
+ *    4.2 Dashboard generátor függvények
+ *    4.3 Login/Regisztráció kezelése
+ *    4.4 Navigáció és szekció váltás
+ *    4.5 Modal kezelés
+ *    4.6 Profil kezelés
+ *    4.7 Keresési funkciók
+ * 5. Chatszoba modul (IIFE)
+ * 6. Tárgy és tartalom műveletek (CRUD)
+ * 7. Admin modul (IIFE)
+ * 
+ * @author Hallgatói projekt
+ * @version 1.0.0
+ * ============================================================================
+ */
+
+'use strict';
+
+// ============================================================================
+// 1. GLOBÁLIS KONSTANSOK ÉS KONFIGURÁCIÓK
+// ============================================================================
+
+/**
+ * Időzítési konstansok (milliszekundumban)
+ */
+const TIMING = {
+    ANIMATION_FAST: 10,         // Gyors animáció (pl. classList hozzáadás)
+    ANIMATION_SHORT: 50,        // Rövid animáció
+    ANIMATION_MEDIUM: 100,      // Közepes animáció
+    MODAL_CLOSE: 400,           // Modal bezárási animáció
+    LOADING_SHORT: 500,         // Rövid betöltés
+    LOADING_LONG: 1250,         // Hosszú betöltés (pl. bejelentkezés)
+    CHAT_POLLING: 3000          // Chat frissítési időköz
+};
+
+/**
+ * Validációs minták (RegExp)
+ */
+const VALIDATION_PATTERNS = {
+    neptun: /^[A-Z0-9]{6}$/i,
+    username: /^[a-zA-Z0-9_]{3,20}$/,
+    fullname: /^[a-zA-ZáéíóöőúüűÁÉÍÓÖŐÚÜŰ]+ [a-zA-ZáéíóöőúüűÁÉÍÓÖŐÚÜŰ\s]{1,49}$/,
+    email: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
+    password: /^(?=.*[A-Z])(?=.*\d).{8,}$/
+};
+
+/**
+ * API végpontok
+ */
+const API = {
+    // Autentikáció
+    LOGIN: 'php/login.php',
+    LOGOUT: 'php/logout.php',
+    REGISTER: 'php/registration.php',
+    
+    // Felhasználó
+    PROFILE_GET: 'php/profile_get.php',
+    PROFILE_UPDATE: 'php/profile_update.php',
+    
+    // Tárgyak
+    GET_USER_SUBJECTS: 'php/getUserSubjects.php',
+    GET_AVAILABLE_SUBJECTS: 'php/getAvailableSubjects.php',
+    GET_ALL_SUBJECTS: 'php/getAllSubjects.php',
+    ADD_SUBJECT: 'php/add_subject.php',
+    DELETE_SUBJECT: 'php/delete_subject.php',
+    
+    // Fájlok
+    GET_FILES: 'php/getFiles.php',
+    GET_FILE_DETAILS: 'php/getFileDetails.php',
+    UPLOAD_FILE: 'php/upload_file.php',
+    EDIT_FILE: 'php/edit_file.php',
+    DELETE_FILE: 'php/delete_file.php',
+    DOWNLOAD_FILE: 'php/download_file.php',
+    INCREMENT_DOWNLOAD: 'php/increment_download.php',
+    
+    // Kérelmek
+    GET_REQUESTS: 'php/getRequests.php',
+    ADD_REQUEST: 'php/add_request.php',
+    EDIT_REQUEST: 'php/edit_request.php',
+    DELETE_REQUEST: 'php/delete_request.php',
+    ACCEPT_REQUEST: 'php/accept_request.php',
+    RESET_REQUEST: 'php/reset_request.php',
+    
+    // Chatszobák
+    GET_CHATROOMS: 'php/getChatrooms.php',
+    ADD_CHATROOM: 'php/add_chatroom.php',
+    EDIT_CHATROOM: 'php/edit_chatroom.php',
+    DELETE_CHATROOM: 'php/delete_chatroom.php',
+    FOLLOW_CHATROOM: 'php/follow_chatroom.php',
+    UNFOLLOW_CHATROOM: 'php/unfollow_chatroom.php',
+    GET_MESSAGES: 'php/getMessages.php',
+    SEND_MESSAGE: 'php/send_message.php',
+    
+    // Szavazás
+    VOTE: 'php/vote.php',
+    
+    // Jelentések
+    SUBMIT_REPORT: 'php/submit_report.php',
+    GET_REPORTS: 'php/getReports.php',
+    CLOSE_REPORT: 'php/close_report.php',
+    
+    // Admin
+    GET_STATISTICS: 'php/getStatistics.php',
+    GET_LATEST_ACTIVITIES: 'php/getLatestActivities.php',
+    GET_USERS: 'php/getUsers.php',
+    DELETE_USER: 'php/delete_user.php',
+    ADMIN_SUBJECT_HANDLER: 'php/admin_subject_handler.php'
+};
+
+// ============================================================================
+// 2. SEGÉDFÜGGVÉNYEK
+// ============================================================================
+
+/**
+ * HTML escape - megakadályozza XSS támadásokat
+ * @param {string} text - A szöveg, amit escape-elni kell
+ * @returns {string} - Az escape-elt szöveg
+ */
+function escapeHtml(text) {
+    if (!text) return '';
+    const div = document.createElement('div');
+    div.textContent = text;
+    return div.innerHTML;
+}
+
+/**
+ * Töltő képernyő megjelenítése
+ * @param {string} message - A megjelenítendő üzenet
+ */
 function showLoading(message = 'Betöltés...') {
     let loadingScreen = document.getElementById('loading-screen');
     
@@ -9,7 +150,7 @@ function showLoading(message = 'Betöltés...') {
         loadingScreen.innerHTML = `
             <div class="loading-spinner">
                 <img src="icons/hourglass.svg" alt="Betöltés">
-                <div class="loading-text">${message}</div>
+                <div class="loading-text">${escapeHtml(message)}</div>
             </div>
         `;
         document.body.appendChild(loadingScreen);
@@ -22,9 +163,12 @@ function showLoading(message = 'Betöltés...') {
     
     setTimeout(() => {
         loadingScreen.classList.add('active');
-    }, 10);
+    }, TIMING.ANIMATION_FAST);
 }
 
+/**
+ * Töltő képernyő elrejtése
+ */
 function hideLoading() {
     const loadingScreen = document.getElementById('loading-screen');
     if (loadingScreen) {
@@ -34,26 +178,54 @@ function hideLoading() {
                 return;
             }
             loadingScreen.classList.remove('active');
-        }, 10);
+        }, TIMING.ANIMATION_FAST);
     }
 }
 
+/**
+ * Oldal URL ellenőrzése
+ * @param {string} pageName - Az oldal neve (pl. 'dashboard.php')
+ * @returns {boolean}
+ */
+function isPage(pageName) {
+    return window.location.pathname.includes(pageName);
+}
+
+/**
+ * URL paraméter lekérése
+ * @param {string} paramName - A paraméter neve
+ * @returns {string|null}
+ */
+function getUrlParam(paramName) {
+    const urlParams = new URLSearchParams(window.location.search);
+    return urlParams.get(paramName);
+}
+
+// ============================================================================
+// 3. OLDAL BETÖLTÉS KEZELÉSE
+// ============================================================================
+
+/**
+ * Kezdeti töltőképernyő elrejtése oldal betöltéskor
+ */
 window.onload = function() {
     setTimeout(() => {
         hideLoading();
-    }, 1250);
+    }, TIMING.LOADING_LONG);
 };
 
+// ============================================================================
+// 4. FŐ ALKALMAZÁS INICIALIZÁLÁSA
+// ============================================================================
+
 document.addEventListener('DOMContentLoaded', function() {
-    // Flag a form váltás érzékeléséhez (register form blur események letiltására)
-    let isRegisterFormSwitching = false;
     
-    // HTML escape - megakadályozza, hogy rosszindulatú HTML/JavaScript kód fusson le
-    function escapeHtml(text) {
-        const div = document.createElement('div');
-        div.textContent = text;
-        return div.innerHTML;
-    }
+    // ------------------------------------------------------------------------
+    // 4.1 FORM VÁLTÁS FLAGEK
+    // ------------------------------------------------------------------------
+    
+    // Flag a form váltás érzékeléséhez (blur események letiltására)
+    let isRegisterFormSwitching = false;
     
     // Sötét mód váltó
     const darkModeToggle = document.querySelector('.dark-mode-toggle');
@@ -87,14 +259,23 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
-    // Dashboard tárgyak generálása
+    // ------------------------------------------------------------------------
+    // 4.2 DASHBOARD GENERÁTOR FÜGGVÉNYEK
+    // ------------------------------------------------------------------------
+    
+    /**
+     * Dashboard tárgyak generálása és megjelenítése
+     * Betölti a felhasználó által felvett tárgyakat és megjeleníti a dashboard-on
+     * @async
+     * @returns {Promise<void>}
+     */
     async function generateSubjects() {
         const subjectSection = document.getElementById('user_subjects');
         if (!subjectSection) return;
         subjectSection.innerHTML = '';
 
         try {
-            const response = await fetch('php/getUserSubjects.php');
+            const response = await fetch(API.GET_USER_SUBJECTS);
             
             if (!response.ok) {
                 throw new Error('Nem sikerült betölteni a tárgyakat.');
@@ -123,26 +304,31 @@ document.addEventListener('DOMContentLoaded', function() {
                 });
             }
         } catch (error) {
-            console.error('Error loading subjects:', error);
+            console.error('Hiba a tárgyak betöltésekor:', error);
             subjectSection.insertAdjacentHTML('beforeend', 
                 '<h2 class="no_content_message">Hiba történt a tárgyak betöltésekor.</h2>'
             );
         }
     }
-    if (window.location.pathname.includes('dashboard.php')) {
+    if (isPage('dashboard.php')) {
         generateSubjects().then(() => {
             searchOwnSubjects();
         });
     }
 
-    // Dashboard fájlok generálása
+    /**
+     * Dashboard fájlok generálása és megjelenítése
+     * Betölti a felhasználó által feltöltött fájlokat
+     * @async
+     * @returns {Promise<void>}
+     */
     async function generateFiles() {
         const fileSection = document.getElementById('dashboard_file_container');
         if (!fileSection) return;
         fileSection.innerHTML = '';
 
         try {
-            const response = await fetch('php/getFiles.php?mode=neptun');
+            const response = await fetch(API.GET_FILES + '?mode=neptun');
             
             if (!response.ok) {
                 throw new Error('Nem sikerült betölteni a fájlokat.');
@@ -181,24 +367,29 @@ document.addEventListener('DOMContentLoaded', function() {
                 });
             }
         } catch (error) {
-            console.error('Error loading files:', error);
+            console.error('Hiba a fájlok betöltésekor:', error);
             fileSection.insertAdjacentHTML('beforeend', 
                 '<h2 class="no_content_message">Hiba történt a fájlok betöltésekor.</h2>'
             );
         }
     }
-    if (window.location.pathname.includes('dashboard.php')) {
+    if (isPage('dashboard.php')) {
         generateFiles();
     }
 
-    // Dashboard kérelmek generálása
+    /**
+     * Dashboard kérelmek generálása és megjelenítése
+     * Betölti a felhasználó által létrehozott kérelmeket
+     * @async
+     * @returns {Promise<void>}
+     */
     async function generateRequests() {
         const requestSection = document.getElementById('dashboard_request_container');
         if (!requestSection) return;
         requestSection.innerHTML = '';
 
         try {
-            const response = await fetch('php/getRequests.php?mode=neptun');
+            const response = await fetch(API.GET_REQUESTS + '?mode=neptun');
             
             if (!response.ok) {
                 throw new Error('Nem sikerült betölteni a kérelmeket.');
@@ -252,17 +443,22 @@ document.addEventListener('DOMContentLoaded', function() {
                 });
             }
         } catch (error) {
-            console.error('Error loading requests:', error);
+            console.error('Hiba a kérelmek betöltésekor:', error);
             requestSection.insertAdjacentHTML('beforeend',
                 '<h2 class="no_content_message">Hiba történt a kérelmek betöltésekor.</h2>'
             );
         }
     }
-    if (window.location.pathname.includes('dashboard.php')) {
+    if (isPage('dashboard.php')) {
         generateRequests();
     }
 
-    // Dashboard chatszobák generálása
+    /**
+     * Dashboard chatszobák generálása és megjelenítése
+     * Betölti a felhasználó által létrehozott és követett chatszobákat
+     * @async
+     * @returns {Promise<void>}
+     */
     async function generateChatrooms() {
         const chatroomSection = document.getElementById('dashboard_chatszobak');
         if (!chatroomSection) return;
@@ -270,7 +466,7 @@ document.addEventListener('DOMContentLoaded', function() {
         const firstHr = chatroomSection.querySelector('hr');
 
         try {
-            const response = await fetch('php/getChatrooms.php?mode=neptun');
+            const response = await fetch(API.GET_CHATROOMS + '?mode=neptun');
             const data = await response.json();
 
             if (!data.success) {
@@ -333,18 +529,23 @@ document.addEventListener('DOMContentLoaded', function() {
             chatroomSection.innerHTML = '<h2 class="no_content_message">Hiba történt a chatszobák betöltésekor.</h2>';
         }
     }
-    if (window.location.pathname.includes('dashboard.php')) {
+    if (isPage('dashboard.php')) {
         generateChatrooms();
     }
 
-    // Dashboard felvehető tárgyak generálása
+    /**
+     * Felvehető tárgyak generálása és megjelenítése
+     * Betölti azokat a tárgyakat, amiket a felhasználó még nem vett fel
+     * @async
+     * @returns {Promise<void>}
+     */
     async function generateAvailableSubjects() {
         const subjectSection = document.getElementById('subject_list_container');
         if (!subjectSection) return;
         subjectSection.innerHTML = '';
 
         try {
-            const response = await fetch('php/getAvailableSubjects.php');
+            const response = await fetch(API.GET_AVAILABLE_SUBJECTS);
             
             if (!response.ok) {
                 throw new Error('Nem sikerült betölteni a felvehető tárgyakat.');
@@ -378,19 +579,23 @@ document.addEventListener('DOMContentLoaded', function() {
             );
         }
     }
-    if (window.location.pathname.includes('dashboard.php')) {
+    if (isPage('dashboard.php')) {
         generateAvailableSubjects();
     }
 
-    // Subject fájlok generálása
+    /**
+     * Tárgy oldal fájlok generálása és megjelenítése
+     * Betölti az adott tárgyhoz tartozó fájlokat
+     * @async
+     * @returns {Promise<void>}
+     */
     async function generateSubjectFiles() {
         const fileSection = document.getElementById('subject_file_container');
         if (!fileSection) return;
         fileSection.innerHTML = '';
 
         // Tárgy kód lekérése az URL-ből
-        const urlParams = new URLSearchParams(window.location.search);
-        const classCode = urlParams.get('class_code');
+        const classCode = getUrlParam('class_code');
 
         if (!classCode) {
             fileSection.insertAdjacentHTML('beforeend', 
@@ -400,7 +605,7 @@ document.addEventListener('DOMContentLoaded', function() {
         }
 
         try {
-            const response = await fetch(`php/getFiles.php?mode=class&class_code=${encodeURIComponent(classCode)}`);
+            const response = await fetch(`${API.GET_FILES}?mode=class&class_code=${encodeURIComponent(classCode)}`);
             
             if (!response.ok) {
                 throw new Error('Nem sikerült betölteni a fájlokat.');
@@ -475,25 +680,29 @@ document.addEventListener('DOMContentLoaded', function() {
                 });
             }
         } catch (error) {
-            console.error('Error loading files:', error);
+            console.error('Hiba a fájlok betöltésekor:', error);
             fileSection.insertAdjacentHTML('beforeend', 
                 '<h2 class="no_content_message">Hiba történt a fájlok betöltésekor.</h2>'
             );
         }
     }
-    if (window.location.pathname.includes('subject.php')) {
+    if (isPage('subject.php')) {
         generateSubjectFiles();
     }
 
-    // Subject kérelmek generálása
+    /**
+     * Tárgy oldal kérelmek generálása és megjelenítése
+     * Betölti az adott tárgyhoz tartozó kérelmeket
+     * @async
+     * @returns {Promise<void>}
+     */
     async function generateSubjectRequests() {
         const requestSection = document.getElementById('subject_request_container');
         if (!requestSection) return;
         requestSection.innerHTML = '';
 
         // Tárgy kód lekérése az URL-ből
-        const urlParams = new URLSearchParams(window.location.search);
-        const classCode = urlParams.get('class_code');
+        const classCode = getUrlParam('class_code');
 
         if (!classCode) {
             requestSection.insertAdjacentHTML('beforeend', 
@@ -503,7 +712,7 @@ document.addEventListener('DOMContentLoaded', function() {
         }
 
         try {
-            const response = await fetch(`php/getRequests.php?mode=class&class_code=${encodeURIComponent(classCode)}`);
+            const response = await fetch(`${API.GET_REQUESTS}?mode=class&class_code=${encodeURIComponent(classCode)}`);
             
             if (!response.ok) {
                 throw new Error('Nem sikerült betölteni a kérelmeket.');
@@ -561,24 +770,28 @@ document.addEventListener('DOMContentLoaded', function() {
                 });
             }
         } catch (error) {
-            console.error('Error loading requests:', error);
+            console.error('Hiba a kérelmek betöltésekor:', error);
             requestSection.insertAdjacentHTML('beforeend',
                 '<h2 class="no_content_message">Hiba történt a kérelmek betöltésekor.</h2>'
             );
         }
     }
-    if (window.location.pathname.includes('subject.php')) {
+    if (isPage('subject.php')) {
         generateSubjectRequests();
     }
 
-    // Subject chatszobák generálása
+    /**
+     * Tárgy oldal chatszobák generálása és megjelenítése
+     * Betölti az adott tárgyhoz tartozó chatszobákat
+     * @async
+     * @returns {Promise<void>}
+     */
     async function generateSubjectChatrooms() {
         const chatroomSection = document.getElementById('subject_chatszobak');
         if (!chatroomSection) return;
 
         // Tárgy kód lekérése az URL-ből
-        const urlParams = new URLSearchParams(window.location.search);
-        const classCode = urlParams.get('class_code');
+        const classCode = getUrlParam('class_code');
 
         if (!classCode) {
             chatroomSection.innerHTML = '<h2 class="no_content_message">Hiányzik a tárgy kód az URL-ből.</h2>';
@@ -586,7 +799,7 @@ document.addEventListener('DOMContentLoaded', function() {
         }
 
         try {
-            const response = await fetch(`php/getChatrooms.php?mode=class&class_code=${encodeURIComponent(classCode)}`);
+            const response = await fetch(`${API.GET_CHATROOMS}?mode=class&class_code=${encodeURIComponent(classCode)}`);
             const data = await response.json();
 
             if (!data.success) {
@@ -649,7 +862,7 @@ document.addEventListener('DOMContentLoaded', function() {
             chatroomSection.innerHTML = '<h2 class="no_content_message">Hiba történt a chatszobák betöltésekor.</h2>';
         }
     }
-    if (window.location.pathname.includes('subject.php')) {
+    if (isPage('subject.php')) {
         generateSubjectChatrooms();
     }
 
@@ -807,7 +1020,7 @@ document.addEventListener('DOMContentLoaded', function() {
     }
     
     function showRegisterError(field, message, shouldFocus = false) {
-        // Convert field name to camelCase for input ID (e.g., confirm_password -> ConfirmPassword)
+        // Átalakítjuk a mező nevét camelCase-re az input ID-hez (pl. confirm_password -> ConfirmPassword)
         const inputIdSuffix = field.split('_').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join('');
         const input = document.getElementById('register' + inputIdSuffix);
         const errorSpan = document.getElementById('error_register_' + field);
@@ -822,7 +1035,7 @@ document.addEventListener('DOMContentLoaded', function() {
     }
     
     function clearRegisterError(field) {
-        // Convert field name to camelCase for input ID (e.g., confirm_password -> ConfirmPassword)
+        // Átalakítjuk a mező nevét camelCase-re az input ID-hez (pl. confirm_password -> ConfirmPassword)
         const inputIdSuffix = field.split('_').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join('');
         const input = document.getElementById('register' + inputIdSuffix);
         const errorSpan = document.getElementById('error_register_' + field);
@@ -838,15 +1051,13 @@ document.addEventListener('DOMContentLoaded', function() {
         fields.forEach(field => clearRegisterError(field));
     }
 
-    // Validációs minták
-    const patterns = {
-        neptun: /^[A-Z0-9]{6}$/i,
-        username: /^[a-zA-Z0-9_]{3,20}$/,
-        fullname: /^[a-zA-ZáéíóöőúüűÁÉÍÓÖŐÚÜŰ]+ [a-zA-ZáéíóöőúüűÁÉÍÓÖŐÚÜŰ\s]{1,49}$/,
-        email: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
-        password: /^(?=.*[A-Z])(?=.*\d).{8,}$/
-    };
+    // Validációs minták hivatkozása (globális konstansból)
+    const patterns = VALIDATION_PATTERNS;
 
+    // ------------------------------------------------------------------------
+    // 4.3 LOGIN/REGISZTRÁCIÓ KEZELÉSE
+    // ------------------------------------------------------------------------
+    
     // Login form kezelése
     const loginForm = document.getElementById('loginForm');
     if (loginForm) {
@@ -927,7 +1138,7 @@ document.addEventListener('DOMContentLoaded', function() {
             try {
                 showLoading('Bejelentkezés...');
                 
-                const response = await fetch('php/login.php', {
+                const response = await fetch(API.LOGIN, {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json'
@@ -948,7 +1159,7 @@ document.addEventListener('DOMContentLoaded', function() {
                         } else {
                             window.location.href = 'dashboard.php';
                         }
-                    }, 1250);
+                    }, TIMING.LOADING_LONG);
                 } else {
                     setTimeout(() => {
                         hideLoading();
@@ -962,11 +1173,11 @@ document.addEventListener('DOMContentLoaded', function() {
                                 errorSpan.textContent = result.error || 'Hiba történt a bejelentkezés során!';
                             }
                         }
-                    }, 1250);
+                    }, TIMING.LOADING_LONG);
                 }
             } catch (error) {
                 hideLoading();
-                console.error('Login error:', error);
+                console.error('Bejelentkezési hiba:', error);
                 alert('Hiba történt a bejelentkezés során!');
             }
         });
@@ -1215,7 +1426,7 @@ document.addEventListener('DOMContentLoaded', function() {
             
             if (hasError) {
                 if (firstErrorField) {
-                    // Convert field name to camelCase for input ID (e.g., confirm_password -> ConfirmPassword)
+                    // Átalakítjuk a mező nevét camelCase-re az input ID-hez (pl. confirm_password -> ConfirmPassword)
                     const inputIdSuffix = firstErrorField.split('_').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join('');
                     const firstInput = document.getElementById('register' + inputIdSuffix);
                     if (firstInput) firstInput.focus();
@@ -1227,7 +1438,7 @@ document.addEventListener('DOMContentLoaded', function() {
             try {
                 showLoading('Regisztráció...');
                 
-                const response = await fetch('php/registration.php', {
+                const response = await fetch(API.REGISTER, {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json'
@@ -1277,17 +1488,21 @@ document.addEventListener('DOMContentLoaded', function() {
                             alert(result.error || 'Hiba történt a regisztráció során!');
                         }
                     }
-                }, 1250);
+                }, TIMING.LOADING_LONG);
 
                 
             } catch (error) {
                 hideLoading();
-                console.error('Registration error:', error);
+                console.error('Regisztrációs hiba:', error);
                 alert('Hiba történt a regisztráció során!');
             }
         });
     }
 
+    // ------------------------------------------------------------------------
+    // 4.4 NAVIGÁCIÓ ÉS SZEKCIÓ VÁLTÁS
+    // ------------------------------------------------------------------------
+    
     // Navbar kezelése
     const navMenu = document.querySelector('.nav-menu');
     if (navMenu) {
@@ -1421,6 +1636,10 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
 
+    // ------------------------------------------------------------------------
+    // 4.5 MODAL KEZELÉS
+    // ------------------------------------------------------------------------
+    
     // Modal bezárás
     const modalCloseButtons = document.querySelectorAll('.modal_close_button');
     const modals = document.querySelectorAll('.modal');
@@ -1526,7 +1745,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     chatroomDescription.value = '';
                 }
             }
-        }, 400);
+        }, TIMING.MODAL_CLOSE);
     }
 
     // Modal bezárás gombra kattintáskor
@@ -1563,7 +1782,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     if (addSubjectModal) {
                         addSubjectModal.classList.remove('hidden');
                     }  
-                }, 500);
+                }, TIMING.LOADING_SHORT);
             });
         });
     }
@@ -1631,7 +1850,7 @@ document.addEventListener('DOMContentLoaded', function() {
             showLoading('Fájl részleteinek betöltése...');
             
             try {
-                const response = await fetch(`php/getFileDetails.php?mode=upload&id=${upId}`);
+                const response = await fetch(`${API.GET_FILE_DETAILS}?mode=upload&id=${upId}`);
                 
                 if (!response.ok) {
                     throw new Error('Hiba a fájl részleteinek betöltésekor');
@@ -1688,7 +1907,7 @@ document.addEventListener('DOMContentLoaded', function() {
                         hideLoading();
                         // Modal megjelenítése
                         fileDetailsModal.classList.remove('hidden');
-                    }, 1250);
+                    }, TIMING.LOADING_LONG);
                 }
                 
             } catch (error) {
@@ -1714,7 +1933,7 @@ document.addEventListener('DOMContentLoaded', function() {
             showLoading('Fájl részleteinek betöltése...');
             
             try {
-                const response = await fetch(`php/getFileDetails.php?mode=upload&id=${upId}`);
+                const response = await fetch(`${API.GET_FILE_DETAILS}?mode=upload&id=${upId}`);
                 
                 if (!response.ok) {
                     throw new Error('Hiba a fájl részleteinek betöltésekor');
@@ -1755,7 +1974,7 @@ document.addEventListener('DOMContentLoaded', function() {
                         hideLoading();
                         // Modal megjelenítése
                         ownFileModal.classList.remove('hidden');
-                    }, 1250);
+                    }, TIMING.LOADING_LONG);
                 }
                 
             } catch (error) {
@@ -1847,7 +2066,7 @@ document.addEventListener('DOMContentLoaded', function() {
             showLoading('Kérelem részleteinek betöltése...');
             
             try {
-                const response = await fetch(`php/getFileDetails.php?mode=request&id=${requestId}`);
+                const response = await fetch(`${API.GET_FILE_DETAILS}?mode=request&id=${requestId}`);
                 
                 if (!response.ok) {
                     throw new Error('Hiba a kérelem részleteinek betöltésekor');
@@ -1909,7 +2128,7 @@ document.addEventListener('DOMContentLoaded', function() {
                         hideLoading();
                         // Modal megjelenítése
                         ownCompletedRequestsModal.classList.remove('hidden');
-                    }, 1250);
+                    }, TIMING.LOADING_LONG);
                 }
                 
             } catch (error) {
@@ -2054,10 +2273,14 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
 
+    // ------------------------------------------------------------------------
+    // 4.6 PROFIL KEZELÉS
+    // ------------------------------------------------------------------------
+    
     // Profil adatok betöltése
     async function loadProfileData() {
         try {
-            const response = await fetch('php/profile_get.php', {
+            const response = await fetch(API.PROFILE_GET, {
                 method: 'GET',
                 credentials: 'same-origin'
             });
@@ -2083,7 +2306,7 @@ document.addEventListener('DOMContentLoaded', function() {
     }
     
     // Csak a dashboard.php oldalon töltődik be a profil adat
-    if (window.location.pathname.includes('dashboard.php')) {
+    if (isPage('dashboard.php')) {
         loadProfileData();
     }
 
@@ -2196,14 +2419,8 @@ document.addEventListener('DOMContentLoaded', function() {
         const newPasswordInput = document.getElementById('profile_new_password');
         const repeatPasswordInput = document.getElementById('profile_repeat_password');
         
-        // Érvényesítési minták
-        const patterns = {
-            neptun: /^[A-Z0-9]{6}$/i,
-            username: /^[a-zA-Z0-9_]{3,20}$/,
-            fullname: /^[a-zA-ZáéíóöőúüűÁÉÍÓÖŐÚÜŰ]+ [a-zA-ZáéíóöőúüűÁÉÍÓÖŐÚÜŰ\s]{1,49}$/,
-            email: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
-            password: /^(?=.*[A-Z])(?=.*\d).{8,}$/
-        };
+        // Validációs minták hivatkozása (globális konstansból)
+        const patterns = VALIDATION_PATTERNS;
         
         // Neptun kód validálás
         if (neptunInput) {
@@ -2396,14 +2613,8 @@ document.addEventListener('DOMContentLoaded', function() {
             const newPassword = newPasswordInput?.value || '';
             const repeatPassword = repeatPasswordInput?.value || '';
             
-            // Érvényesítési minták
-            const patterns = {
-                neptun: /^[A-Z0-9]{6}$/i,
-                username: /^[a-zA-Z0-9_]{3,20}$/,
-                fullname: /^[a-zA-ZáéíóöőúüűÁÉÍÓÖŐÚÜŰ]+ [a-zA-ZáéíóöőúüűÁÉÍÓÖŐÚÜŰ\s]{1,49}$/,
-                email: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
-                password: /^(?=.*[A-Z])(?=.*\d).{8,}$/
-            };
+            // Validációs minták hivatkozása (globális konstansból)
+            const patterns = VALIDATION_PATTERNS;
             
             // Validáció hibák gyűjtése
             let hasError = false;
@@ -2502,7 +2713,7 @@ document.addEventListener('DOMContentLoaded', function() {
             };
             
             try {
-                const response = await fetch('php/profile_update.php', {
+                const response = await fetch(API.PROFILE_UPDATE, {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json'
@@ -2589,6 +2800,10 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
+    // ------------------------------------------------------------------------
+    // 4.7 KERESÉS FUNKCIÓK
+    // ------------------------------------------------------------------------
+    
     // Felvett tárgyak keresése
     function searchOwnSubjects() {
         const ownSubjectSearchInput = document.querySelector('.subject_search_input');
@@ -2697,9 +2912,12 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
-    // Upvote és downvote kezelés - backend hívás a fő eseménykezelőben
+}); // DOMContentLoaded vége
 
-// Chatszoba
+// ============================================================================
+// 5. CHATSZOBA MODUL (IIFE)
+// ============================================================================
+
 (() => {
     // Csak akkor fut, ha chatszoba oldalon vagyunk
     const chatroomPage = document.getElementById('chatszobak');
@@ -2714,13 +2932,18 @@ document.addEventListener('DOMContentLoaded', function() {
     let chatPollingInterval = null;
     let lastKnownMessageId = 0;
 
-    // 1. Chatszobák listázása
+    /**
+     * Chatszoba lista generálása és megjelenítése
+     * Betölti a felhasználó által követett chatszobákat
+     * @async
+     * @returns {Promise<void>}
+     */
     async function generateChatroomList() {
         const chatConvList = document.getElementById('chat_conv_list');
         if (!chatConvList) return;
         
         try {
-            const response = await fetch('php/getChatrooms.php?mode=neptun');
+            const response = await fetch(API.GET_CHATROOMS + '?mode=neptun');
             if (!response.ok) throw new Error('Hiba a listázáskor');
             
             const result = await response.json();
@@ -2743,20 +2966,11 @@ document.addEventListener('DOMContentLoaded', function() {
             console.error('Hiba a szobák betöltésekor:', error);
         }
     }
-    
-    // HTML tisztítás
-    function escapeHtml(text) {
-        if (!text) return "";
-        const div = document.createElement('div');
-        div.textContent = text;
-        return div.innerHTML;
-    }
 
     // 2. Szobaválasztás kezelése
     function initializeChatroom() {
         const chatListItems = document.querySelectorAll('.chat_list_item');
-        const urlParams = new URLSearchParams(window.location.search);
-        const roomIdFromUrl = urlParams.get('room_id');
+        const roomIdFromUrl = getUrlParam('room_id');
         
         if (roomIdFromUrl) {
             const roomInList = Array.from(chatListItems).find(item => item.dataset.roomId === roomIdFromUrl);
@@ -2821,13 +3035,18 @@ document.addEventListener('DOMContentLoaded', function() {
             if (activeChatroomId === roomId) {
                 fetchNewMessages(roomId);
             }
-        }, 3000);
+        }, TIMING.CHAT_POLLING);
     }
 
-    // 4. Üzenetek lekérése
+    /**
+     * Új üzenetek lekérése a szerverről (polling)
+     * @async
+     * @param {string|number} roomId - A chatszoba azonosítója
+     * @returns {Promise<void>}
+     */
     async function fetchNewMessages(roomId) {
         try {
-            const response = await fetch(`php/getMessages.php?room_id=${roomId}&last_id=${lastKnownMessageId}`);
+            const response = await fetch(`${API.GET_MESSAGES}?room_id=${roomId}&last_id=${lastKnownMessageId}`);
             const result = await response.json();
             
             if (result.success && result.messages.length > 0) {
@@ -2845,7 +3064,7 @@ document.addEventListener('DOMContentLoaded', function() {
                  chatMessages.innerHTML = '<div class="chat_row other"><div class="chat_bubble">Még nincs üzenet. Légy te az első!</div></div>';
             }
         } catch (error) {
-            console.error('Chat polling hiba:', error);
+            console.error('Chat frissítési hiba:', error);
         }
     }
 
@@ -2881,7 +3100,7 @@ document.addEventListener('DOMContentLoaded', function() {
             chatText.value = ''; // Mező törlése azonnal
 
             try {
-                const response = await fetch('php/send_message.php', {
+                const response = await fetch(API.SEND_MESSAGE, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
@@ -2937,6 +3156,10 @@ document.addEventListener('DOMContentLoaded', function() {
     generateChatroomList();
 })();
 
+// ============================================================================
+// 6. TÁRGY ÉS TARTALOM MŰVELETEK (CRUD)
+// ============================================================================
+
 // Tárgy felvétele
 document.addEventListener('click', async function(e) {
     if (e.target.closest('.subject_add_button')) {
@@ -2948,7 +3171,7 @@ document.addEventListener('click', async function(e) {
         
         try {
             showLoading('Tárgy felvétele...');
-            const response = await fetch('php/add_subject.php', {
+            const response = await fetch(API.ADD_SUBJECT, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
@@ -2987,7 +3210,7 @@ document.addEventListener('click', async function(e) {
                         
                         // Tárgy adatainak lekérése a backend-től
                         try {
-                            const subjectsResponse = await fetch('php/getUserSubjects.php');
+                            const subjectsResponse = await fetch(API.GET_USER_SUBJECTS);
                             if (subjectsResponse.ok) {
                                 const subjects = await subjectsResponse.json();
                                 const addedSubject = subjects.find(s => s.class_code === classCode);
@@ -3018,15 +3241,15 @@ document.addEventListener('click', async function(e) {
                     throw new Error(result.error || 'Ismeretlen hiba történt.');
                 }
                 hideLoading();
-            }, 1250);
+            }, TIMING.LOADING_LONG);
         } catch (error) {
-            console.error('Error adding subject:', error);
+            console.error('Hiba a tárgy felvételekor:', error);
             alert('Hiba történt a tárgy felvételekor: ' + error.message);
             button.disabled = false;
         }
     }
 });
-});
+
 // Tárgy törlése
 document.addEventListener('click', async function(e) {
     const deleteButton = e.target.closest('.own_subject_container .content_delete_button');
@@ -3050,7 +3273,7 @@ document.addEventListener('click', async function(e) {
         try {
             showLoading('Tárgy törlése...');
             
-            const response = await fetch('php/delete_subject.php', {
+            const response = await fetch(API.DELETE_SUBJECT, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
@@ -3083,7 +3306,7 @@ document.addEventListener('click', async function(e) {
                 } else {
                     alert('Hiba: ' + (result.error || 'Nem sikerült törölni a tárgyat!'));
                 }
-            }, 1250);
+            }, TIMING.LOADING_LONG);
             
         } catch (error) {
             hideLoading();
@@ -3117,7 +3340,7 @@ document.addEventListener('click', async function(e) {
         try {
             showLoading('Fájl törlése...');
             
-            const response = await fetch('php/delete_file.php', {
+            const response = await fetch(API.DELETE_FILE, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
@@ -3150,7 +3373,7 @@ document.addEventListener('click', async function(e) {
                 } else {
                     alert('Hiba: ' + (result.error || 'Nem sikerült törölni a fájlt!'));
                 }
-            }, 1250);
+            }, TIMING.LOADING_LONG);
             
         } catch (error) {
             hideLoading();
@@ -3183,7 +3406,7 @@ document.addEventListener('click', async function(e) {
         try {
             showLoading('Fájl törlése...');
             
-            const response = await fetch('php/delete_file.php', {
+            const response = await fetch(API.DELETE_FILE, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
@@ -3227,7 +3450,7 @@ document.addEventListener('click', async function(e) {
                 } else {
                     alert('Hiba: ' + (result.error || 'Nem sikerült törölni a fájlt!'));
                 }
-            }, 1250);
+            }, TIMING.LOADING_LONG);
             
         } catch (error) {
             hideLoading();
@@ -3237,9 +3460,9 @@ document.addEventListener('click', async function(e) {
     }
 });
 
-// =========================
+// ----------------------------------------------------------------------------
 // KÉRELEM TÖRLÉSE (list nézetből)
-// =========================
+// ----------------------------------------------------------------------------
 
 document.addEventListener('click', async function(e) {
     // Keressük a törlés gombot - működik dashboard és subject oldalon is
@@ -3268,7 +3491,7 @@ document.addEventListener('click', async function(e) {
         try {
             showLoading('Kérelem törlése...');
             
-            const response = await fetch('php/delete_request.php', {
+            const response = await fetch(API.DELETE_REQUEST, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
@@ -3305,7 +3528,7 @@ document.addEventListener('click', async function(e) {
                 } else {
                     alert('Hiba: ' + (result.error || 'Nem sikerült törölni a kérelmet!'));
                 }
-            }, 1250);
+            }, TIMING.LOADING_LONG);
             
         } catch (error) {
             hideLoading();
@@ -3315,9 +3538,9 @@ document.addEventListener('click', async function(e) {
     }
 });
 
-// =========================
+// ----------------------------------------------------------------------------
 // KÉRELEM TÖRLÉSE (modal-ból)
-// =========================
+// ----------------------------------------------------------------------------
 
 document.addEventListener('click', async function(e) {
     const deleteButton = e.target.closest('.own_uncompleted_requests_modal .modal_delete_button');
@@ -3341,7 +3564,7 @@ document.addEventListener('click', async function(e) {
         try {
             showLoading('Kérelem törlése...');
             
-            const response = await fetch('php/delete_request.php', {
+            const response = await fetch(API.DELETE_REQUEST, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
@@ -3384,7 +3607,7 @@ document.addEventListener('click', async function(e) {
                 } else {
                     alert('Hiba: ' + (result.error || 'Nem sikerült törölni a kérelmet!'));
                 }
-            }, 1250);
+            }, TIMING.LOADING_LONG);
             
         } catch (error) {
             hideLoading();
@@ -3394,9 +3617,9 @@ document.addEventListener('click', async function(e) {
     }
 });
 
-// =========================
+// ----------------------------------------------------------------------------
 // CHATSZOBA TÖRLÉSE (list nézetből)
-// =========================
+// ----------------------------------------------------------------------------
 
 document.addEventListener('click', async function(e) {
     // Ellenőrizzük, hogy a törlés gomb egy chatszoba konténerben van-e (dashboard vagy subject oldal)
@@ -3424,7 +3647,7 @@ document.addEventListener('click', async function(e) {
         try {
             showLoading('Chatszoba törlése...');
             
-            const response = await fetch('php/delete_chatroom.php', {
+            const response = await fetch(API.DELETE_CHATROOM, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
@@ -3466,7 +3689,7 @@ document.addEventListener('click', async function(e) {
                 } else {
                     alert('Hiba: ' + (result.error || 'Nem sikerült törölni a chatszobát!'));
                 }
-            }, 1250);
+            }, TIMING.LOADING_LONG);
             
         } catch (error) {
             hideLoading();
@@ -3476,9 +3699,9 @@ document.addEventListener('click', async function(e) {
     }
 });
 
-// =========================
+// ----------------------------------------------------------------------------
 // CHATSZOBA KÖVETÉS MEGSZÜNTETÉSE
-// =========================
+// ----------------------------------------------------------------------------
 
 document.addEventListener('click', async function(e) {
     const unfollowButton = e.target.closest('.content_unfollow_button');
@@ -3506,7 +3729,7 @@ document.addEventListener('click', async function(e) {
         try {
             showLoading('Követés megszüntetése...');
             
-            const response = await fetch('php/unfollow_chatroom.php', {
+            const response = await fetch(API.UNFOLLOW_CHATROOM, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
@@ -3547,7 +3770,7 @@ document.addEventListener('click', async function(e) {
                 } else {
                     alert('Hiba: ' + (result.error || 'Nem sikerült megszüntetni a követést!'));
                 }
-            }, 500);
+            }, TIMING.LOADING_SHORT);
             
         } catch (error) {
             hideLoading();
@@ -3557,9 +3780,9 @@ document.addEventListener('click', async function(e) {
     }
 });
 
-// =========================
+// ----------------------------------------------------------------------------
 // CHATSZOBA KÖVETÉSE
-// =========================
+// ----------------------------------------------------------------------------
 
 document.addEventListener('click', async function(e) {
     const followButton = e.target.closest('.content_follow_button');
@@ -3581,7 +3804,7 @@ document.addEventListener('click', async function(e) {
         try {
             showLoading('Követés...');
             
-            const response = await fetch('php/follow_chatroom.php', {
+            const response = await fetch(API.FOLLOW_CHATROOM, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
@@ -3608,7 +3831,7 @@ document.addEventListener('click', async function(e) {
                 } else {
                     alert('Hiba: ' + (result.error || 'Nem sikerült követni a chatszobát!'));
                 }
-            }, 500);
+            }, TIMING.LOADING_SHORT);
             
         } catch (error) {
             hideLoading();
@@ -3618,9 +3841,9 @@ document.addEventListener('click', async function(e) {
     }
 });
 
-// =========================
+// ----------------------------------------------------------------------------
 // KÉRELEM LEZÁRÁSA (ELFOGADÁS)
-// =========================
+// ----------------------------------------------------------------------------
 
 document.addEventListener('click', async function(e) {
     const acceptButton = e.target.closest('.own_completed_requests_modal .modal_accept_button');
@@ -3644,7 +3867,7 @@ document.addEventListener('click', async function(e) {
         try {
             showLoading('Kérelem lezárása...');
             
-            const response = await fetch('php/accept_request.php', {
+            const response = await fetch(API.ACCEPT_REQUEST, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
@@ -3687,7 +3910,7 @@ document.addEventListener('click', async function(e) {
                 } else {
                     alert('Hiba: ' + (result.error || 'Nem sikerült lezárni a kérelmet!'));
                 }
-            }, 1250);
+            }, TIMING.LOADING_LONG);
             
         } catch (error) {
             hideLoading();
@@ -3697,9 +3920,9 @@ document.addEventListener('click', async function(e) {
     }
 });
 
-// =========================
+// ----------------------------------------------------------------------------
 // KÉRELEM ÚJRAKÜLDÉSE (RESET)
-// =========================
+// ----------------------------------------------------------------------------
 
 document.addEventListener('click', async function(e) {
     const resetButton = e.target.closest('.own_completed_requests_modal .modal_reset_button');
@@ -3723,7 +3946,7 @@ document.addEventListener('click', async function(e) {
         try {
             showLoading('Kérelem újraküldése...');
             
-            const response = await fetch('php/reset_request.php', {
+            const response = await fetch(API.RESET_REQUEST, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
@@ -3789,7 +4012,7 @@ document.addEventListener('click', async function(e) {
                 } else {
                     alert('Hiba: ' + (result.error || 'Nem sikerült újraküldeni a kérelmet!'));
                 }
-            }, 1250);
+            }, TIMING.LOADING_LONG);
             
         } catch (error) {
             hideLoading();
@@ -3799,9 +4022,9 @@ document.addEventListener('click', async function(e) {
     }
 });
 
-// =========================
+// ----------------------------------------------------------------------------
 // SZAVAZÁS (UPVOTE / DOWNVOTE)
-// =========================
+// ----------------------------------------------------------------------------
 
 document.addEventListener('click', async function(e) {
     const upvoteButton = e.target.closest('.upvote_button');
@@ -3839,7 +4062,7 @@ document.addEventListener('click', async function(e) {
     const vote = isActive ? 'remove' : voteType;
     
     try {
-        const response = await fetch('php/vote.php', {
+        const response = await fetch(API.VOTE, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
@@ -3966,13 +4189,18 @@ document.addEventListener('click', function(e) {
     }
 });
 
-// Letöltés végrehajtása
+/**
+ * Fájl letöltése - növeli a letöltés számlálót és elindítja a letöltést
+ * @async
+ * @param {string|number} upId - A feltöltés azonosítója
+ * @returns {Promise<void>}
+ */
 async function downloadFile(upId) {
     try {
         showLoading('Letöltés indítása...');
         
         // Először növeljük a letöltések számát az adatbázisban
-        const response = await fetch(`php/increment_download.php?up_id=${upId}`);
+        const response = await fetch(`${API.INCREMENT_DOWNLOAD}?up_id=${upId}`);
         const result = await response.json();
         
         if (result.success) {
@@ -4012,7 +4240,7 @@ async function downloadFile(upId) {
         
         setTimeout(() => {
             hideLoading();
-        }, 500);
+        }, TIMING.LOADING_SHORT);
         
     } catch (error) {
         console.error('Letöltési hiba:', error);
@@ -4030,9 +4258,9 @@ async function downloadFile(upId) {
 }
 // Fájl szerkesztés és feltöltés funkciók - illeszd be a scripts.js fájlba
 
-// =========================
+// ----------------------------------------------------------------------------
 // FÁJL SZERKESZTÉS MODAL MEGNYITÁSA
-// =========================
+// ----------------------------------------------------------------------------
 
 // Szerkesztés gomb a modal-ban
 document.addEventListener('click', async function(e) {
@@ -4071,9 +4299,9 @@ document.addEventListener('click', async function(e) {
     }
 });
 
-// =========================
+// ----------------------------------------------------------------------------
 // FÁJL SZERKESZTÉS MENTÉSE
-// =========================
+// ----------------------------------------------------------------------------
 
 const editFileForm = document.getElementById('editFileForm');
 if (editFileForm) {
@@ -4097,7 +4325,7 @@ if (editFileForm) {
         try {
             showLoading('Fájl módosítása...');
             
-            const response = await fetch('php/edit_file.php', {
+            const response = await fetch(API.EDIT_FILE, {
                 method: 'POST',
                 body: formData
             });
@@ -4133,7 +4361,7 @@ if (editFileForm) {
                 } else {
                     alert('Hiba: ' + (result.error || 'Nem sikerült módosítani a fájlt!'));
                 }
-            }, 1250);
+            }, TIMING.LOADING_LONG);
             
         } catch (error) {
             hideLoading();
@@ -4143,9 +4371,9 @@ if (editFileForm) {
     });
 }
 
-// =========================
+// ----------------------------------------------------------------------------
 // KÉRELEM SZERKESZTÉS MENTÉSE
-// =========================
+// ----------------------------------------------------------------------------
 
 const editRequestForm = document.getElementById('editRequestForm');
 if (editRequestForm) {
@@ -4169,7 +4397,7 @@ if (editRequestForm) {
         try {
             showLoading('Kérelem módosítása...');
             
-            const response = await fetch('php/edit_request.php', {
+            const response = await fetch(API.EDIT_REQUEST, {
                 method: 'POST',
                 body: formData
             });
@@ -4205,7 +4433,7 @@ if (editRequestForm) {
                 } else {
                     alert('Hiba: ' + (result.error || 'Nem sikerült módosítani a kérelmet!'));
                 }
-            }, 1250);
+            }, TIMING.LOADING_LONG);
             
         } catch (error) {
             hideLoading();
@@ -4215,9 +4443,9 @@ if (editRequestForm) {
     });
 }
 
-// =========================
+// ----------------------------------------------------------------------------
 // CHATSZOBA SZERKESZTÉS MENTÉSE
-// =========================
+// ----------------------------------------------------------------------------
 
 const editChatroomForm = document.getElementById('editChatroomForm');
 if (editChatroomForm) {
@@ -4241,7 +4469,7 @@ if (editChatroomForm) {
         try {
             showLoading('Chatszoba módosítása...');
             
-            const response = await fetch('php/edit_chatroom.php', {
+            const response = await fetch(API.EDIT_CHATROOM, {
                 method: 'POST',
                 body: formData
             });
@@ -4270,7 +4498,7 @@ if (editChatroomForm) {
                 } else {
                     alert('Hiba: ' + (result.error || 'Nem sikerült módosítani a chatszobát!'));
                 }
-            }, 1250);
+            }, TIMING.LOADING_LONG);
             
         } catch (error) {
             hideLoading();
@@ -4280,9 +4508,9 @@ if (editChatroomForm) {
     });
 }
 
-// =========================
+// ----------------------------------------------------------------------------
 // FÁJL FELTÖLTÉS
-// =========================
+// ----------------------------------------------------------------------------
 
 const uploadFileForm = document.getElementById('upload_file_form');
 if (uploadFileForm) {
@@ -4290,8 +4518,7 @@ if (uploadFileForm) {
         e.preventDefault();
         
         // Tárgy kód lekérése az URL-ből
-        const urlParams = new URLSearchParams(window.location.search);
-        const classCode = urlParams.get('class_code');
+        const classCode = getUrlParam('class_code');
         
         if (!classCode) {
             alert('Hiba: Nem található a tárgy kód!');
@@ -4311,7 +4538,7 @@ if (uploadFileForm) {
         try {
             showLoading('Fájl feltöltése...');
             
-            const response = await fetch('php/upload_file.php', {
+            const response = await fetch(API.UPLOAD_FILE, {
                 method: 'POST',
                 body: formData
             });
@@ -4340,7 +4567,7 @@ if (uploadFileForm) {
                     }
                     
                     // Új fájl kártya hozzáadása a listához (subject.php esetén)
-                    if (window.location.pathname.includes('subject.php') && result.file) {
+                    if (isPage('subject.php') && result.file) {
                         const fileSection = document.getElementById('subject_file_container');
                         if (fileSection) {
                             // Töröljük a "nincs fájl" üzenetet ha van
@@ -4349,11 +4576,6 @@ if (uploadFileForm) {
                             
                             // Saját fájl kártya hozzáadása az elejére
                             const file = result.file;
-                            const escapeHtml = (text) => {
-                                const div = document.createElement('div');
-                                div.textContent = text;
-                                return div.innerHTML;
-                            };
                             
                             fileSection.insertAdjacentHTML('afterbegin', `
                                 <div class="content_container uploaded_files_container">
@@ -4398,7 +4620,7 @@ if (uploadFileForm) {
                 } else {
                     alert('Hiba: ' + (result.error || 'Nem sikerült feltölteni a fájlt!'));
                 }
-            }, 1250);
+            }, TIMING.LOADING_LONG);
             
         } catch (error) {
             hideLoading();
@@ -4436,16 +4658,24 @@ document.addEventListener('click', function(e) {
     }
 });
 
+// ============================================================================
+// 7. ADMIN MODUL (IIFE)
+// ============================================================================
+
 // Admin felület
 (() => {
     // Csak akkor fut le, ha admin oldalon vagyunk
     const admin = document.getElementById('admin_page');
     if (!admin) return;
 
-    // Statisztikák betöltése
+    /**
+     * Admin statisztikák betöltése és megjelenítése
+     * @async
+     * @returns {Promise<void>}
+     */
     async function loadStatistics() {
         try {
-            const response = await fetch('php/getStatistics.php');
+            const response = await fetch(API.GET_STATISTICS);
             if (!response.ok) {
                 throw new Error('Nem sikerült betölteni a statisztikákat');
             }
@@ -4471,12 +4701,16 @@ document.addEventListener('click', function(e) {
     // Statisztikák betöltése oldal betöltésekor
     loadStatistics();
 
-    // Legutóbbi aktivitások betöltése és megjelenítése
+    /**
+     * Legutóbbi aktivitások betöltése és megjelenítése
+     * @async
+     * @returns {Promise<void>}
+     */
     let latestActivitiesData = null;
 
     async function loadLatestActivities() {
         try {
-            const response = await fetch('php/getLatestActivities.php');
+            const response = await fetch(API.GET_LATEST_ACTIVITIES);
             if (!response.ok) {
                 throw new Error('Nem sikerült betölteni a legutóbbi aktivitásokat');
             }
@@ -4605,7 +4839,7 @@ document.addEventListener('click', function(e) {
 
     async function loadReports() {
         try {
-            const response = await fetch('php/getReports.php');
+            const response = await fetch(API.GET_REPORTS);
             if (!response.ok) {
                 throw new Error('Nem sikerült betölteni a jelentéseket');
             }
@@ -4619,6 +4853,10 @@ document.addEventListener('click', function(e) {
         }
     }
 
+    /**
+     * Jelentések megjelenítése szűréssel
+     * @param {string} filter - Szűrő típusa: 'all', 'upload', 'request', 'chatroom'
+     */
     function displayReports(filter) {
         const container = document.getElementById('reported_items_container');
         if (!container || !reportsData) return;
@@ -4758,13 +4996,17 @@ document.addEventListener('click', function(e) {
         }
     });
     
-    // Felhasználók betöltése és megjelenítése
+    /**
+     * Felhasználók betöltése és megjelenítése az admin felületen
+     * @async
+     * @returns {Promise<void>}
+     */
     async function loadUsers() {
         const container = document.getElementById('user_list_container');
         if (!container) return;
 
         try {
-            const response = await fetch('php/getUsers.php');
+            const response = await fetch(API.GET_USERS);
             if (!response.ok) {
                 throw new Error('Nem sikerült betölteni a felhasználókat');
             }
@@ -4836,7 +5078,7 @@ document.addEventListener('click', function(e) {
                     if (adminUsersModal) {
                         adminUsersModal.classList.remove('hidden');
                     }  
-                }, 500);
+                }, TIMING.LOADING_SHORT);
             });
         });
     }
@@ -4847,7 +5089,7 @@ document.addEventListener('click', function(e) {
         if (!container) return;
 
         try {
-            const response = await fetch('php/getAllSubjects.php');
+            const response = await fetch(API.GET_ALL_SUBJECTS);
             if (!response.ok) {
                 throw new Error('Nem sikerült betölteni a tárgyakat');
             }
@@ -4934,7 +5176,7 @@ document.addEventListener('click', function(e) {
                     if (adminSubjectsModal) {
                         adminSubjectsModal.classList.remove('hidden');
                     }  
-                }, 500);
+                }, TIMING.LOADING_SHORT);
             });
         });
     }
@@ -4984,7 +5226,7 @@ document.addEventListener('click', function(e) {
         if (!container) return;
 
         try {
-            const response = await fetch('php/getFileDetails.php?mode=all');
+            const response = await fetch(API.GET_FILE_DETAILS + '?mode=all');
             if (!response.ok) {
                 throw new Error('Nem sikerült betölteni a fájlokat');
             }
@@ -5083,7 +5325,7 @@ document.addEventListener('click', function(e) {
                     if (adminFilesModal) {
                         adminFilesModal.classList.remove('hidden');
                     }  
-                }, 500);
+                }, TIMING.LOADING_SHORT);
             });
         });
     }
@@ -5093,7 +5335,7 @@ document.addEventListener('click', function(e) {
         if (!container) return;
 
         try {
-            const response = await fetch('php/getRequests.php?mode=all');
+            const response = await fetch(API.GET_REQUESTS + '?mode=all');
             if (!response.ok) {
                 throw new Error('Nem sikerült betölteni a kérelmeket');
             }
@@ -5168,7 +5410,7 @@ document.addEventListener('click', function(e) {
                     if (adminRequestsModal) {
                         adminRequestsModal.classList.remove('hidden');
                     }  
-                }, 500);
+                }, TIMING.LOADING_SHORT);
             });
         });
     }
@@ -5178,7 +5420,7 @@ document.addEventListener('click', function(e) {
         if (!container) return;
 
         try {
-            const response = await fetch('php/getChatrooms.php?mode=all');
+            const response = await fetch(API.GET_CHATROOMS + '?mode=all');
             if (!response.ok) {
                 throw new Error('Nem sikerült betölteni a chatszobákat');
             }
@@ -5259,7 +5501,7 @@ document.addEventListener('click', function(e) {
                     if (adminChatroomsModal) {
                         adminChatroomsModal.classList.remove('hidden');
                     }  
-                }, 500);
+                }, TIMING.LOADING_SHORT);
             });
         });
     }
@@ -5316,9 +5558,9 @@ document.addEventListener('click', function(e) {
         });
     });
 
-    // =========================
+    // ------------------------------------------------------------------------
     // ADMIN FÁJL LETÖLTÉSE
-    // =========================
+    // ------------------------------------------------------------------------
     document.addEventListener('click', function(e) {
         const downloadButton = e.target.closest('.admin_file_container .file_download_button');
         if (!downloadButton) return;
@@ -5336,9 +5578,9 @@ document.addEventListener('click', function(e) {
         downloadFile(fileId);
     });
 
-    // =========================
+    // ------------------------------------------------------------------------
     // ADMIN FÁJL TÖRLÉSE
-    // =========================
+    // ------------------------------------------------------------------------
     document.addEventListener('click', async function(e) {
         const deleteButton = e.target.closest('.admin_file_container .file_delete_button');
         if (!deleteButton) return;
@@ -5359,7 +5601,7 @@ document.addEventListener('click', function(e) {
         try {
             showLoading('Fájl törlése...');
             
-            const response = await fetch('php/delete_file.php', {
+            const response = await fetch(API.DELETE_FILE, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
@@ -5393,7 +5635,7 @@ document.addEventListener('click', function(e) {
                 } else {
                     alert(result.error || 'Hiba történt a törlés során!');
                 }
-            }, 1250);
+            }, TIMING.LOADING_LONG);
             
         } catch (error) {
             hideLoading();
@@ -5402,9 +5644,9 @@ document.addEventListener('click', function(e) {
         }
     });
 
-    // =========================
+    // ------------------------------------------------------------------------
     // ADMIN KÉRELEM TÖRLÉSE
-    // =========================
+    // ------------------------------------------------------------------------
     document.addEventListener('click', async function(e) {
         const deleteButton = e.target.closest('.admin_request_container .request_delete_button');
         if (!deleteButton) return;
@@ -5425,7 +5667,7 @@ document.addEventListener('click', function(e) {
         try {
             showLoading('Kérelem törlése...');
             
-            const response = await fetch('php/delete_request.php', {
+            const response = await fetch(API.DELETE_REQUEST, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
@@ -5459,7 +5701,7 @@ document.addEventListener('click', function(e) {
                 } else {
                     alert(result.error || 'Hiba történt a törlés során!');
                 }
-            }, 1250);
+            }, TIMING.LOADING_LONG);
             
         } catch (error) {
             hideLoading();
@@ -5468,9 +5710,9 @@ document.addEventListener('click', function(e) {
         }
     });
 
-    // =========================
+    // ------------------------------------------------------------------------
     // ADMIN CHATSZOBA TÖRLÉSE
-    // =========================
+    // ------------------------------------------------------------------------
     document.addEventListener('click', async function(e) {
         const deleteButton = e.target.closest('.admin_chatroom_container .chatroom_delete_button');
         if (!deleteButton) return;
@@ -5491,7 +5733,7 @@ document.addEventListener('click', function(e) {
         try {
             showLoading('Chatszoba törlése...');
             
-            const response = await fetch('php/delete_chatroom.php', {
+            const response = await fetch(API.DELETE_CHATROOM, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
@@ -5525,7 +5767,7 @@ document.addEventListener('click', function(e) {
                 } else {
                     alert(result.error || 'Hiba történt a törlés során!');
                 }
-            }, 1250);
+            }, TIMING.LOADING_LONG);
             
         } catch (error) {
             hideLoading();
@@ -5534,9 +5776,9 @@ document.addEventListener('click', function(e) {
         }
     });
 
-    // =========================
+    // ------------------------------------------------------------------------
     // ADMIN FELHASZNÁLÓ TÖRLÉSE
-    // =========================
+    // ------------------------------------------------------------------------
     document.addEventListener('click', async function(e) {
         const deleteButton = e.target.closest('.admin_user_container .user_delete_button');
         if (!deleteButton) return;
@@ -5557,7 +5799,7 @@ document.addEventListener('click', function(e) {
         try {
             showLoading('Felhasználó törlése...');
             
-            const response = await fetch('php/delete_user.php', {
+            const response = await fetch(API.DELETE_USER, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
@@ -5588,7 +5830,7 @@ document.addEventListener('click', function(e) {
                 } else {
                     alert(result.error || 'Hiba történt a törlés során!');
                 }
-            }, 1250);
+            }, TIMING.LOADING_LONG);
             
         } catch (error) {
             hideLoading();
@@ -5597,9 +5839,9 @@ document.addEventListener('click', function(e) {
         }
     });
 
-    // =========================
+    // ------------------------------------------------------------------------
     // ADMIN TÁRGY TÖRLÉSE
-    // =========================
+    // ------------------------------------------------------------------------
     document.addEventListener('click', async function(e) {
         const deleteButton = e.target.closest('.admin_subject_container .subject_delete_button');
         if (!deleteButton) return;
@@ -5620,7 +5862,7 @@ document.addEventListener('click', function(e) {
         try {
             showLoading('Tárgy törlése...');
             
-            const response = await fetch('php/delete_subject.php', {
+            const response = await fetch(API.DELETE_SUBJECT, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
@@ -5652,7 +5894,7 @@ document.addEventListener('click', function(e) {
                 } else {
                     alert(result.error || 'Hiba történt a törlés során!');
                 }
-            }, 1250);
+            }, TIMING.LOADING_LONG);
             
         } catch (error) {
             hideLoading();
@@ -5661,9 +5903,9 @@ document.addEventListener('click', function(e) {
         }
     });
 
-    // =========================
+    // ------------------------------------------------------------------------
     // LATEST ACTIVITIES TÖRLÉS
-    // =========================
+    // ------------------------------------------------------------------------
     
     // Legutóbbi aktivitások - Fájl törlése
     document.addEventListener('click', async function(e) {
@@ -5686,7 +5928,7 @@ document.addEventListener('click', function(e) {
         try {
             showLoading('Fájl törlése...');
             
-            const response = await fetch('php/delete_file.php', {
+            const response = await fetch(API.DELETE_FILE, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
@@ -5718,7 +5960,7 @@ document.addEventListener('click', function(e) {
                 } else {
                     alert(result.error || 'Hiba történt a törlés során!');
                 }
-            }, 1250);
+            }, TIMING.LOADING_LONG);
             
         } catch (error) {
             hideLoading();
@@ -5748,7 +5990,7 @@ document.addEventListener('click', function(e) {
         try {
             showLoading('Kérelem törlése...');
             
-            const response = await fetch('php/delete_request.php', {
+            const response = await fetch(API.DELETE_REQUEST, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
@@ -5780,7 +6022,7 @@ document.addEventListener('click', function(e) {
                 } else {
                     alert(result.error || 'Hiba történt a törlés során!');
                 }
-            }, 1250);
+            }, TIMING.LOADING_LONG);
             
         } catch (error) {
             hideLoading();
@@ -5810,7 +6052,7 @@ document.addEventListener('click', function(e) {
         try {
             showLoading('Chatszoba törlése...');
             
-            const response = await fetch('php/delete_chatroom.php', {
+            const response = await fetch(API.DELETE_CHATROOM, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
@@ -5842,7 +6084,7 @@ document.addEventListener('click', function(e) {
                 } else {
                     alert(result.error || 'Hiba történt a törlés során!');
                 }
-            }, 1250);
+            }, TIMING.LOADING_LONG);
             
         } catch (error) {
             hideLoading();
@@ -5851,9 +6093,9 @@ document.addEventListener('click', function(e) {
         }
     });
 
-    // =========================
+    // ------------------------------------------------------------------------
     // FILE DETAILS MODAL TÖRLÉS
-    // =========================
+    // ------------------------------------------------------------------------
     document.addEventListener('click', async function(e) {
         const deleteButton = e.target.closest('.file_details_modal .delete_button');
         if (!deleteButton) return;
@@ -5876,7 +6118,7 @@ document.addEventListener('click', function(e) {
         try {
             showLoading('Fájl törlése...');
             
-            const response = await fetch('php/delete_file.php', {
+            const response = await fetch(API.DELETE_FILE, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
@@ -5907,7 +6149,7 @@ document.addEventListener('click', function(e) {
                 } else {
                     alert(result.error || 'Hiba történt a törlés során!');
                 }
-            }, 1250);
+            }, TIMING.LOADING_LONG);
             
         } catch (error) {
             hideLoading();
@@ -5916,9 +6158,9 @@ document.addEventListener('click', function(e) {
         }
     });
 
-    // =========================
+    // ------------------------------------------------------------------------
     // REPORT MODAL - FÁJL TÖRLÉSE
-    // =========================
+    // ------------------------------------------------------------------------
     document.addEventListener('click', async function(e) {
         const deleteButton = e.target.closest('.reported_file_details_modal .delete_button');
         if (!deleteButton) return;
@@ -5941,7 +6183,7 @@ document.addEventListener('click', function(e) {
         try {
             showLoading('Fájl törlése...');
             
-            const response = await fetch('php/delete_file.php', {
+            const response = await fetch(API.DELETE_FILE, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
@@ -5972,7 +6214,7 @@ document.addEventListener('click', function(e) {
                 } else {
                     alert(result.error || 'Hiba történt a törlés során!');
                 }
-            }, 1250);
+            }, TIMING.LOADING_LONG);
             
         } catch (error) {
             hideLoading();
@@ -5981,9 +6223,9 @@ document.addEventListener('click', function(e) {
         }
     });
 
-    // =========================
+    // ------------------------------------------------------------------------
     // REPORT MODAL - KÉRELEM TÖRLÉSE
-    // =========================
+    // ------------------------------------------------------------------------
     document.addEventListener('click', async function(e) {
         const deleteButton = e.target.closest('.reported_request_details_modal .delete_button');
         if (!deleteButton) return;
@@ -6006,7 +6248,7 @@ document.addEventListener('click', function(e) {
         try {
             showLoading('Kérelem törlése...');
             
-            const response = await fetch('php/delete_request.php', {
+            const response = await fetch(API.DELETE_REQUEST, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
@@ -6037,7 +6279,7 @@ document.addEventListener('click', function(e) {
                 } else {
                     alert(result.error || 'Hiba történt a törlés során!');
                 }
-            }, 1250);
+            }, TIMING.LOADING_LONG);
             
         } catch (error) {
             hideLoading();
@@ -6046,9 +6288,9 @@ document.addEventListener('click', function(e) {
         }
     });
 
-    // =========================
+    // ------------------------------------------------------------------------
     // REPORT MODAL - CHATSZOBA TÖRLÉSE
-    // =========================
+    // ------------------------------------------------------------------------
     document.addEventListener('click', async function(e) {
         const deleteButton = e.target.closest('.reported_chatroom_details_modal .delete_button');
         if (!deleteButton) return;
@@ -6071,7 +6313,7 @@ document.addEventListener('click', function(e) {
         try {
             showLoading('Chatszoba törlése...');
             
-            const response = await fetch('php/delete_chatroom.php', {
+            const response = await fetch(API.DELETE_CHATROOM, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
@@ -6102,7 +6344,7 @@ document.addEventListener('click', function(e) {
                 } else {
                     alert(result.error || 'Hiba történt a törlés során!');
                 }
-            }, 1250);
+            }, TIMING.LOADING_LONG);
             
         } catch (error) {
             hideLoading();
@@ -6111,9 +6353,9 @@ document.addEventListener('click', function(e) {
         }
     });
 
-    // =========================
+    // ------------------------------------------------------------------------
     // REPORT MODAL - FÁJL FELTÖLTŐ TÖRLÉSE
-    // =========================
+    // ------------------------------------------------------------------------
     document.addEventListener('click', async function(e) {
         const deleteButton = e.target.closest('.reported_file_details_modal .user_delete_button');
         if (!deleteButton) return;
@@ -6136,7 +6378,7 @@ document.addEventListener('click', function(e) {
         try {
             showLoading('Felhasználó törlése...');
             
-            const response = await fetch('php/delete_user.php', {
+            const response = await fetch(API.DELETE_USER, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
@@ -6163,7 +6405,7 @@ document.addEventListener('click', function(e) {
                 } else {
                     alert(result.error || 'Hiba történt a törlés során!');
                 }
-            }, 1250);
+            }, TIMING.LOADING_LONG);
             
         } catch (error) {
             hideLoading();
@@ -6172,9 +6414,9 @@ document.addEventListener('click', function(e) {
         }
     });
 
-    // =========================
+    // ------------------------------------------------------------------------
     // REPORT MODAL - KÉRELMEZŐ TÖRLÉSE
-    // =========================
+    // ------------------------------------------------------------------------
     document.addEventListener('click', async function(e) {
         const deleteButton = e.target.closest('.reported_request_details_modal .user_delete_button');
         if (!deleteButton) return;
@@ -6197,7 +6439,7 @@ document.addEventListener('click', function(e) {
         try {
             showLoading('Felhasználó törlése...');
             
-            const response = await fetch('php/delete_user.php', {
+            const response = await fetch(API.DELETE_USER, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
@@ -6224,7 +6466,7 @@ document.addEventListener('click', function(e) {
                 } else {
                     alert(result.error || 'Hiba történt a törlés során!');
                 }
-            }, 1250);
+            }, TIMING.LOADING_LONG);
             
         } catch (error) {
             hideLoading();
@@ -6233,9 +6475,9 @@ document.addEventListener('click', function(e) {
         }
     });
 
-    // =========================
+    // ------------------------------------------------------------------------
     // REPORT MODAL - CHATSZOBA LÉTREHOZÓ TÖRLÉSE
-    // =========================
+    // ------------------------------------------------------------------------
     document.addEventListener('click', async function(e) {
         const deleteButton = e.target.closest('.reported_chatroom_details_modal .user_delete_button');
         if (!deleteButton) return;
@@ -6258,7 +6500,7 @@ document.addEventListener('click', function(e) {
         try {
             showLoading('Felhasználó törlése...');
             
-            const response = await fetch('php/delete_user.php', {
+            const response = await fetch(API.DELETE_USER, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
@@ -6285,7 +6527,7 @@ document.addEventListener('click', function(e) {
                 } else {
                     alert(result.error || 'Hiba történt a törlés során!');
                 }
-            }, 1250);
+            }, TIMING.LOADING_LONG);
             
         } catch (error) {
             hideLoading();
@@ -6294,9 +6536,9 @@ document.addEventListener('click', function(e) {
         }
     });
 
-    // =========================
+    // ------------------------------------------------------------------------
     // REPORT MODAL - JELENTÉS LEZÁRÁSA (FÁJL)
-    // =========================
+    // ------------------------------------------------------------------------
     document.addEventListener('click', async function(e) {
         const closeButton = e.target.closest('.reported_file_details_modal .finish_report_button');
         if (!closeButton) return;
@@ -6319,7 +6561,7 @@ document.addEventListener('click', function(e) {
         try {
             showLoading('Jelentés lezárása...');
             
-            const response = await fetch('php/close_report.php', {
+            const response = await fetch(API.CLOSE_REPORT, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
@@ -6344,7 +6586,7 @@ document.addEventListener('click', function(e) {
                 } else {
                     alert(result.error || 'Hiba történt a lezárás során!');
                 }
-            }, 1250);
+            }, TIMING.LOADING_LONG);
             
         } catch (error) {
             hideLoading();
@@ -6353,9 +6595,9 @@ document.addEventListener('click', function(e) {
         }
     });
 
-    // =========================
+    // ------------------------------------------------------------------------
     // REPORT MODAL - JELENTÉS LEZÁRÁSA (KÉRELEM)
-    // =========================
+    // ------------------------------------------------------------------------
     document.addEventListener('click', async function(e) {
         const closeButton = e.target.closest('.reported_request_details_modal .finish_report_button');
         if (!closeButton) return;
@@ -6378,7 +6620,7 @@ document.addEventListener('click', function(e) {
         try {
             showLoading('Jelentés lezárása...');
             
-            const response = await fetch('php/close_report.php', {
+            const response = await fetch(API.CLOSE_REPORT, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
@@ -6403,7 +6645,7 @@ document.addEventListener('click', function(e) {
                 } else {
                     alert(result.error || 'Hiba történt a lezárás során!');
                 }
-            }, 1250);
+            }, TIMING.LOADING_LONG);
             
         } catch (error) {
             hideLoading();
@@ -6412,9 +6654,9 @@ document.addEventListener('click', function(e) {
         }
     });
 
-    // =========================
+    // ------------------------------------------------------------------------
     // REPORT MODAL - JELENTÉS LEZÁRÁSA (CHATSZOBA)
-    // =========================
+    // ------------------------------------------------------------------------
     document.addEventListener('click', async function(e) {
         const closeButton = e.target.closest('.reported_chatroom_details_modal .finish_report_button');
         if (!closeButton) return;
@@ -6437,7 +6679,7 @@ document.addEventListener('click', function(e) {
         try {
             showLoading('Jelentés lezárása...');
             
-            const response = await fetch('php/close_report.php', {
+            const response = await fetch(API.CLOSE_REPORT, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
@@ -6462,7 +6704,7 @@ document.addEventListener('click', function(e) {
                 } else {
                     alert(result.error || 'Hiba történt a lezárás során!');
                 }
-            }, 1250);
+            }, TIMING.LOADING_LONG);
             
         } catch (error) {
             hideLoading();
@@ -6471,9 +6713,9 @@ document.addEventListener('click', function(e) {
         }
     });
 
-    // =========================
+    // ------------------------------------------------------------------------
     // REPORT MODAL - CHATSZOBA MEGTEKINTÉSE
-    // =========================
+    // ------------------------------------------------------------------------
     document.addEventListener('click', function(e) {
         const viewButton = e.target.closest('.reported_chatroom_details_modal .view_button');
         if (!viewButton) return;
@@ -6493,649 +6735,214 @@ document.addEventListener('click', function(e) {
         window.location.href = `chatroom.php?room_id=${roomId}`;
     });
 
-})();
-// ==========================================
-// 1. ALAPVETŐ SEGÉDFÜGGVÉNYEK (Loading, stb.)
-// ==========================================
-
-function showLoading(message = 'Betöltés...') {
-    let loadingScreen = document.getElementById('loading-screen');
+    // ------------------------------------------------------------------------
+    // ADMIN TÁRGY HOZZÁADÁSA ÉS SZERKESZTÉSE
+    // ------------------------------------------------------------------------
     
-    if (!loadingScreen) {
-        loadingScreen = document.createElement('div');
-        loadingScreen.id = 'loading-screen';
-        loadingScreen.className = 'loading-screen';
-        loadingScreen.innerHTML = `
-            <div class="loading-spinner">
-                <img src="icons/hourglass.svg" alt="Betöltés">
-                <div class="loading-text">${message}</div>
-            </div>
-        `;
-        document.body.appendChild(loadingScreen);
-    } else {
-        const loadingText = loadingScreen.querySelector('.loading-text');
-        if (loadingText) loadingText.textContent = message;
+    // Tárgy kártya létrehozó függvény
+    function createSubjectCard(classCode, className) {
+        const subjectDiv = document.createElement('div');
+        subjectDiv.className = 'content_container admin_container admin_subject_container';
+        subjectDiv.setAttribute('data-class-code', classCode);
+
+        const link = document.createElement('a');
+        link.href = `subject.php?class_code=${encodeURIComponent(classCode)}`;
+        link.className = 'container_link subject_link';
+        link.setAttribute('aria-label', 'Tárgy megnyitása');
+        subjectDiv.appendChild(link);
+
+        const title = document.createElement('h2');
+        title.textContent = className;
+
+        const editButton = document.createElement('button');
+        editButton.className = 'button small_button admin_button subject_edit_button';
+        editButton.setAttribute('data-class-code', classCode);
+        editButton.setAttribute('aria-label', 'Tárgy szerkesztése');
+
+        const editImg = document.createElement('img');
+        editImg.src = 'icons/edit.svg';
+        editImg.alt = 'Szerkesztés';
+
+        const editSpan = document.createElement('span');
+        editSpan.className = 'icon_text';
+        editSpan.textContent = 'Szerkesztés';
+
+        editButton.appendChild(editImg);
+        editButton.appendChild(editSpan);
+
+        const code = document.createElement('p');
+        code.textContent = classCode;
+
+        const deleteButton = document.createElement('button');
+        deleteButton.className = 'button small_button admin_button subject_delete_button';
+        deleteButton.setAttribute('data-class-code', classCode);
+        deleteButton.setAttribute('aria-label', 'Tárgy törlése');
+
+        const deleteImg = document.createElement('img');
+        deleteImg.src = 'icons/delete.svg';
+        deleteImg.alt = 'Törlés';
+
+        const deleteSpan = document.createElement('span');
+        deleteSpan.className = 'icon_text';
+        deleteSpan.textContent = 'Törlés';
+
+        deleteButton.appendChild(deleteImg);
+        deleteButton.appendChild(deleteSpan);
+
+        subjectDiv.appendChild(title);
+        subjectDiv.appendChild(editButton);
+        subjectDiv.appendChild(code);
+        subjectDiv.appendChild(deleteButton);
+
+        return subjectDiv;
     }
-    
-    setTimeout(() => {
-        loadingScreen.classList.add('active');
-    }, 10);
-}
 
-function hideLoading() {
-    const loadingScreen = document.getElementById('loading-screen');
-    if (loadingScreen) {
-        setTimeout(() => {
-            if (loadingScreen.classList.contains('initial-loading')) {
-                loadingScreen.remove();
-                return;
-            }
-            loadingScreen.classList.remove('active');
-        }, 10);
-    }
-}
-
-// Oldal betöltésekor eltüntetjük a töltőképernyőt
-window.onload = function() {
-    hideLoading();
-};
-
-// 2. FŐ LOGIKA (DOM BETÖLTÉS UTÁN)
-
-document.addEventListener('DOMContentLoaded', function() {
-    console.log("Scripts.js betöltve - Tiszta lap.");
-
-    // Globális változók a jelentéshez
-    let currentReportType = '';
-    let currentReportId = 0;
-
-    // A) Modal bezárás (X gombok és háttér)
-    
-    // Gombok
-    const closeButtons = document.querySelectorAll('.modal_close_button, .report_close_button');
-    closeButtons.forEach(btn => {
-        btn.addEventListener('click', (e) => {
+    // Új tárgy hozzáadása form kezelése
+    const addSubjectForm = document.getElementById('addSubjectForm');
+    if (addSubjectForm) {
+        addSubjectForm.addEventListener('submit', async function(e) {
             e.preventDefault();
-            const modal = btn.closest('.modal');
-            if (modal) modal.classList.add('hidden');
-        });
-    });
-
-    // Háttérre kattintás
-    const modals = document.querySelectorAll('.modal');
-    modals.forEach(modal => {
-        modal.addEventListener('click', (e) => {
-            if (e.target === modal) modal.classList.add('hidden');
-        });
-    });
-
-    // B) Fájl részletek megnyitása
-
-    document.body.addEventListener('click', async function(e) {
-        // Keressük a fájl részletek linket/kártyát
-        const link = e.target.closest('.file_details_link') || e.target.closest('.uploaded_files_container a.container_link');
-        
-        // Csak akkor fut, ha NEM saját fájlra kattintasz (sajátnál 'own_details_link' van)
-        if (link && !link.classList.contains('own_details_link')) {
-            e.preventDefault();
-            
-            const upId = link.getAttribute('data-up-id');
-            if (!upId) return; // Ha nincs ID, nem csinálunk semmit
-
-            showLoading('Fájl adatok betöltése...');
-
-            try {
-                // PHP hívás a részletekért
-                const response = await fetch(`php/getFileDetails.php?mode=upload&id=${upId}`);
-                const result = await response.json();
-
-                if (result.success) {
-                    const data = result.data;
-                    const modal = document.querySelector('.file_details_modal');
-                    
-                    if (modal) {
-                        // BEÁLLÍTJUK AZ ID-T A MODALRA (Ez kritikus a jelentéshez!)
-                        modal.setAttribute('data-up-id', data.up_id);
-
-                        // Kitöltjük az adatokat (Cím, leírás, stb.)
-                        if(modal.querySelector('.data-file-title')) modal.querySelector('.data-file-title').textContent = data.title;
-                        if(modal.querySelector('.data-file-uploader')) modal.querySelector('.data-file-uploader').textContent = data.uploader;
-                        if(modal.querySelector('.data-file-name')) modal.querySelector('.data-file-name').textContent = data.file_name;
-                        if(modal.querySelector('.data-file-description')) modal.querySelector('.data-file-description').textContent = data.description;
-                        
-                        // Megnyitjuk a modalt
-                        setTimeout(() => {
-                            hideLoading();
-                            modal.classList.remove('hidden');
-                        }, 500);
-                    }
-                } else {
-                    hideLoading();
-                    alert("Hiba: " + result.message);
-                }
-            } catch (error) {
-                hideLoading();
-                console.error(error);
-                alert("Hálózati hiba a fájl megnyitásakor.");
-            }
-        }
-    });
-    // JELENTÉS FUNKCIÓ - Gombnyo
-   
-    document.body.addEventListener('click', function(e) {
-        const reportBtn = e.target.closest('.report_button');
-        
-        if (reportBtn) {
-            e.preventDefault();
-            console.log("Jelentés gomb megnyomva.");
-
-            // Reset
-            currentReportType = '';
-            currentReportId = 0;
-
-            // 1. Megnézzük, hogy MODAL-ban vagyunk-e (pl. Részletek ablak)
-            const parentModal = reportBtn.closest('.modal');
-            
-            if (parentModal) {
-                if (parentModal.hasAttribute('data-up-id')) {
-                    currentReportType = 'upload';
-                    currentReportId = parentModal.getAttribute('data-up-id');
-                } else if (parentModal.hasAttribute('data-request-id')) {
-                    currentReportType = 'request';
-                    currentReportId = parentModal.getAttribute('data-request-id');
-                } else if (parentModal.hasAttribute('data-room-id')) {
-                    currentReportType = 'chatroom';
-                    currentReportId = parentModal.getAttribute('data-room-id');
-                }
-            }
-
-            // 2. Ha nem modalban találtuk, megnézzük a KÁRTYÁT (Lista nézet)
-            if (!currentReportId) {
-                const card = reportBtn.closest('.content_container');
-                if (card) {
-                    // A) Kérelem (Request)
-                    // A kérelem ID-ja gyakran a benne lévő link attribútumában van
-                    const reqLink = card.querySelector('[data-request-id]');
-                    if (reqLink) {
-                        currentReportType = 'request';
-                        currentReportId = reqLink.getAttribute('data-request-id');
-                    }
-                    // B) Chatszoba (Chatroom)
-                    // A chatszoba ID-ja magán a konténeren szokott lenni
-                    else if (card.hasAttribute('data-room-id')) {
-                        currentReportType = 'chatroom';
-                        currentReportId = card.getAttribute('data-room-id');
-                    }
-                    // C) Fájl (Upload)
-                    // Ritka, de ha listából jelentjük
-                    else if (card.querySelector('[data-up-id]')) {
-                        currentReportType = 'upload';
-                        currentReportId = card.querySelector('[data-up-id]').getAttribute('data-up-id');
-                    }
-                }
-            }
-
-            console.log("Azonosítva:", currentReportType, currentReportId);
-            
-            // Ha sikerült azonosítani, nyitjuk a jelentés ablakot
-            if (currentReportType && currentReportId) {
-                const reportModal = document.querySelector('.report_content_modal');
-                if (reportModal) {
-                    // Töröljük az előző szöveget
-                    const textarea = reportModal.querySelector('#report_description');
-                    if(textarea) textarea.value = '';
-                    
-                    reportModal.classList.remove('hidden');
-                }
-            } else {
-                alert("Hiba: Nem sikerült azonosítani az elemet (ID nem található)!");
-            }
-        }
-    });
-
-    // JELENTÉS BEKÜLDÉSE
-    const reportForm = document.getElementById('reportContentForm');
-    
-    if (reportForm) {
-        reportForm.addEventListener('submit', async function(e) {
-            e.preventDefault(); // NE TÖLTSÖN ÚJRA AZ OLDAL!
-            
-            if (!currentReportType || !currentReportId) {
-                alert("Hiba: Hiányzó adatok! Indítsd újra a folyamatot.");
-                return;
-            }
-
             const formData = new FormData(this);
-            formData.append('item_type', currentReportType);
-            formData.append('item_id', currentReportId);
+            formData.append('action', 'add');
 
             try {
-                showLoading("Jelentés küldése...");
-                
-                const response = await fetch('php/submit_report.php', {
+                showLoading("Mentés...");
+                const response = await fetch(API.ADMIN_SUBJECT_HANDLER, {
                     method: 'POST',
                     body: formData
                 });
-
                 const result = await response.json();
                 
                 setTimeout(() => {
                     hideLoading();
                     if (result.success) {
-                        // Bezárjuk a modalt
-                        document.querySelector('.report_content_modal').classList.add('hidden');
+                        // Modal bezárása
+                        const addModal = document.querySelector('.admin_add_subject_modal');
+                        if (addModal) {
+                            addModal.classList.add('hidden');
+                        }
+                        addSubjectForm.reset();
+                        
+                        // Dinamikusan hozzáadjuk az új kártyát
+                        const container = document.getElementById('subject_list_container');
+                        if (container && result.subject) {
+                            // Eltávolítjuk a "nincsenek tárgyak" üzenetet, ha van
+                            const noContentMsg = container.querySelector('p');
+                            if (noContentMsg && noContentMsg.textContent.includes('Nincsenek tárgyak')) {
+                                noContentMsg.remove();
+                            }
+                            
+                            const newCard = createSubjectCard(result.subject.class_code, result.subject.class_name);
+                            container.appendChild(newCard);
+                        }
                     } else {
                         alert("Hiba: " + result.error);
                     }
-                }, 500);
-
+                }, TIMING.LOADING_SHORT);
             } catch (error) {
                 hideLoading();
-                console.error("Fetch hiba:", error);
-                alert("Szerver hiba történt!");
+                console.error(error);
             }
         });
     }
 
-    // ÚJ KÉRELEM KEZELÉSE
-
-    // 1. Modal megnyitása
-    document.body.addEventListener('click', function(e) {
-        // Megkeressük a gombot (add_request_button)
-        const addBtn = e.target.closest('.add_request_button');
-        if (addBtn) {
+    // Tárgy szerkesztése - Modal megnyitása és adatok betöltése
+    document.addEventListener('click', function(e) {
+        const editBtn = e.target.closest('.subject_edit_button');
+        if (editBtn) {
             e.preventDefault();
-            const modal = document.querySelector('.add_request_modal');
+            
+            // Adatok kinyerése a kártyából
+            const container = editBtn.closest('.admin_subject_container');
+            const name = container.querySelector('h2').textContent;
+            const code = container.querySelector('p').textContent;
+
+            const modal = document.querySelector('.admin_edit_subject_modal');
             if (modal) {
+                // Mezők kitöltése
+                modal.querySelector('#editSubjectName').value = name;
+                modal.querySelector('#editSubjectCode').value = code;
+                
+                // Eredeti kód mentése (hogy tudjuk, mit módosítunk)
+                modal.setAttribute('data-original-code', code);
+                
                 modal.classList.remove('hidden');
             }
         }
     });
 
-    // 2. Űrlap beküldése
-    const addRequestForm = document.getElementById('add_request_form');
-    
-    if (addRequestForm) {
-        addRequestForm.addEventListener('submit', async function(e) {
-            e.preventDefault(); // Megállítjuk az oldal újratöltést
+    // Tárgy szerkesztés mentése form kezelése
+    const editSubjectForm = document.getElementById('editSubjectForm');
+    if (editSubjectForm) {
+        editSubjectForm.addEventListener('submit', async function(e) {
+            e.preventDefault();
             
-            // Kiolvassuk a tárgy kódját az URL-ből 
-            const urlParams = new URLSearchParams(window.location.search);
-            const classCode = urlParams.get('class_code');
-            
-            if (!classCode) {
-                alert('Hiba: Nem található a tárgy kódja az URL-ben!');
-                return;
-            }
+            const modal = this.closest('.modal');
+            const originalCode = modal.getAttribute('data-original-code');
 
-            // Adatok összegyűjtése
             const formData = new FormData(this);
-            formData.append('class_code', classCode); // Hozzácsapjuk a kódot
+            formData.append('action', 'edit');
+            formData.append('original_class_code', originalCode);
 
             try {
-                showLoading('Kérelem létrehozása...');
-                
-                const response = await fetch('php/add_request.php', {
+                showLoading("Frissítés...");
+                const response = await fetch(API.ADMIN_SUBJECT_HANDLER, {
                     method: 'POST',
                     body: formData
                 });
-                
                 const result = await response.json();
                 
                 setTimeout(() => {
                     hideLoading();
                     if (result.success) {
-                        // Bezárjuk a modalt
-                        document.querySelector('.request_close_button').click();
-                        // Töröljük a mezőket
-                        addRequestForm.reset();
+                        modal.classList.add('hidden');
                         
-                        // Dinamikusan hozzáadjuk az új kártya
-                        const requestSection = document.getElementById('subject_request_container');
-                        if (requestSection && result.request) {
-                            // Eltávolítjuk a "nincs kérelem" üzenetet, ha van
-                            const noContentMsg = requestSection.querySelector('.no_content_message');
-                            if (noContentMsg) {
-                                noContentMsg.remove();
-                            }
-                            
-                            const escapeHtml = (text) => {
-                                const div = document.createElement('div');
-                                div.textContent = text;
-                                return div.innerHTML;
-                            };
-                            
-                            const newCard = `
-                                <div class="content_container request_container">
-                                    <a href="#" class="container_link own_uncompleted_requests_link" data-request-id="${result.request.request_id}" aria-label="Kérelem megnyitása"></a>
-                                    <button class="button small_button content_edit_button edit_request_button" aria-label="Szerkesztés">
-                                        <span class="icon_text">Szerkesztés</span>
-                                        <img src="icons/edit.svg" alt="Szerkesztés">
-                                    </button>
-                                    <button class="button small_button content_delete_button" aria-label="Törlés">
-                                        <span class="icon_text">Törlés</span>
-                                        <img src="icons/delete.svg" alt="Törlés">
-                                    </button>
-                                    <h2>${escapeHtml(result.request.request_name)}</h2>
-                                    <p>${escapeHtml(result.request.description)}</p>
-                                    <p>Én, ${escapeHtml(result.request.request_date)}</p>
-                                </div>
-                            `;
-                            requestSection.insertAdjacentHTML('beforeend', newCard);
-                        }
-                    } else {
-                        alert('Hiba: ' + result.error);
-                    }
-                }, 500);
-                
-            } catch (error) {
-                hideLoading();
-                console.error('Hiba:', error);
-                alert('Hálózati hiba történt!');
-            }
-        });
-    }
-    // ÚJ CHATSZOBA KEZELÉSE
-
-
-    // 1. Modal megnyitása
-    document.body.addEventListener('click', function(e) {
-        const addBtn = e.target.closest('.add_chatroom_button');
-        if (addBtn) {
-            e.preventDefault();
-            const modal = document.querySelector('.add_chatroom_modal');
-            if (modal) {
-                modal.classList.remove('hidden');
-            }
-        }
-    });
-
-    // 2. Űrlap beküldése
-    const addChatroomForm = document.getElementById('add_chatroom_form');
-    if (addChatroomForm) {
-        addChatroomForm.addEventListener('submit', async function(e) {
-            e.preventDefault();
-            
-            const urlParams = new URLSearchParams(window.location.search);
-            const classCode = urlParams.get('class_code');
-            
-            if (!classCode) {
-                alert('Hiba: Nem található a tárgy kódja az URL-ben!');
-                return;
-            }
-
-            const formData = new FormData(this);
-            formData.append('class_code', classCode);
-
-            try {
-                showLoading('Chatszoba létrehozása...');
-                
-                const response = await fetch('php/add_chatroom.php', {
-                    method: 'POST',
-                    body: formData
-                });
-                
-                const result = await response.json();
-                
-                setTimeout(() => {
-                    hideLoading();
-                    if (result.success) {
-                        document.querySelector('.chatroom_close_button').click();
-                        addChatroomForm.reset();
-                        
-                        // Dinamikusan hozzáadjuk az új kártya
-                        const chatroomSection = document.getElementById('subject_chatszobak');
-                        if (chatroomSection && result.chatroom) {
-                            // Eltávolítjuk a "nincs chatszoba" üzenetet, ha van
-                            const noContentMsg = chatroomSection.querySelector('.no_content_message');
-                            if (noContentMsg) {
-                                noContentMsg.remove();
-                            }
-                            
-                            const escapeHtml = (text) => {
-                                const div = document.createElement('div');
-                                div.textContent = text;
-                                return div.innerHTML;
-                            };
-                            
-                            const newCard = `
-                                <div class="content_container chatroom_container" data-room-id="${escapeHtml(result.chatroom.room_id.toString())}">
-                                    <a href="chatroom.php?room_id=${escapeHtml(result.chatroom.room_id.toString())}" class="container_link chatroom_link" aria-label="Chatroom megnyitása"></a>
-                                    <button class="button small_button content_edit_button edit_chatroom_button" aria-label="Szerkesztés">
-                                        <span class="icon_text">Szerkesztés</span>
-                                        <img src="icons/edit.svg" alt="Szerkesztés">
-                                    </button>
-                                    <button class="button small_button content_delete_button" aria-label="Törlés">
-                                        <span class="icon_text">Törlés</span>
-                                        <img src="icons/delete.svg" alt="Törlés">
-                                    </button>
-                                    <h2>${escapeHtml(result.chatroom.title)}</h2>
-                                    <p>${escapeHtml(result.chatroom.description)}</p>
-                                    <p>Én${result.chatroom.create_date ? ', ' + escapeHtml(result.chatroom.create_date) : ''}</p>
-                                </div>
-                            `;
-                            chatroomSection.insertAdjacentHTML('beforeend', newCard);
-                        }
-                    } else {
-                        alert('Hiba: ' + result.error);
-                    }
-                }, 500);
-                
-            } catch (error) {
-                hideLoading();
-                console.error('Hiba:', error);
-                alert('Hálózati hiba történt!');
-            }
-        });
-    }
-
-    // ADMIN: TÁRGYAK KEZELÉSE
- 
-
-    // Csak akkor fusson, ha az admin oldalon vagyunk
-    if (document.getElementById('admin_page')) {
-
-        // Tárgy kártya létrehozó függvény
-        function createSubjectCard(classCode, className) {
-            const subjectDiv = document.createElement('div');
-            subjectDiv.className = 'content_container admin_container admin_subject_container';
-            subjectDiv.setAttribute('data-class-code', classCode);
-
-            const link = document.createElement('a');
-            link.href = `subject.php?class_code=${encodeURIComponent(classCode)}`;
-            link.className = 'container_link subject_link';
-            link.setAttribute('aria-label', 'Tárgy megnyitása');
-            subjectDiv.appendChild(link);
-
-            const title = document.createElement('h2');
-            title.textContent = className;
-
-            const editButton = document.createElement('button');
-            editButton.className = 'button small_button admin_button subject_edit_button';
-            editButton.setAttribute('data-class-code', classCode);
-            editButton.setAttribute('aria-label', 'Tárgy szerkesztése');
-
-            const editImg = document.createElement('img');
-            editImg.src = 'icons/edit.svg';
-            editImg.alt = 'Szerkesztés';
-
-            const editSpan = document.createElement('span');
-            editSpan.className = 'icon_text';
-            editSpan.textContent = 'Szerkesztés';
-
-            editButton.appendChild(editImg);
-            editButton.appendChild(editSpan);
-
-            const code = document.createElement('p');
-            code.textContent = classCode;
-
-            const deleteButton = document.createElement('button');
-            deleteButton.className = 'button small_button admin_button subject_delete_button';
-            deleteButton.setAttribute('data-class-code', classCode);
-            deleteButton.setAttribute('aria-label', 'Tárgy törlése');
-
-            const deleteImg = document.createElement('img');
-            deleteImg.src = 'icons/delete.svg';
-            deleteImg.alt = 'Törlés';
-
-            const deleteSpan = document.createElement('span');
-            deleteSpan.className = 'icon_text';
-            deleteSpan.textContent = 'Törlés';
-
-            deleteButton.appendChild(deleteImg);
-            deleteButton.appendChild(deleteSpan);
-
-            subjectDiv.appendChild(title);
-            subjectDiv.appendChild(editButton);
-            subjectDiv.appendChild(code);
-            subjectDiv.appendChild(deleteButton);
-
-            return subjectDiv;
-        }
-
-        // 1. Új tárgy hozzáadása
-        const addSubjectForm = document.getElementById('addSubjectForm');
-        if (addSubjectForm) {
-            addSubjectForm.addEventListener('submit', async function(e) {
-                e.preventDefault();
-                const formData = new FormData(this);
-                formData.append('action', 'add');
-
-                try {
-                    showLoading("Mentés...");
-                    const response = await fetch('php/admin_subject_handler.php', {
-                        method: 'POST',
-                        body: formData
-                    });
-                    const result = await response.json();
-                    
-                    setTimeout(() => {
-                        hideLoading();
-                        if (result.success) {
-                            // Modal bezárása
-                            const addModal = document.querySelector('.admin_add_subject_modal');
-                            if (addModal) {
-                                addModal.classList.add('hidden');
-                            }
-                            addSubjectForm.reset();
-                            
-                            // Dinamikusan hozzáadjuk az új kártyát
+                        // Dinamikusan frissítjük a kártyát
+                        if (result.subject) {
                             const container = document.getElementById('subject_list_container');
-                            if (container && result.subject) {
-                                // Eltávolítjuk a "nincsenek tárgyak" üzenetet, ha van
-                                const noContentMsg = container.querySelector('p');
-                                if (noContentMsg && noContentMsg.textContent.includes('Nincsenek tárgyak')) {
-                                    noContentMsg.remove();
-                                }
-                                
-                                const newCard = createSubjectCard(result.subject.class_code, result.subject.class_name);
-                                container.appendChild(newCard);
+                            if (container) {
+                                // Megkeressük a megfelelő kártyát az eredeti kód alapján
+                                const cards = container.querySelectorAll('.admin_subject_container');
+                                cards.forEach(card => {
+                                    const cardCode = card.querySelector('p').textContent;
+                                    if (cardCode === result.subject.original_code) {
+                                        // Frissítjük a kártya tartalmát
+                                        card.querySelector('h2').textContent = result.subject.class_name;
+                                        card.querySelector('p').textContent = result.subject.class_code;
+                                        card.setAttribute('data-class-code', result.subject.class_code);
+                                        
+                                        // Frissítjük a linket
+                                        const link = card.querySelector('.subject_link');
+                                        if (link) {
+                                            link.href = `subject.php?class_code=${encodeURIComponent(result.subject.class_code)}`;
+                                        }
+                                        
+                                        // Frissítjük a gombok adat attribútumait
+                                        const editBtn = card.querySelector('.subject_edit_button');
+                                        if (editBtn) {
+                                            editBtn.setAttribute('data-class-code', result.subject.class_code);
+                                        }
+                                        const deleteBtn = card.querySelector('.subject_delete_button');
+                                        if (deleteBtn) {
+                                            deleteBtn.setAttribute('data-class-code', result.subject.class_code);
+                                        }
+                                    }
+                                });
                             }
-                        } else {
-                            alert("Hiba: " + result.error);
                         }
-                    }, 500);
-                } catch (error) {
-                    hideLoading();
-                    console.error(error);
-                }
-            });
-        }
-
-        // 2. Tárgy szerkesztése - Modal megnyitása és adatok betöltése
-        // (Mivel a gombok dinamikusan jöhetnek létre, a document-re tesszük a figyelőt)
-        document.addEventListener('click', function(e) {
-            const editBtn = e.target.closest('.subject_edit_button');
-            if (editBtn) {
-                e.preventDefault();
-                
-                // Adatok kinyerése a kártyából
-                const container = editBtn.closest('.admin_subject_container');
-                const name = container.querySelector('h2').textContent;
-                const code = container.querySelector('p').textContent;
-
-                const modal = document.querySelector('.admin_edit_subject_modal');
-                if (modal) {
-                    // Mezők kitöltése
-                    modal.querySelector('#editSubjectName').value = name;
-                    modal.querySelector('#editSubjectCode').value = code;
-                    
-                    // Eredeti kód mentése (hogy tudjuk, mit módosítunk)
-                    modal.setAttribute('data-original-code', code);
-                    
-                    modal.classList.remove('hidden');
-                }
+                    } else {
+                        alert("Hiba: " + result.error);
+                    }
+                }, TIMING.LOADING_SHORT);
+            } catch (error) {
+                hideLoading();
+                console.error(error);
             }
         });
-
-        // 3. Szerkesztés mentése
-        const editSubjectForm = document.getElementById('editSubjectForm');
-        if (editSubjectForm) {
-            editSubjectForm.addEventListener('submit', async function(e) {
-                e.preventDefault();
-                
-                const modal = this.closest('.modal');
-                const originalCode = modal.getAttribute('data-original-code');
-
-                const formData = new FormData(this);
-                formData.append('action', 'edit');
-                formData.append('original_class_code', originalCode);
-
-                try {
-                    showLoading("Frissítés...");
-                    const response = await fetch('php/admin_subject_handler.php', {
-                        method: 'POST',
-                        body: formData
-                    });
-                    const result = await response.json();
-                    
-                    setTimeout(() => {
-                        hideLoading();
-                        if (result.success) {
-                            modal.classList.add('hidden');
-                            
-                            // Dinamikusan frissítjük a kártyát
-                            if (result.subject) {
-                                const container = document.getElementById('subject_list_container');
-                                if (container) {
-                                    // Megkeressük a megfelelő kártyát az eredeti kód alapján
-                                    const cards = container.querySelectorAll('.admin_subject_container');
-                                    cards.forEach(card => {
-                                        const cardCode = card.querySelector('p').textContent;
-                                        if (cardCode === result.subject.original_code) {
-                                            // Frissítjük a kártya tartalmát
-                                            card.querySelector('h2').textContent = result.subject.class_name;
-                                            card.querySelector('p').textContent = result.subject.class_code;
-                                            card.setAttribute('data-class-code', result.subject.class_code);
-                                            
-                                            // Frissítjük a linket
-                                            const link = card.querySelector('.subject_link');
-                                            if (link) {
-                                                link.href = `subject.php?class_code=${encodeURIComponent(result.subject.class_code)}`;
-                                            }
-                                            
-                                            // Frissítjük a gombok adat attribútumait
-                                            const editBtn = card.querySelector('.subject_edit_button');
-                                            if (editBtn) {
-                                                editBtn.setAttribute('data-class-code', result.subject.class_code);
-                                            }
-                                            const deleteBtn = card.querySelector('.subject_delete_button');
-                                            if (deleteBtn) {
-                                                deleteBtn.setAttribute('data-class-code', result.subject.class_code);
-                                            }
-                                        }
-                                    });
-                                }
-                            }
-                        } else {
-                            alert("Hiba: " + result.error);
-                        }
-                    }, 500);
-                } catch (error) {
-                    hideLoading();
-                    console.error(error);
-                }
-            });
-        }
     }
-});
+
+})();
+
+// ============================================================================
+// FÁJL VÉGE
+// ============================================================================
