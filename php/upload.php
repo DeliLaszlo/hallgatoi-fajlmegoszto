@@ -1,4 +1,21 @@
 <?php
+/**
+ * Fájl feltöltés (Legacy verzió)
+ * 
+ * Régebbi form alapú fájl feltöltő. Az upload_file.php az újabb,
+ * AJAX alapú verzió több funkcióval. Ez a fájl visszafelé kompatibilitás miatt maradt.
+ * 
+ * Engedélyezett fájltípusok: jpg, jpeg, png, gif, pdf, txt
+ * 
+ * Metódus: POST (multipart/form-data)
+ * Paraméterek:
+ *   - fileToUpload (file): A feltöltendő fájl
+ * Válasz: Visszairányítás az előző oldalra
+ * Szükséges: Bejelentkezés
+ * 
+ * ELAVULT: Használd az upload_file.php-t helyette
+ */
+
 /*
 <form action="upload.php" method="post" enctype="multipart/form-data">
     <button type="submit" name="fileToUpload" class="button small_button content_upload_button upload_file_button" aria-label="Fájl feltöltése">

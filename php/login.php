@@ -1,4 +1,16 @@
 <?php
+/**
+ * Felhasználó bejelentkezés API
+ * 
+ * Kezeli a felhasználó bejelentkezését Neptun kód és jelszó alapján.
+ * Sikeres bejelentkezés esetén session-t indít és beállítja az admin jogosultságot.
+ * 
+ * Metódus: POST
+ * Paraméterek:
+ *   - neptun (string): Neptun kód
+ *   - password (string): Jelszó
+ * Válasz: JSON {success: bool, message?: string, error?: string, isAdmin?: bool}
+ */
 session_start();
 require_once __DIR__ . '/../config.php';
 header('Content-Type: application/json');

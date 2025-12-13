@@ -1,4 +1,18 @@
 <?php
+/**
+ * Fájl letöltés (Legacy verzió)
+ * 
+ * Régebbi form alapú letöltő. A download_file.php az újabb verzió.
+ * Ez a fájl visszafelé kompatibilitás miatt maradt.
+ * 
+ * Metódus: POST (form)
+ * Paraméterek:
+ *   - file (string): Fájl neve
+ * Válasz: A letöltendő fájl tartalma (binary)
+ * 
+ * ELAVULT: Használd a download_file.php-t helyette
+ */
+
 /*
 while ($row = $result->fetch_assoc()) {
     $file = $row['upload_title'];  

@@ -1,4 +1,16 @@
 <?php
+/**
+ * Fájl letöltés API
+ * 
+ * Letölti a megadott fájlt a szerverről. Ellenőrzi a fájl létezését
+ * és beállítja a megfelelő HTTP fejléceket a letöltéshez.
+ * 
+ * Metódus: GET
+ * Paraméterek:
+ *   - up_id (int): Feltöltés azonosító
+ * Válasz: A letöltendő fájl tartalma (binary)
+ * Szükséges: Bejelentkezés
+ */
 session_start();
 
 // Ellenőrizzük, hogy be van-e jelentkezve

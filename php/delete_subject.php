@@ -1,4 +1,17 @@
 <?php
+/**
+ * Tárgy törlése/leadása API
+ * 
+ * Normál módban: A felhasználó leadja a tárgyat (eltávolítja a saját listájáról).
+ * Admin módban: Teljesen törli a tárgyat a rendszerből minden kapcsolódó adattal.
+ * 
+ * Metódus: POST
+ * Paraméterek:
+ *   - class_code (string): Tárgy kódja
+ *   - admin_mode (bool, opcionális): Admin mód (teljes törlés)
+ * Válasz: JSON {success: bool, error?: string}
+ * Szükséges: Bejelentkezés, Admin jogosultság (admin módhoz)
+ */
 session_start();
 header('Content-Type: application/json');
 

@@ -1,4 +1,14 @@
 <?php
+/**
+ * Profil adatok lekérdezése API
+ * 
+ * Visszaadja a bejelentkezett felhasználó profil adatait
+ * (Neptun kód, felhasználónév, teljes név, email).
+ * 
+ * Metódus: GET
+ * Válasz: JSON {neptun, nickname, full_name, email} vagy {error: string}
+ * Szükséges: Bejelentkezés
+ */
 session_start();
 header('Content-Type: application/json');
 

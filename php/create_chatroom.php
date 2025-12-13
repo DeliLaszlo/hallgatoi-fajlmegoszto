@@ -1,4 +1,21 @@
 <?php
+/**
+ * Chatszoba létrehozása (Legacy verzió)
+ * 
+ * Régebbi form alapú chatszoba létrehozó. Az add_chatroom.php az újabb,
+ * AJAX alapú verzió. Ez a fájl visszafelé kompatibilitás miatt maradt.
+ * 
+ * Metódus: POST (form)
+ * Paraméterek:
+ *   - classcode (string): Tárgy kódja
+ *   - chatroom_title (string): Chatszoba címe
+ *   - chatroom_description (string): Chatszoba leírása
+ * Válasz: Visszairányítás az előző oldalra
+ * Szükséges: Bejelentkezés
+ * 
+ * ELAVULT: Használd az add_chatroom.php-t helyette
+ */
+
 /*
             <form id="add_chatroom_form" action="php/create_chatroom.php" method="post" enctype="multipart/form-data">
                 <input type="hidden" id="classcode" name="classcode" value="<?php echo $class_code ?>">

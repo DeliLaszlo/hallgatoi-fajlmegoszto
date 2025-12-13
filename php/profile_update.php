@@ -1,4 +1,22 @@
 <?php
+/**
+ * Profil frissítése API
+ * 
+ * Frissíti a bejelentkezett felhasználó profil adatait.
+ * Opcionálisan jelszó is módosítható a jelenlegi jelszó megadásával.
+ * Validálja az összes mezőt és ellenőrzi az egyediséget.
+ * 
+ * Metódus: POST
+ * Paraméterek:
+ *   - neptun (string): Neptun kód
+ *   - username (string): Felhasználónév
+ *   - fullname (string): Teljes név
+ *   - email (string): Email cím
+ *   - current_password (string, opcionális): Jelenlegi jelszó
+ *   - new_password (string, opcionális): Új jelszó
+ * Válasz: JSON {success: bool, error?: string}
+ * Szükséges: Bejelentkezés
+ */
 session_start();
 header('Content-Type: application/json');
 

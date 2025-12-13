@@ -1,4 +1,14 @@
 <?php
+/**
+ * Felhasználó tárgyainak lekérdezése API
+ * 
+ * Visszaadja a bejelentkezett felhasználó által felvett tárgyakat,
+ * kiegészítve a fájlok és függő kérelmek számával.
+ * 
+ * Metódus: GET
+ * Válasz: JSON [{class_code, class_name, semester, file_count, request_count}, ...]
+ * Szükséges: Bejelentkezés
+ */
 session_start();
 header('Content-Type: application/json');
 

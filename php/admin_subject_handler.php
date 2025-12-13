@@ -1,4 +1,19 @@
 <?php
+/**
+ * Admin tárgykezelő API
+ * 
+ * Adminisztrátori műveletek a tárgyakon: hozzáadás, szerkesztés, törlés.
+ * Az action paraméter határozza meg a műveletet.
+ * 
+ * Metódus: POST
+ * Paraméterek:
+ *   - action (string): Művelet típusa (add|edit|delete)
+ *   - subject_code (string): Tárgy kódja (add/edit)
+ *   - subject_name (string): Tárgy neve (add/edit)
+ *   - original_class_code (string): Eredeti tárgykód (edit)
+ * Válasz: JSON {success: bool, error?: string, subject?: object}
+ * Szükséges: Bejelentkezés, Admin jogosultság
+ */
 session_start();
 require_once '../config.php';
 header('Content-Type: application/json');

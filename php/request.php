@@ -1,4 +1,20 @@
 <?php
+/**
+ * Kérelem létrehozása (Legacy verzió)
+ * 
+ * Régebbi form alapú kérelem létrehozó. Az add_request.php az újabb,
+ * AJAX alapú verzió. Ez a fájl visszafelé kompatibilitás miatt maradt.
+ * 
+ * Metódus: POST (form)
+ * Paraméterek:
+ *   - classcode (string): Tárgy kódja
+ *   - request_title (string): Kérelem címe
+ *   - request_description (string): Kérelem leírása
+ * Válasz: Visszairányítás az előző oldalra
+ * Szükséges: Bejelentkezés
+ * 
+ * ELAVULT: Használd az add_request.php-t helyette
+ */
 session_start();
 
 $conn = new mysqli("localhost", "root", "", "pm_db_fm_v1");

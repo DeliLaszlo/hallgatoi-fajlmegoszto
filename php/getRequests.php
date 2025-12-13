@@ -1,4 +1,19 @@
 <?php
+/**
+ * Kérelmek lekérdezése API
+ * 
+ * Lekérdezi a kérelmeket különböző módok szerint:
+ * - 'neptun': Saját kérelmek
+ * - 'class': Tárgyhoz tartozó kérelmek
+ * - 'all': Összes kérelem (admin)
+ * 
+ * Metódus: GET
+ * Paraméterek:
+ *   - mode (string): Lekérdezés módja (neptun|class|all)
+ *   - class_code (string, opcionális): Tárgy kód 'class' módhoz
+ * Válasz: JSON {success: bool, requests?: array, message?: string}
+ * Szükséges: Bejelentkezés
+ */
 session_start();
 header('Content-Type: application/json');
 

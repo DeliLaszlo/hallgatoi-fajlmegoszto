@@ -1,4 +1,17 @@
 <?php
+/**
+ * Kérelem törlése API
+ * 
+ * Törli a megadott kérelmet. A felhasználó csak saját kérelmeit
+ * törölheti, kivéve admin módban.
+ * 
+ * Metódus: POST
+ * Paraméterek:
+ *   - request_id (int): Kérelem azonosító
+ *   - admin_mode (bool, opcionális): Admin mód
+ * Válasz: JSON {success: bool, error?: string}
+ * Szükséges: Bejelentkezés, Admin jogosultság (admin módhoz)
+ */
 session_start();
 header('Content-Type: application/json');
 

@@ -1,4 +1,14 @@
 <?php
+/**
+ * Jelentések lekérdezése API (Admin)
+ * 
+ * Visszaadja az összes beküldött jelentést a jelentett tartalom
+ * részleteivel együtt. Csak adminisztrátorok számára elérhető.
+ * 
+ * Metódus: GET
+ * Válasz: JSON [{report_id, reported_type, description, item_details...}, ...]
+ * Szükséges: Bejelentkezés, Admin jogosultság
+ */
 session_start();
 require_once '../config.php';
 

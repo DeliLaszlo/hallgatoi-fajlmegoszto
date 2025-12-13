@@ -1,4 +1,17 @@
 <?php
+/**
+ * Fájl részletek lekérdezése API
+ * 
+ * Lekérdezi egy fájl részletes adatait (cím, leírás, feltöltő,
+ * értékelés, letöltések száma, felhasználó szavazata).
+ * 
+ * Metódus: GET
+ * Paraméterek:
+ *   - mode (string): Lekérdezés módja (upload|all)
+ *   - id (int): Feltöltés azonosító
+ * Válasz: JSON {success: bool, file?: object, message?: string}
+ * Szükséges: Bejelentkezés
+ */
 session_start();
 header('Content-Type: application/json');
 

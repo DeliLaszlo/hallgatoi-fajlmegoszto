@@ -1,4 +1,14 @@
 <?php
+/**
+ * Összes tárgy lekérdezése API (Admin)
+ * 
+ * Visszaadja az összes tárgyat a rendszerben. Csak adminisztrátorok
+ * számára elérhető a tárgyak kezeléséhez.
+ * 
+ * Metódus: GET
+ * Válasz: JSON [{class_code, class_name, semester}, ...]
+ * Szükséges: Bejelentkezés, Admin jogosultság
+ */
 session_start();
 header('Content-Type: application/json');
 

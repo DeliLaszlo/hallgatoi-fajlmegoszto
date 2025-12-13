@@ -1,4 +1,17 @@
 <?php
+/**
+ * Felhasználó törlése API (Admin)
+ * 
+ * Törli a megadott felhasználót és az összes kapcsolódó adatát
+ * (feltöltések, kérelmek, chatszobák, üzenetek, szavazatok, stb.).
+ * Az admin nem törölheti saját magát.
+ * 
+ * Metódus: POST
+ * Paraméterek:
+ *   - neptun (string): Törlendő felhasználó Neptun kódja
+ * Válasz: JSON {success: bool, error?: string}
+ * Szükséges: Bejelentkezés, Admin jogosultság
+ */
 session_start();
 header('Content-Type: application/json');
 

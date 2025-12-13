@@ -1,4 +1,14 @@
 <?php
+/**
+ * Statisztikák lekérdezése API (Admin)
+ * 
+ * Visszaadja a rendszer összesített statisztikáit: felhasználók száma,
+ * tárgyak, fájlok, függő kérelmek és aktív jelentések száma.
+ * 
+ * Metódus: GET
+ * Válasz: JSON {allUsers, allSubjects, allFiles, pendingRequests, activeReports}
+ * Szükséges: Bejelentkezés, Admin jogosultság
+ */
 session_start();
 header('Content-Type: application/json');
 

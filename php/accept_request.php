@@ -1,4 +1,15 @@
 <?php
+/**
+ * Kérelem elfogadása/teljesítettként jelölése API
+ * 
+ * A kérelem létrehozója elfogadja a teljesítést és lezárja a kérelmet.
+ * 
+ * Metódus: POST
+ * Paraméterek:
+ *   - request_id (int): Kérelem azonosító
+ * Válasz: JSON {success: bool, error?: string}
+ * Szükséges: Bejelentkezés
+ */
 session_start();
 header('Content-Type: application/json');
 

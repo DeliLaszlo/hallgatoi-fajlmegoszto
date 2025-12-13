@@ -1,4 +1,17 @@
 <?php
+/**
+ * Üzenetek lekérdezése API
+ * 
+ * Lekérdezi egy chatszoba üzeneteit. Támogatja az inkrementális
+ * lekérdezést a last_id paraméterrel (csak az új üzenetek).
+ * 
+ * Metódus: GET
+ * Paraméterek:
+ *   - room_id (int): Chatszoba azonosító
+ *   - last_id (int, opcionális): Utolsó üzenet ID, csak az ennél újabbakat adja vissza
+ * Válasz: JSON {success: bool, messages?: array, has_messages?: bool}
+ * Szükséges: Bejelentkezés
+ */
 session_start();
 header('Content-Type: application/json');
 

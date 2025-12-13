@@ -1,4 +1,20 @@
 <?php
+/**
+ * Fájl szerkesztés API
+ * 
+ * Szerkeszti a feltöltött fájl adatait (cím, leírás). Opcionálisan
+ * lehetőség van a fájl cseréjére is. Csak a saját fájlok szerkeszthetők.
+ * 
+ * Metódus: POST (multipart/form-data)
+ * Paraméterek:
+ *   - up_id (int): Feltöltés azonosító
+ *   - file_title (string): Új fájl cím
+ *   - file_description (string): Új leírás
+ *   - replace_file (bool, opcionális): Fájl cseréje
+ *   - file_upload (file, opcionális): Új fájl csere esetén
+ * Válasz: JSON {success: bool, error?: string}
+ * Szükséges: Bejelentkezés
+ */
 session_start();
 header('Content-Type: application/json');
 

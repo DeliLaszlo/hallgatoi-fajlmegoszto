@@ -1,4 +1,17 @@
 <?php
+/**
+ * Chatszoba szerkesztése API
+ * 
+ * Szerkeszti egy chatszoba címét és leírását. Csak a saját chatszobák szerkeszthetők.
+ * 
+ * Metódus: POST
+ * Paraméterek:
+ *   - room_id (int): Chatszoba azonosító
+ *   - chatroom_title (string): Új cím
+ *   - chatroom_description (string): Új leírás
+ * Válasz: JSON {success: bool, error?: string}
+ * Szükséges: Bejelentkezés
+ */
 session_start();
 header('Content-Type: application/json');
 

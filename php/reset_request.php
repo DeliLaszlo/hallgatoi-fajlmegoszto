@@ -1,4 +1,16 @@
 <?php
+/**
+ * Kérelem újranyitása API
+ * 
+ * Visszaállítja egy teljesített kérelmet várakozó állapotba.
+ * Csak a kérelem létrehozója használhatja.
+ * 
+ * Metódus: POST
+ * Paraméterek:
+ *   - request_id (int): Kérelem azonosító
+ * Válasz: JSON {success: bool, error?: string}
+ * Szükséges: Bejelentkezés
+ */
 session_start();
 header('Content-Type: application/json');
 

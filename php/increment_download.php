@@ -1,4 +1,16 @@
 <?php
+/**
+ * Letöltésszámláló API
+ * 
+ * Növeli egy fájl letöltési számlálóját. A saját fájl letöltése
+ * nem növeli a számlálót. AJAX hívással használandó.
+ * 
+ * Metódus: GET
+ * Paraméterek:
+ *   - up_id (int): Feltöltés azonosító
+ * Válasz: JSON {success: bool, error?: string, downloads?: int, isOwn?: bool}
+ * Szükséges: Bejelentkezés
+ */
 session_start();
 header('Content-Type: application/json');
 

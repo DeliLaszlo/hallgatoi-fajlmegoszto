@@ -1,4 +1,14 @@
 <?php
+/**
+ * Felhasználók lekérdezése API (Admin)
+ * 
+ * Visszaadja az összes felhasználót a rendszerben (kivéve a bejelentkezett admint).
+ * Felhasználókezeléshez használandó az admin felületen.
+ * 
+ * Metódus: GET
+ * Válasz: JSON [{neptun, nickname, full_name, email}, ...]
+ * Szükséges: Bejelentkezés, Admin jogosultság
+ */
 session_start();
 header('Content-Type: application/json');
 

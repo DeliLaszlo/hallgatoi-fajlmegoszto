@@ -1,4 +1,16 @@
 <?php
+/**
+ * Jelentés lezárása API (Admin)
+ * 
+ * Lezár (töröl) egy jelentést az admin felületről. A jelentett
+ * tartalom marad, csak a jelentés kerül törlésre.
+ * 
+ * Metódus: POST
+ * Paraméterek:
+ *   - report_id (int): Jelentés azonosító
+ * Válasz: JSON {success: bool, error?: string}
+ * Szükséges: Bejelentkezés, Admin jogosultság
+ */
 session_start();
 header('Content-Type: application/json');
 

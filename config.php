@@ -1,13 +1,25 @@
 <?php
+/**
+ * Adatbázis konfiguráció és kapcsolatok
+ * 
+ * Ez a fájl tartalmazza az adatbázis beállításokat és a kapcsolatkezelő függvényeket.
+ * Két típusú kapcsolatot biztosít: MySQLi és PDO.
+ * 
+ * @file config.php
+ * @project Hallgatói Fájlmegosztó
+ */
 
+// Adatbázis kapcsolat beállítások
 define('DB_HOST', 'localhost');
 define('DB_USER', 'root');
 define('DB_PASS', '');
 define('DB_NAME', 'pm_db_fm_v1');
 
 /**
- * @return mysqli
- * @throws Exception
+ * MySQLi adatbázis kapcsolat létrehozása (singleton pattern)
+ * 
+ * @return mysqli A MySQLi kapcsolat objektum
+ * @throws Exception Ha a kapcsolódás sikertelen
  */
 function getMysqliConnection() {
     static $conn = null;
@@ -26,8 +38,10 @@ function getMysqliConnection() {
 }
 
 /**
- * @return PDO
- * @throws PDOException
+ * PDO adatbázis kapcsolat létrehozása (singleton pattern)
+ * 
+ * @return PDO A PDO kapcsolat objektum
+ * @throws PDOException Ha a kapcsolódás sikertelen
  */
 function getPdoConnection() {
     static $pdo = null;
@@ -48,11 +62,14 @@ function getPdoConnection() {
 }
 
 /**
- * @return PDO
+ * Rövidített alias a getPdoConnection() függvényhez
+ * 
+ * @return PDO A PDO kapcsolat objektum
  */
 function db() {
     return getPdoConnection();
 }
 
+// Alapértelmezett kapcsolatok inicializálása
 $conn = getMysqliConnection();
 $pdo = getPdoConnection();

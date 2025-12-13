@@ -1,4 +1,14 @@
 <?php
+/**
+ * Legutóbbi aktivitások lekérdezése API (Admin)
+ * 
+ * Visszaadja a legutóbbi 5-5 fájlfeltöltést, kérelmet és chatszobát.
+ * Az admin dashboard áttekintéséhez használandó.
+ * 
+ * Metódus: GET
+ * Válasz: JSON {files: array, requests: array, chatrooms: array}
+ * Szükséges: Bejelentkezés, Admin jogosultság
+ */
 session_start();
 header('Content-Type: application/json');
 

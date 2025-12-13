@@ -1,4 +1,17 @@
 <?php
+/**
+ * Üzenet küldése API
+ * 
+ * Új üzenetet küld egy chatszobába. Az üzenet mentésre kerül
+ * az adatbázisba a küldő Neptun kódjával és időbélyeggel.
+ * 
+ * Metódus: POST
+ * Paraméterek:
+ *   - room_id (int): Chatszoba azonosító
+ *   - text (string): Üzenet szövege
+ * Válasz: JSON {success: bool, error?: string}
+ * Szükséges: Bejelentkezés
+ */
 session_start();
 require_once '../config.php';
 header('Content-Type: application/json');

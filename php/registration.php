@@ -1,4 +1,21 @@
 <?php
+/**
+ * Felhasználó regisztráció API
+ * 
+ * Új felhasználó regisztrálása a rendszerbe. Validálja az összes mezőt
+ * (Neptun kód, felhasználónév, teljes név, email, jelszó) és ellenőrzi
+ * az egyediséget az adatbázisban.
+ * 
+ * Metódus: POST
+ * Paraméterek:
+ *   - neptun (string): 6 karakteres alfanumerikus Neptun kód
+ *   - username (string): Felhasználónév (3-20 karakter)
+ *   - fullname (string): Teljes név (vezetéknév + keresztnév)
+ *   - email (string): Email cím
+ *   - password (string): Jelszó (min. 8 karakter, 1 nagybetű, 1 szám)
+ *   - confirm_password (string): Jelszó megerősítése
+ * Válasz: JSON {success: bool, field?: string, error?: string}
+ */
 session_start();
 require_once __DIR__ . '/../config.php';
 header('Content-Type: application/json');

@@ -1,4 +1,16 @@
 <?php
+/**
+ * Chatszoba követésének megszüntetése API
+ * 
+ * A felhasználó lekövet egy chatszobát. Ezután nem látja a szobát
+ * a dashboard-on, de bármikor újra követheti.
+ * 
+ * Metódus: POST
+ * Paraméterek:
+ *   - room_id (int): Chatszoba azonosító
+ * Válasz: JSON {success: bool, error?: string}
+ * Szükséges: Bejelentkezés
+ */
 session_start();
 header('Content-Type: application/json');
 

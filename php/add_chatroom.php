@@ -1,4 +1,18 @@
 <?php
+/**
+ * Chatszoba létrehozása API
+ * 
+ * Létrehoz egy új chatszobát az adott tárgyhoz. A létrehozó automatikusan
+ * hozzáférést kap a szobához. AJAX alapú modern verzió.
+ * 
+ * Metódus: POST
+ * Paraméterek:
+ *   - class_code (string): Tárgy kódja
+ *   - chatroom_title (string): Chatszoba címe
+ *   - chatroom_description (string): Chatszoba leírása
+ * Válasz: JSON {success: bool, error?: string, chatroom?: object}
+ * Szükséges: Bejelentkezés
+ */
 session_start();
 require_once '../config.php';
 header('Content-Type: application/json');

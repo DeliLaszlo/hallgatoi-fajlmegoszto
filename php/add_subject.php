@@ -1,4 +1,16 @@
 <?php
+/**
+ * Tárgy felvétele API
+ * 
+ * A bejelentkezett felhasználó felvesz egy tárgyat a saját listájára.
+ * Ellenőrzi, hogy a tárgy létezik-e és nincs-e már felvéve.
+ * 
+ * Metódus: POST
+ * Paraméterek:
+ *   - class_code (string): Tárgy kódja
+ * Válasz: JSON {success: bool, error?: string, message?: string}
+ * Szükséges: Bejelentkezés
+ */
 session_start();
 header('Content-Type: application/json');
 

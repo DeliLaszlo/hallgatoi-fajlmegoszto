@@ -1,4 +1,16 @@
 <?php
+/**
+ * Chatszoba követése API
+ * 
+ * A felhasználó követni kezd egy chatszobát. Ezután láthatja a szobát
+ * a dashboard-on és hozzáférhet az üzenetekhez.
+ * 
+ * Metódus: POST
+ * Paraméterek:
+ *   - room_id (int): Chatszoba azonosító
+ * Válasz: JSON {success: bool, error?: string}
+ * Szükséges: Bejelentkezés
+ */
 session_start();
 header('Content-Type: application/json');
 

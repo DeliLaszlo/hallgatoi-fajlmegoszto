@@ -1,4 +1,19 @@
 <?php
+/**
+ * Fájlok lekérdezése API
+ * 
+ * Lekérdezi a fájlokat különböző módok szerint:
+ * - 'neptun': Saját feltöltött fájlok
+ * - 'class': Tárgyhoz tartozó fájlok
+ * - 'all': Összes fájl (admin)
+ * 
+ * Metódus: GET
+ * Paraméterek:
+ *   - mode (string): Lekérdezés módja (neptun|class|all)
+ *   - class_code (string, opcionális): Tárgy kód 'class' módhoz
+ * Válasz: JSON {success: bool, files?: array, message?: string}
+ * Szükséges: Bejelentkezés
+ */
 session_start();
 header('Content-Type: application/json');
 

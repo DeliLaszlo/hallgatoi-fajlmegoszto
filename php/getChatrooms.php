@@ -1,4 +1,19 @@
 <?php
+/**
+ * Chatszobák lekérdezése API
+ * 
+ * Lekérdezi a chatszobákat különböző módok szerint:
+ * - 'neptun': Saját és követett chatszobák
+ * - 'class': Tárgyhoz tartozó chatszobák
+ * - 'all': Összes chatszoba (admin)
+ * 
+ * Metódus: GET
+ * Paraméterek:
+ *   - mode (string): Lekérdezés módja (neptun|class|all)
+ *   - class_code (string, opcionális): Tárgy kód 'class' módhoz
+ * Válasz: JSON {success: bool, chatrooms?: array, message?: string}
+ * Szükséges: Bejelentkezés
+ */
 session_start();
 header('Content-Type: application/json');
 

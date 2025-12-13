@@ -1,4 +1,23 @@
 <?php
+/**
+ * Fájl feltöltés API
+ * 
+ * Kezeli a fájlok feltöltését a rendszerbe. Ellenőrzi a fájltípust,
+ * méretet és a kötelező mezőket. Támogatja a kérelem teljesítését is.
+ * 
+ * Engedélyezett fájltípusok: pdf, doc, docx, txt, xls, xlsx, ppt, pptx
+ * Maximális fájlméret: 10MB
+ * 
+ * Método: POST (multipart/form-data)
+ * Paraméterek:
+ *   - file_title (string): Fájl címe
+ *   - file_description (string): Fájl leírása
+ *   - class_code (string): Tárgy kódja
+ *   - file_upload (file): A feltöltendő fájl
+ *   - request_id (int, opcionális): Kérelem azonosító, ha kérelmet teljesít
+ * Válasz: JSON {success: bool, error?: string, file?: object}
+ * Szükséges: Bejelentkezés
+ */
 session_start();
 header('Content-Type: application/json');
 

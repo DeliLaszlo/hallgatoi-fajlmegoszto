@@ -1,4 +1,17 @@
 <?php
+/**
+ * Fájl törlés API
+ * 
+ * Törli a megadott fájlt a rendszerből. A felhasználó csak saját fájljait
+ * törölheti, kivéve admin módban, amikor bármely fájl törölhető.
+ * 
+ * Metódus: POST
+ * Paraméterek:
+ *   - up_id (int): Feltöltés azonosító
+ *   - admin_mode (bool, opcionális): Admin mód használata
+ * Válasz: JSON {success: bool, error?: string}
+ * Szükséges: Bejelentkezés, Admin jogosultság (admin módhoz)
+ */
 session_start();
 header('Content-Type: application/json');
 

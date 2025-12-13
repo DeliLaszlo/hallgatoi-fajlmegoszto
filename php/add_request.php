@@ -1,4 +1,18 @@
 <?php
+/**
+ * Új kérelem létrehozása API
+ * 
+ * Létrehoz egy új fájlkérelmet egy adott tárgyhoz. A kérelmet
+ * más felhasználók teljesíthetik fájl feltöltésével.
+ * 
+ * Metódus: POST
+ * Paraméterek:
+ *   - class_code (string): Tárgy kódja
+ *   - request_title (string): Kérelem címe
+ *   - request_description (string): Kérelem leírása
+ * Válasz: JSON {success: bool, error?: string, request?: object}
+ * Szükséges: Bejelentkezés
+ */
 session_start();
 require_once '../config.php';
 header('Content-Type: application/json');

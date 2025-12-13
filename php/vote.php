@@ -1,4 +1,18 @@
 <?php
+/**
+ * Szavazás API
+ * 
+ * Kezeli a fájlokra leadott szavazatokat (upvote/downvote).
+ * A felhasználó módosíthatja vagy visszavonhatja szavazatát.
+ * A saját fájlra nem lehet szavazni.
+ * 
+ * Metódus: POST
+ * Paraméterek:
+ *   - up_id (int): Feltöltés azonosító
+ *   - vote (string): Szavazat típusa (up|down|remove)
+ * Válasz: JSON {success: bool, error?: string, newRating?: int}
+ * Szükséges: Bejelentkezés
+ */
 session_start();
 header('Content-Type: application/json');
 

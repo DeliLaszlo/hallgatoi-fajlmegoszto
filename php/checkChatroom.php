@@ -1,4 +1,16 @@
 <?php
+/**
+ * Chatszoba létezésének ellenőrzése API
+ * 
+ * Ellenőrzi, hogy egy adott chatszoba létezik-e. Hasznos a chatszoba
+ * oldal betöltése előtt az érvényesség ellenőrzésére.
+ * 
+ * Metódus: GET
+ * Paraméterek:
+ *   - room_id (int): Chatszoba azonosító
+ * Válasz: JSON {success: bool, exists: bool, message?: string}
+ * Szükséges: Bejelentkezés
+ */
 session_start();
 header('Content-Type: application/json');
 

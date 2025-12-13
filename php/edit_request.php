@@ -1,4 +1,17 @@
 <?php
+/**
+ * Kérelem szerkesztése API
+ * 
+ * Szerkeszti egy kérelem címét és leírását. Csak a saját kérelmek szerkeszthetők.
+ * 
+ * Metódus: POST
+ * Paraméterek:
+ *   - request_id (int): Kérelem azonosító
+ *   - request_title (string): Új cím
+ *   - request_description (string): Új leírás
+ * Válasz: JSON {success: bool, error?: string}
+ * Szükséges: Bejelentkezés
+ */
 session_start();
 header('Content-Type: application/json');
 

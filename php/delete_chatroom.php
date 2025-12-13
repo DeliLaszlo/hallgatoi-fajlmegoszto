@@ -1,4 +1,17 @@
 <?php
+/**
+ * Chatszoba törlése API
+ * 
+ * Törli a megadott chatszobát az összes üzenetével és hozzáférésével együtt.
+ * A felhasználó csak saját szobáit törölheti, kivéve admin módban.
+ * 
+ * Metódus: POST
+ * Paraméterek:
+ *   - room_id (int): Chatszoba azonosító
+ *   - admin_mode (bool, opcionális): Admin mód
+ * Válasz: JSON {success: bool, error?: string}
+ * Szükséges: Bejelentkezés, Admin jogosultság (admin módhoz)
+ */
 session_start();
 header('Content-Type: application/json');
 

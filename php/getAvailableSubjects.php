@@ -1,4 +1,13 @@
 <?php
+/**
+ * Felvehető tárgyak lekérdezése API
+ * 
+ * Visszaadja azokat a tárgyakat, amelyeket a felhasználó még nem vett fel.
+ * 
+ * Metódus: GET
+ * Válasz: JSON [{class_code, class_name, semester}, ...]
+ * Szükséges: Bejelentkezés
+ */
 session_start();
 header('Content-Type: application/json');
 

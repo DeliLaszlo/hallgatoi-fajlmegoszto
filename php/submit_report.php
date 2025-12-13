@@ -1,4 +1,18 @@
 <?php
+/**
+ * Jelentés beküldése API
+ * 
+ * Beküld egy jelentést (report) egy tartalom ellen (fájl, kérelem vagy chatszoba).
+ * Ellenőrzi, hogy a felhasználó nem jelentette-e már korábban ugyanazt.
+ * 
+ * Metódus: POST
+ * Paraméterek:
+ *   - item_type (string): Tartalom típusa (upload|request|chatroom)
+ *   - item_id (int): Tartalom azonosítója
+ *   - report_description (string): Jelentés indoklása
+ * Válasz: JSON {success: bool, error?: string, message?: string}
+ * Szükséges: Bejelentkezés
+ */
 session_start();
 require_once '../config.php';
 header('Content-Type: application/json');
