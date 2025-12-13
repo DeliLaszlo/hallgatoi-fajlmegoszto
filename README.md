@@ -1,24 +1,45 @@
-# hallgatoi-fajlmegoszto
-Hallgatói fájlmegosztó projektmunka, SZE 2025/26-1
-## Futtatás:
-<ul>
-    <li><a href="https://www.apachefriends.org/">XAMPP</a> letöltés</li>
-    <li>XAMPP Control Panel -> Start Apache, MySQL</li>
-    <li>Repo klónozása a C:\xampp\htdocs mappába</li>
-    <li>Böngészőn belül megnyitni a localhost/phpmyadmin oldalt</li>
-    <li>Databases fülön Create Database pm_db_fm_v1 névvel</li>
-    <li>Import fülön adatbazis.sql importálása</li>
-    <li>Böngészőn belül megnyitni a localhost/hallgatoi-fajlmegoszto/ kezdőoldalt</li>
-</ul>
-<ul>
-    <li>A phpmyadmin kezelése:</li>
-    <li>A megfelelő adatbázis lenyitása után a táblákra kattintva tudod azokat módosítani.</li>
-    <li>A <b>Szerkezet</b> fülön tudod módosítani a tábla felépítését.</li>
-    <li>A <b>Tartalom</b> fülön megtekintheted az adatok listáját.</li>
-    <li>Új adatot feltölteni vagy lekérdezést futtatni az <b>SQL</b> fülön tudsz.</li>
-    <li>Az adatbázishoz való csatlakozás módja részletesen, megjegyzésekkel együtt megtalálható a <b>login.php</b> fájlban.</li>
-    <li>Az adatbázisban már található egy teszt felhasználó:<br>
-        <b>Neptun:</b> asd123<br>
-        <b>Jelszó:</b> 12345678
-    </li>
-</ul>
+# Hallgatói Fájlmegosztó
+
+Webes alkalmazás a Széchenyi István Egyetem hallgatói számára tanulmányi anyagok megosztására.
+
+**Projektmunka 2025/26-1**
+
+## Funkciók
+
+- 📚 Tantárgyak felvétele és kezelése
+- 📁 Fájlok feltöltése és letöltése
+- 📝 Tananyag kérelmek létrehozása
+- 💬 Chatszobák valós idejű kommunikációhoz
+- ⭐ Feltöltések értékelése
+- 🛡️ Admin felület
+
+## Technológiák
+
+- **Frontend:** HTML, CSS, JavaScript
+- **Backend:** PHP 8.x
+- **Adatbázis:** MariaDB / MySQL
+- **Szerver:** Apache (XAMPP)
+
+## Telepítés
+
+1. [XAMPP](https://www.apachefriends.org/) telepítése
+2. Apache és MySQL indítása a XAMPP Control Panelen
+3. Repo klónozása: `C:\xampp\htdocs\hallgatoi-fajlmegoszto`
+4. Adatbázis létrehozása:
+   - `localhost/phpmyadmin` megnyitása
+   - Új adatbázis: `pm_db_fm_v1`
+   - `adatbazis.sql` importálása
+5. Alkalmazás megnyitása: `localhost/hallgatoi-fajlmegoszto/`
+
+## Teszt Felhasználók
+
+| Neptun |      Jelszó     |       Típus        |
+|--------|-----------------|--------------------|
+| asd123 | 12345678        | Normál felhasználó |
+| qwe123 | qwe123KissJanos | Normál felhasználó |
+| yxc123 | FelhoHyxc123    | Normál felhasználó |
+| admin1 | adminFerenc123  | Adminisztrátor     |
+
+## Dokumentáció
+
+Részletes műszaki dokumentáció: [DOCUMENTATION.md](DOCUMENTATION.md)
