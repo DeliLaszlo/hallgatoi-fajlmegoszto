@@ -1,56 +1,170 @@
-/*Univerzális*/
+/**
+ * =============================================================================
+ * HALLGATÓI FÁJLMEGOSZTÓ - STÍLUSLAP
+ * =============================================================================
+ * 
+ * Ez a stíluslap a Hallgatói Fájlmegosztó webalkalmazás megjelenéséért felelős.
+ * 
+ * TARTALOMJEGYZÉK:
+ * -----------------------------------------------------------------------------
+ * 1. ALAPOK ÉS CSS VÁLTOZÓK
+ *    - Reset stílusok
+ *    - Világos téma változók (:root)
+ *    - Sötét téma változók (.dark_mode)
+ * 
+ * 2. ÁLTALÁNOS ELEMEK
+ *    - Body, tipográfia (h1, p, h3, hr)
+ *    - Űrlap elemek (input, textarea, label, form)
+ *    - Kereső konténer (.search_container)
+ * 
+ * 3. FEJLÉC ÉS NAVIGÁCIÓ
+ *    - Header struktúra
+ *    - Navigációs menü (.nav-menu)
+ *    - Hamburger menü és reszponzív viselkedés
+ *    - Sötét mód kapcsoló (.dark-mode-toggle)
+ * 
+ * 4. FŐ TARTALOM
+ *    - Main és section elemek
+ *    - Tartalom konténerek (.content_container)
+ *    - Gombok (.button, .small_button, .large_button)
+ *    - Státusz badge-ek (.status_badge)
+ * 
+ * 5. MODÁLIS ABLAKOK
+ *    - Modal struktúra és animációk
+ *    - Modal tartalom és fejléc
+ *    - Szavazás szekció (.voting_container)
+ * 
+ * 6. OLDALSPECIFIKUS STÍLUSOK
+ *    - Bejelentkezés/Regisztráció (index.php / log_reg.php)
+ *    - Dashboard (dashboard.php)
+ *    - Tantárgy oldal (subject.php)
+ *    - Chatszobák (chatroom.php)
+ *    - Admin felület (admin.php)
+ * 
+ * 7. SÖTÉT TÉMA FELÜLÍRÁSOK
+ *    - Színek és kontrasztok
+ *    - Ikonok és képek szűrői
+ * 
+ * 8. SEGÉDOSZTÁLYOK
+ *    - Töltőképernyő (.loading-screen)
+ *    - Üres tartalom üzenet (.no_content_message)
+ *    - Szűrő gombok (.filterButtons)
+ * 
+ * =============================================================================
+ */
+
+
+/* =============================================================================
+   1. ALAPOK ÉS CSS VÁLTOZÓK
+   ============================================================================= */
+
+/**
+ * Reset stílusok
+ * Eltávolítja a böngésző alapértelmezett margóit és paddingját,
+ * valamint beállítja a border-box modellt az egyszerűbb méretezéshez.
+ */
 * {
     margin: 0;
     padding: 0;
     box-sizing: border-box;
 }
 
+/**
+ * Világos téma CSS változók
+ * Az alkalmazás színpalettája és árnyékolási értékei.
+ * Ezeket a változókat használjuk az egész alkalmazásban a konzisztens megjelenéshez.
+ */
 :root {
-    --primary-color: #1e3a8a;
-    --secondary-color: #3b82f6;
-    --background-primary: #f8f9fa;
-    --background-secondary: #ffffff;
-    --border-color: #808080;
-    --border-light: #e3e7ee;
-    --success-background: #d9f9e6;
-    --waiting-background: #fcf3cb;
-    --text-primary: #333;
-    --text-secondary: #ffffff;
-    --error-color: #951f2f;
-    --success-color: #4caf50;
-    --error-icon-color: #f44336;
+    /* Elsődleges és másodlagos színek */
+    --primary-color: #1e3a8a;           /* Sötétkék - főszín */
+    --secondary-color: #3b82f6;         /* Világoskék - másodlagos szín */
+    
+    /* Háttérszínek */
+    --background-primary: #f8f9fa;      /* Fő háttérszín */
+    --background-secondary: #ffffff;    /* Másodlagos háttér (kártyák, modálok) */
+    
+    /* Szegélyszínek */
+    --border-color: #808080;            /* Alapértelmezett szegélyszín */
+    --border-light: #e3e7ee;            /* Világos szegély */
+    
+    /* Állapotjelző háttérszínek */
+    --success-background: #d9f9e6;      /* Sikeres állapot háttere */
+    --waiting-background: #fcf3cb;      /* Várakozó állapot háttere */
+    
+    /* Szövegszínek */
+    --text-primary: #333;               /* Elsődleges szövegszín */
+    --text-secondary: #ffffff;          /* Másodlagos szövegszín (fehér) */
+    
+    /* Állapotjelző színek */
+    --error-color: #951f2f;             /* Hibaszín */
+    --success-color: #4caf50;           /* Sikeres művelet színe */
+    --error-icon-color: #f44336;        /* Hiba ikon színe */
+    
+    /* Árnyékok */
     --shadow-light: rgba(0, 0, 0, 0.1);
     --shadow-medium: rgba(0, 0, 0, 0.2);
     --shadow-dark: rgba(0, 0, 0, 0.5);
     --focus-shadow: rgba(59, 130, 246, 0.5);
+    
+    /* Hover és interakciós színek */
     --hover-overlay: rgba(30, 58, 138, 0.1);
     --upvote-hover: rgba(76, 175, 80, 0.15);
     --downvote-hover: rgba(244, 67, 54, 0.15);
 }
 
+/**
+ * Sötét téma CSS változók
+ * A .dark_mode osztály felülírja a :root változókat sötét témához.
+ * Ez az osztály a body elemre kerül JavaScript segítségével.
+ */
 .dark_mode {
+    /* Elsődleges és másodlagos színek - világosabb a kontraszthoz */
     --primary-color: #d8d8d8;
     --secondary-color: #bdbdbd;
+    
+    /* Sötét háttérszínek */
     --background-primary: #121212;
     --background-secondary: #1e1e1e;
+    
+    /* Szegélyszínek - sötétebb tónusok */
     --border-color: #555555;
     --border-light: #2c2c2c;
+    
+    /* Állapotjelző háttérszínek - sötétebb változatok */
     --success-background: #214d36;
     --waiting-background: #4b3b1f;
+    
+    /* Szövegszínek - világosabb az olvashatósághoz */
     --text-primary: #d8d8d8;
     --text-secondary: #bdbdbd;
+    
+    /* Állapotjelző színek */
     --error-color: #f87171;
     --success-color: #4caf50;
     --error-icon-color: #ef5350;
+    
+    /* Erősebb árnyékok sötét háttéren */
     --shadow-light: rgba(0, 0, 0, 0.5);
     --shadow-medium: rgba(0, 0, 0, 0.7);
     --shadow-dark: rgba(0, 0, 0, 0.9);
     --focus-shadow: rgba(96, 165, 250, 0.7);
+    
+    /* Hover és interakciós színek */
     --hover-overlay: rgba(147, 197, 253, 0.1);
     --upvote-hover: rgba(76, 175, 80, 0.25);
     --downvote-hover: rgba(244, 67, 54, 0.25);
 }
 
+
+/* =============================================================================
+   2. ÁLTALÁNOS ELEMEK
+   ============================================================================= */
+
+/**
+ * Body elem
+ * Az oldal fő konténere, flexbox elrendezéssel a footer pozicionálásához.
+ * Minimum szélesség 375px a mobil eszközök támogatásához.
+ */
 body {
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     background-color: var(--background-primary);
@@ -62,6 +176,10 @@ body {
     flex-direction: column;
 }
 
+/**
+ * Tipográfia
+ * Címsorok, bekezdések és elválasztó vonalak stílusai.
+ */
 h1 {
     font-size: 2rem;
     margin-bottom: 0.5rem;
@@ -69,6 +187,7 @@ h1 {
 }
 
 p {
+    /* Reszponzív betűméret: minimum 0.875rem, maximum 1rem */
     font-size: clamp(0.875rem, 1.5vw, 1rem);
 }
 
@@ -86,6 +205,16 @@ h3 span {
     font-weight: normal;
 }
 
+
+/* =============================================================================
+   3. FEJLÉC ÉS NAVIGÁCIÓ
+   ============================================================================= */
+
+/**
+ * Header elem
+ * Rögzített pozíciójú fejléc az oldal tetején.
+ * Tartalmazza a logót, navigációt és a kijelentkezés gombot.
+ */
 header {
     background: var(--background-secondary);
     color: var(--text-secondary);
@@ -99,6 +228,10 @@ header {
     z-index: 100;
 }
 
+/**
+ * IVK logó
+ * Bal felső sarokban elhelyezett intézményi logó.
+ */
 .ivk_logo {
     position: absolute;
     top: 10px;
@@ -108,6 +241,9 @@ header {
     z-index: 10;
 }
 
+/**
+ * Header háttérkép
+ */
 .header_img {
     background: var(--background-secondary);
     border: 2px solid transparent;
@@ -118,6 +254,10 @@ header {
     top: 0;
 }
 
+/**
+ * Navigációs menü
+ * Középre igazított menüelemek flexbox elrendezéssel.
+ */
 .nav-menu {
     display: flex;
     flex-direction: column;
@@ -132,12 +272,14 @@ header {
     margin-bottom: 0.5rem;
 }
 
+/* Menüelemek listája */
 .nav-menu ul {
     list-style: none;
     display: flex;
     gap: 2rem;
 }
 
+/* Menü linkek stílusai */
 .nav-menu ul li a {
     color: var(--primary-color);
     text-decoration: none;
@@ -153,11 +295,16 @@ header {
     background: var(--border-light);
 }
 
+/* Aktív menüelem kiemelése */
 .nav-menu ul li a.active {
     color: var(--text-secondary);
     background: var(--primary-color);
 }
 
+/**
+ * Kijelentkezés és Dashboard gombok
+ * Abszolút pozícionálású gombok a fejléc jobb/bal oldalán.
+ */
 .nav-menu>a {
     position: absolute;
     top: 50%;
@@ -187,18 +334,32 @@ header {
     left: 20px;
 }
 
+/* Ikon stílusok a gombokban */
 .logout-icon, .dashboard-icon {
     width: 24px;
     height: 24px;
     filter: brightness(0) invert(1);
 }
 
+
+/* =============================================================================
+   4. FŐ TARTALOM
+   ============================================================================= */
+
+/**
+ * Main elem
+ * Az oldal fő tartalmi része, flexbox-szal kitölti a maradék helyet.
+ */
 main {
     flex: 1;
     display: flex;
     flex-direction: column;
 }
 
+/**
+ * Section elem
+ * A tartalom központi konténere, reszponzív szélességgel.
+ */
 section {
     background: var(--background-secondary);
     padding: 2rem;
@@ -207,6 +368,10 @@ section {
     flex: 1;
 }
 
+/**
+ * Űrlap elemek
+ * Form, input, textarea és label stílusok.
+ */
 form {
     display: flex;
     flex-direction: column;
@@ -226,11 +391,13 @@ input[type="file"] {
     border: none;
 }
 
+/* Csak olvasható input mezők */
 input[readonly] {
     background-color: var(--border-light);
     cursor: not-allowed;
 }
 
+/* Input fókusz állapot */
 input:focus {
     border: 2px solid var(--primary-color);
     outline: none;
@@ -261,6 +428,10 @@ textarea:focus {
     box-shadow: 0 0 5px var(--focus-shadow);
 }
 
+/**
+ * Kereső konténer
+ * Keresőmező stílusai keresés ikonnal.
+ */
 .search_container {
     display: flex;
     align-items: center;
@@ -305,6 +476,9 @@ textarea:focus {
     width: 100%;
 }
 
+/**
+ * Header div - kép és szöveg együtt
+ */
 .header-div {
     display: flex;
     align-items: center;
@@ -316,6 +490,10 @@ textarea:focus {
     width: auto;
 }
 
+/**
+ * Sötét mód kapcsoló gomb
+ * Nap/Hold ikon váltás a téma változtatásához.
+ */
 .dark-mode-toggle {
     background: none;
     border: none;
@@ -341,10 +519,12 @@ textarea:focus {
     height: 20px;
 }
 
+/* Világos módban a nap ikon rejtett */
 .dark-mode-toggle .sun-icon {
     display: none;
 }
 
+/* Sötét módban a hold ikon rejtett, nap látható */
 .dark_mode .dark-mode-toggle .moon-icon {
     display: none;
 }
@@ -353,6 +533,10 @@ textarea:focus {
     display: block;
 }
 
+/**
+ * Hamburger menü gomb
+ * Mobil nézetben megjelenő menü ikon.
+ */
 .hamburger {
     display: none;
     background: none;
@@ -370,6 +554,7 @@ textarea:focus {
     transition: opacity 0.3s ease, transform 0.3s ease;
 }
 
+/* Hamburger X ikon animáció */
 .hamburger .close-icon {
     position: absolute;
     top: 50%;
@@ -383,6 +568,7 @@ textarea:focus {
     transform: rotate(0deg);
 }
 
+/* Aktív menüpont neve - mobil nézetben */
 .active-section-name {
     display: none;
     font-weight: bold;
@@ -391,13 +577,20 @@ textarea:focus {
     font-size: 2rem;
 }
 
+/**
+ * Reszponzív töréspontok - Navigáció
+ */
 @media (max-width: 1350px) {
     section {
         width: 80%;
     }
 }
 
-/*Mindig látható hamburger esetén*/
+/**
+ * Mindig látható hamburger menü
+ * Speciális osztály, amely mindig megjeleníti a hamburger menüt.
+ * Használat: .visible_hamburger osztály hozzáadása a header-hez.
+ */
 .visible_hamburger:not(#chatBody) {
     justify-content: flex-start;
 }
@@ -411,6 +604,7 @@ textarea:focus {
     font-size: 1.5rem;
 }
 
+/* Kinyíló oldalsó navigációs panel */
 .visible_hamburger:not(#chatBody) .nav-menu {
     position: fixed;
     right: -100%;
@@ -491,6 +685,7 @@ textarea:focus {
     border-radius: 10px;
 }
 
+/* Hamburger gomb animáció aktív állapotban */
 .visible_hamburger .hamburger.active {
     z-index: 1003;
 }
@@ -505,6 +700,7 @@ textarea:focus {
     transform: translate(-50%, -50%) rotate(0deg);
 }
 
+/* Háttér overlay a menü mögött */
 .visible_hamburger header.menu-open::after {
     content: '';
     position: fixed;
@@ -517,6 +713,10 @@ textarea:focus {
     pointer-events: none;
 }
 
+/**
+ * Reszponzív hamburger menü - 1100px alatt
+ * A navigáció oldalsó panelbe kerül mobil és tablet eszközökön.
+ */
 @media (max-width: 1100px) {
     header:not(#chatBody header) {
         justify-content: flex-start;
@@ -532,6 +732,7 @@ textarea:focus {
         font-size: 1.5rem;
     }
     
+    /* Kinyíló oldalsó navigációs panel */
     .nav-menu:not(#chatBody .nav-menu) {
         position: fixed;
         right: -100%;
@@ -611,6 +812,7 @@ textarea:focus {
         border-radius: 10px;
     }
     
+    /* Hamburger gomb animáció */
     .hamburger.active {
         z-index: 1003;
     }
@@ -625,6 +827,7 @@ textarea:focus {
         transform: translate(-50%, -50%) rotate(0deg);
     }
     
+    /* Háttér overlay */
     header.menu-open::after {
         content: '';
         position: fixed;
@@ -652,6 +855,9 @@ textarea:focus {
     }
 }
 
+/**
+ * Reszponzív töréspontok - Kis képernyők
+ */
 @media (max-width: 650px) {
     .header_img {
         height: 40%;
@@ -670,6 +876,10 @@ textarea:focus {
     }
 }
 
+/**
+ * Üres tartalom üzenet
+ * Megjelenik, ha nincs megjeleníthető tartalom.
+ */
 .no_content_message {
     text-align: center;
     color: var(--border-color);
@@ -677,6 +887,11 @@ textarea:focus {
     font-size: 1.25rem;
 }
 
+/**
+ * Tartalom konténer
+ * Általános kártya stílus a tartalom megjelenítéséhez.
+ * Bal oldali színes szegéllyel és hover effekttel.
+ */
 .content_container {
     background: var(--background-primary);
     border-radius: 10px;
@@ -699,6 +914,7 @@ textarea:focus {
     color: var(--primary-color);
 }
 
+/* Láthatatlan link az egész kártyára kattintáshoz */
 .container_link {
     position: absolute;
     top: 0;
@@ -709,6 +925,10 @@ textarea:focus {
     text-decoration: none;
 }
 
+/**
+ * Gomb stílusok
+ * Alapvető gomb, kis gomb és nagy gomb variánsok.
+ */
 .button {
     background: transparent;
     border: none;
@@ -725,6 +945,7 @@ textarea:focus {
     background-color: var(--hover-overlay);
 }
 
+/* Kis gomb - ikon gombok */
 .small_button {
     border-radius: 20px;
     position: absolute;
@@ -736,6 +957,7 @@ textarea:focus {
     margin-right: 0.25rem;
 }
 
+/* Nagy gomb - akciógombok */
 .large_button {
     background-color: var(--primary-color);
     border-radius: 30px;
@@ -764,6 +986,10 @@ textarea:focus {
     height: 24px;
 }
 
+/**
+ * Tartalom gombok pozícionálása
+ * Letöltés, feltöltés, szerkesztés, követés gombok.
+ */
 .content_download_button, .content_upload_button, .content_edit_button, .content_follow_button, .content_unfollow_button {
     top: 0.5rem;
     right: 0.5rem;
@@ -774,6 +1000,10 @@ textarea:focus {
     right: 0.5rem;
 }
 
+/**
+ * Letöltésszámláló
+ * Fájlok letöltési számát mutatja.
+ */
 .content_downloads {
     position: absolute;
     top: 50%;
@@ -793,6 +1023,10 @@ textarea:focus {
     opacity: 0.7;
 }
 
+/**
+ * Státusz badge
+ * Kérések állapotát jelző címke (teljesített/várakozó).
+ */
 .status_badge {
     position: absolute;
     top: 10px;
@@ -825,6 +1059,7 @@ textarea:focus {
     background-color: var(--waiting-background)
 }
 
+/* Tartalom szövegtörés */
 .content_container h2,
 .content_container p {
     max-width: 1500px;
@@ -834,6 +1069,9 @@ textarea:focus {
     hyphens: auto;
 }
 
+/**
+ * Reszponzív töréspontok - Tartalom konténer
+ */
 @media (max-width: 600px) {
     .content_container {
         padding-right: 65px;
@@ -844,6 +1082,7 @@ textarea:focus {
         max-width: 300px;
     }
 
+    /* Státusz badge kör alakú lesz kis képernyőn */
     .status_badge {
         padding: 6px;
         border-radius: 50%;
@@ -883,6 +1122,7 @@ textarea:focus {
         padding: 0.4rem;
     }
 
+    /* Elrejthető elemek kis képernyőn */
     .hideable_text, .hideable_content {
         display: none !important;
     }
@@ -900,6 +1140,16 @@ textarea:focus {
     }
 }
 
+
+/* =============================================================================
+   5. MODÁLIS ABLAKOK
+   ============================================================================= */
+
+/**
+ * Modal háttér
+ * Teljes képernyős sötétített háttér a modális ablak mögött.
+ * Fade in/out animációval.
+ */
 .modal {
     display: flex;
     justify-content: center;
@@ -919,6 +1169,7 @@ textarea:focus {
     animation: fadeOut 0.3s ease forwards;
 }
 
+/* Fade animációk */
 @keyframes fadeIn {
     to {
         opacity: 1;
@@ -938,6 +1189,10 @@ textarea:focus {
     display: none;
 }
 
+/**
+ * Modal tartalom
+ * A modális ablak fő konténere slide-in animációval.
+ */
 .modal_content {
     background-color: var(--background-secondary);
     border: 2px solid var(--primary-color);
@@ -953,6 +1208,7 @@ textarea:focus {
     padding-right: calc(2rem + 8px);
 }
 
+/* Egyedi scrollbar a modal tartalomhoz */
 .modal_content::-webkit-scrollbar {
     width: 8px;
 }
@@ -971,10 +1227,12 @@ textarea:focus {
     background: var(--primary-color);
 }
 
+/* Kis méretű modal */
 .small_modal_content {
     width: min(70%, 400px);
 }
 
+/* Slide animációk */
 .modal.closing .modal_content {
     animation: slideOutToRight 0.4s ease forwards;
 }
@@ -994,6 +1252,10 @@ textarea:focus {
     }
 }
 
+/**
+ * Modal fejléc elrendezés
+ * Grid alapú címke-érték párok megjelenítése.
+ */
 .modal_content h3 {
     display: grid;
     grid-template-columns: 175px 1fr;
@@ -1003,6 +1265,10 @@ textarea:focus {
     grid-template-columns: 175px 25px 1fr;
 }
 
+/**
+ * Szavazás konténer
+ * Upvote/Downvote gombok és számláló.
+ */
 .voting_container {
     display: flex;
     align-items: center;
@@ -1014,6 +1280,7 @@ span.voting_container {
     gap: 5px;
 }
 
+/* Szavazás a tartalomban */
 .content_voting {
     position: absolute;
     bottom: 1rem;
@@ -1066,6 +1333,7 @@ span.voting_container {
     top: 5px;
 }
 
+/* Aktív szavazás gomb állapotok */
 .upvote_button.active img {
     filter: invert(64%) sepia(23%) saturate(1393%) hue-rotate(72deg) brightness(91%) contrast(85%);
 }
@@ -1086,6 +1354,10 @@ span.voting_container {
     font-weight: bold;
 }
 
+/**
+ * Modal lábléc
+ * Gombok középre igazítva.
+ */
 .modal_footer {
     display: flex;
     justify-content: center;
@@ -1101,11 +1373,16 @@ form .modal_footer {
     margin-top: 0;
 }
 
+/* Modal bezáró gombok */
 .modal_close_button, .edit_close_button, .upload_close_button, .request_close_button, .report_close_button, .chatroom_close_button {
     top: 30px;
     right: 30px;
 }
 
+/**
+ * Section fejléc
+ * Cím és akciógombok elrendezése.
+ */
 .section_header {
     display: flex;
     justify-content: space-between;
@@ -1118,7 +1395,18 @@ form .modal_footer {
     gap: 1rem;
 }
 
-/*index.php*/
+
+/* =============================================================================
+   6. OLDALSPECIFIKUS STÍLUSOK
+   ============================================================================= */
+
+/* -----------------------------------------------------------------------------
+   6.1 Bejelentkezés/Regisztráció oldal (index.php / log_reg.php)
+   ----------------------------------------------------------------------------- */
+
+/**
+ * Szerzői jog jelzés
+ */
 #trademark {
     position: absolute;
     bottom: 10px;
@@ -1127,6 +1415,10 @@ form .modal_footer {
     color: var(--border-color);
 }
 
+/**
+ * Bejelentkezési konténer
+ * Középre igazított kártya a bejelentkezéshez/regisztrációhoz.
+ */
 #index_container {
     display: flex;
     flex-direction: column;
@@ -1144,6 +1436,10 @@ form .modal_footer {
     overflow: hidden;
 }
 
+/**
+ * Bejelentkezési fejléc
+ * Gradient háttérrel a kártya tetején.
+ */
 #index_header {
     background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
     color: var(--text-secondary);
@@ -1159,6 +1455,9 @@ form .modal_footer {
     color: var(--text-secondary);
 }
 
+/**
+ * Bejelentkezési és regisztrációs form konténerek
+ */
 #login, #register {
     background: var(--text-secondary);
     padding: 1.5rem;
@@ -1167,6 +1466,7 @@ form .modal_footer {
     overflow: auto;
 }
 
+/* Reszponzív bejelentkezési konténer */
 @media (min-width: 768px) {
     #index_container {
         width: 60vw;
@@ -1188,6 +1488,7 @@ form .modal_footer {
     margin-top: 1rem;
 }
 
+/* Input mezők a bejelentkezési oldalon */
 #index_container .input-field {
     margin-bottom: 0.5rem;
     width: 100%;
@@ -1197,6 +1498,7 @@ form .modal_footer {
     width: 100%;
 }
 
+/* Hibás input mező stílusok */
 #index_container input.error {
     border-color: var(--error-color);
     background-color: rgba(149, 31, 47, 0.1);
@@ -1214,6 +1516,7 @@ form .modal_footer {
     box-shadow: 0 0 5px rgba(248, 113, 113, 0.5);
 }
 
+/* Bejelentkezési gomb */
 #index_container button {
     padding: 0.75rem;
     background-color: var(--primary-color);
@@ -1231,6 +1534,7 @@ form .modal_footer {
     transform: translateY(-2px);
 }
 
+/* Bejelentkezési linkek */
 #index_container a {
     color: var(--primary-color);
     text-decoration: none;
@@ -1250,12 +1554,23 @@ form .modal_footer {
     }
 }
 
-/*dashboard.php*/
+
+/* -----------------------------------------------------------------------------
+   6.2 Dashboard oldal (dashboard.php)
+   ----------------------------------------------------------------------------- */
+
+/**
+ * Tantárgy hozzáadása modal
+ */
 .add_subject_modal .modal_content {
     height: 600px;
     max-height: 90vh;
 }
 
+/**
+ * Tantárgy és regisztrációs lista konténerek
+ * Görgethető listák a modálokban.
+ */
 #subject_list_container, #register_input_container {
     max-height: 315px;
     overflow-y: auto;
@@ -1267,6 +1582,9 @@ form .modal_footer {
     max-height: 150px;
 }
 
+/**
+ * Elérhető tantárgy konténer
+ */
 .available_subject_container {
     margin-bottom: 1rem;
     position: relative;
@@ -1280,6 +1598,7 @@ form .modal_footer {
     }
 }
 
+/* Tantárgy hozzáadása gomb */
 .subject_add_button {
     position: absolute;
     right: 0.5rem;
@@ -1300,6 +1619,10 @@ form .modal_footer {
     filter: brightness(0) invert(1);
 }
 
+/**
+ * Profil szekció
+ * Felhasználói adatok megjelenítése és szerkesztése.
+ */
 #dashboard_profile {
     width: 35%;
 }
@@ -1335,6 +1658,7 @@ form .modal_footer {
     width: 100%;
 }
 
+/* Hibás profil input mezők */
 #profile_info input.error {
     border-color: var(--error-color);
     background-color: rgba(149, 31, 47, 0.1);
@@ -1344,6 +1668,9 @@ form .modal_footer {
     box-shadow: 0 0 5px rgba(149, 31, 47, 0.5);
 }
 
+/**
+ * Hibaüzenet megjelenítése
+ */
 .error-message {
     color: var(--error-color);
     font-size: 0.85rem;
@@ -1374,13 +1701,30 @@ form .modal_footer {
     }
 }
 
-/*subject.php*/
+
+/* -----------------------------------------------------------------------------
+   6.3 Tantárgy oldal (subject.php)
+   ----------------------------------------------------------------------------- */
+
+/**
+ * Jelentés tartalom modal
+ */
 .report_content_modal p {
     margin-bottom: 1rem;
     font-weight: bold;
 }
 
-/*dark mode kivételek*/
+
+/* =============================================================================
+   7. SÖTÉT TÉMA FELÜLÍRÁSOK
+   ============================================================================= */
+
+/**
+ * Sötét téma speciális stílusok
+ * Ezek a stílusok felülírják az alapértelmezett világos téma stílusokat.
+ */
+
+/* Navigáció sötét módban */
 .dark_mode .nav-menu {
     background-color: var(--background-secondary);
 }
@@ -1397,11 +1741,13 @@ form .modal_footer {
     filter: brightness(0) invert(1);
 }
 
+/* Aktív menüelem sötét módban */
 .dark_mode .nav-menu ul li a.active {
     color: black;
     background-color: var(--primary-color);
 }
 
+/* Gombok sötét módban */
 .dark_mode .large_button {
     background-color: var(--primary-color);
 }
@@ -1422,14 +1768,17 @@ form .modal_footer {
     filter: brightness(0);
 }
 
+/* Tartalom ikonok sötét módban */
 .dark_mode .content_container img, .dark_mode .modal_content img, .dark_mode .upvote_button img, .dark_mode .downvote_button img{
     filter: brightness(0) invert(1) opacity(0.8);
 }
 
+/* Modal szegély sötét módban */
 .dark_mode .modal_content {
     border: 2px solid var(--border-color);
 }
 
+/* Szavazás gombok aktív állapotban - megtartott színek */
 .dark_mode .upvote_button.active img {
     filter: invert(64%) sepia(23%) saturate(1393%) hue-rotate(72deg) brightness(91%) contrast(85%);
 }
@@ -1442,10 +1791,12 @@ form .modal_footer {
     color: var(--text-secondary);
 }
 
+/* Elválasztó vonal sötét módban */
 .dark_mode hr {
     border-top: 2px solid var(--border-color);
 }
 
+/* Kereső és tantárgy hozzáadása gombok */
 .dark_mode .search_container img, .dark_mode .subject_add_button img {
     filter: brightness(0);
 }
@@ -1454,6 +1805,7 @@ form .modal_footer {
     color: black;
 }
 
+/* Input placeholder és stílusok sötét módban */
 .dark_mode input::placeholder, .dark_mode textarea::placeholder {
     color: black;
 }  
@@ -1472,6 +1824,7 @@ form .modal_footer {
     color: var(--text-secondary);
 }
 
+/* Bejelentkezési oldal sötét módban */
 .dark_mode #index_container {
     box-shadow: 0 2px 4px var(--secondary-color);
 }
@@ -1497,7 +1850,15 @@ form .modal_footer {
     background-color: var(--secondary-color);
 }
 
-/* Töltő képernyő */
+
+/* =============================================================================
+   8. SEGÉDOSZTÁLYOK
+   ============================================================================= */
+
+/**
+ * Töltőképernyő
+ * Teljes képernyős overlay töltés közben.
+ */
 .loading-screen {
     display: none;
     position: fixed;
@@ -1513,6 +1874,7 @@ form .modal_footer {
     transition: opacity 0.3s ease;
 }
 
+/* Kezdeti töltőképernyő - sötétebb háttér */
 .initial-loading {
     background-color: #222;
 }
@@ -1522,6 +1884,9 @@ form .modal_footer {
     opacity: 1;
 }
 
+/**
+ * Töltés spinner animáció
+ */
 .loading-spinner {
     display: flex;
     flex-direction: column;
@@ -1557,7 +1922,15 @@ form .modal_footer {
     color: var(--text-secondary);
 }
 
-/* Chatszobák */
+
+/* -----------------------------------------------------------------------------
+   6.4 Chatszobák oldal (chatroom.php)
+   ----------------------------------------------------------------------------- */
+
+/**
+ * Chat oldal grid elrendezés
+ * Fejléc, oldalsáv és fő tartalom grid-ben.
+ */
 #chatBody {
     display: grid;
     grid-template-areas:
@@ -1576,6 +1949,7 @@ form .modal_footer {
     overflow-wrap: break-word;
 }
 
+/* Reszponzív chat elrendezés - tablet */
 @media (max-width: 900px) {
     #chatBody {
         grid-template-areas:
@@ -1588,10 +1962,14 @@ form .modal_footer {
     }
 }
 
+/* Mobil specifikus gombok - alapból rejtett */
 .sidebar-back-button, .sidebar-logout-button, #background-overlay, #sidebar-toggle {
     display: none;
 }
 
+/**
+ * Chatszoba lista konténer
+ */
 #chat_conv_list {
     max-height: calc(100vh - 100px);
     overflow-y: auto;
@@ -1603,6 +1981,9 @@ form .modal_footer {
     border-radius: 12px;
 }
 
+/**
+ * Oldalsáv - Chatszoba lista
+ */
 #sidebar {
     position: relative;
     grid-area: side;
@@ -1633,6 +2014,7 @@ form .modal_footer {
     margin: 0 auto 1rem;
 }
 
+/* Chatszoba lista elemek */
 #sidebar ul {
     list-style: none;
     display: flex;
@@ -1666,6 +2048,7 @@ form .modal_footer {
 
 }
 
+/* Aktív chatszoba kiemelése */
 #sidebar ul li.active {
     background-color: var(--primary-color);
     border-left: 4px solid var(--secondary-color);
@@ -1678,6 +2061,9 @@ form .modal_footer {
     color: #1e3a8a;
 }
 
+/**
+ * Fő chat terület
+ */
 #chatBody #chatszobak {
     grid-area: text;
     background: var(--background-secondary);
@@ -1698,6 +2084,10 @@ form .modal_footer {
     display: none;
 }
 
+/**
+ * Reszponzív chat - mobil nézet
+ * Oldalsáv kinyíló panelként jelenik meg.
+ */
 @media (max-width: 600px) {
     #chatszobak {
         width: 80%;
@@ -1712,6 +2102,7 @@ form .modal_footer {
         grid-template-columns: 1fr;
     }
 
+    /* Kinyíló oldalsáv */
     #sidebar {
         display: block;
         position: fixed;
@@ -1732,6 +2123,8 @@ form .modal_footer {
     #sidebar.visible {
         transform: translateX(0);
     }
+    
+    /* Mobil gombok az oldalsávban */
     .sidebar-back-button {
         position: absolute;
         bottom: 1rem;
@@ -1764,6 +2157,8 @@ form .modal_footer {
     #chat_back_button {
         display: none;
     }
+    
+    /* Háttér overlay az oldalsáv mögött */
     #background-overlay {
         display: none;
         position: fixed;
@@ -1775,6 +2170,8 @@ form .modal_footer {
         z-index: 999;
         opacity: 0.5;
     }
+    
+    /* Oldalsáv megnyitó gomb */
     #sidebar-toggle {
         position: fixed !important;
         top: 1.5rem;
@@ -1788,6 +2185,8 @@ form .modal_footer {
         justify-content: center;
         z-index: 9999 !important;
     }
+    
+    /* Oldalsáv bezáró gomb */
     #sidebar-close {
         display: block;
         position: absolute;
@@ -1806,6 +2205,9 @@ form .modal_footer {
     }
 }
 
+/**
+ * Chat szövegmező
+ */
 #chat_text {
     background: var(--background-primary);
     color: var(--primary-color);
@@ -1819,6 +2221,9 @@ form .modal_footer {
     filter: brightness(0) invert(1);
 }
 
+/**
+ * Chat ablak elrendezés
+ */
 .chat_layout {
   display: flex;
   gap: 1rem;
@@ -1832,6 +2237,9 @@ form .modal_footer {
   max-height: calc(100vh - 100px);
 }
 
+/**
+ * Üzenetek konténer
+ */
 .chat_messages {
   flex: 1;
   overflow: auto;
@@ -1841,6 +2249,10 @@ form .modal_footer {
   border: 2px solid var(--light-gray);
 }
 
+/**
+ * Üzenet buborékok
+ * Saját üzenetek jobbra, mások balra igazítva.
+ */
 .chat_row {
   display: flex;
   align-items: flex-end;
@@ -1867,6 +2279,7 @@ form .modal_footer {
   overflow-wrap: break-word;
 }
 
+/* Saját üzenet stílus */
 .chat_bubble.me {
   background: var(--primary-color);
   color: #fff;
@@ -1875,6 +2288,7 @@ form .modal_footer {
   box-shadow: 0 2px 4px rgba(0,0,0,0.1);
 }
 
+/* Sötét módú üzenet buborékok */
 .dark_mode .chat_bubble {
   background: #2c2c2c;
   color: #ddd;
@@ -1893,6 +2307,7 @@ form .modal_footer {
   }
 }
 
+/* Üzenet metaadatok (időbélyeg) */
 .chat_meta {
   font-size: .75rem;
   opacity: .7;
@@ -1900,6 +2315,9 @@ form .modal_footer {
   text-align: right;
 }
 
+/**
+ * Üzenetküldő input
+ */
 .chat_input {
   display: flex;
   gap: .5rem;
@@ -1930,6 +2348,7 @@ form .modal_footer {
   box-shadow: 0 0 5px rgba(59, 130, 246, 0.5);
 }
 
+/* Sötét módú üzenetek konténer */
 .dark_mode
 .chat_messages {
   display: flex;
@@ -1939,10 +2358,22 @@ form .modal_footer {
   background: var(--background-secondary);
 }
 
+
+/* -----------------------------------------------------------------------------
+   6.5 Admin felület (admin.php)
+   ----------------------------------------------------------------------------- */
+
+/**
+ * Admin lista stílusok
+ */
 .admin-list .list-row {
     padding: 14px 4px;
 }
 
+/**
+ * Badge-ek - státusz jelzők
+ * Különböző színekkel az állapot jelzésére.
+ */
 .badge {
     display: inline-block;
     padding: 3px 8px;
@@ -1960,6 +2391,10 @@ form .modal_footer {
     margin: 0 auto;
 }
 
+/**
+ * Szűrő gombok
+ * Checkbox alapú szűrés az admin listákhoz.
+ */
 .filterButtons {
     display: flex;
     flex-wrap: wrap;
@@ -1984,7 +2419,10 @@ form .modal_footer {
     margin: 0;
 }
 
-
+/**
+ * Lenyíló részletek elem
+ * Kinyitható/becsukható szekciók.
+ */
 details summary {
     cursor: pointer;
     list-style: none;
@@ -2003,6 +2441,7 @@ details summary::marker {
     color: var(--primary-color);
 }
 
+/* Nyíl ikon a részletek előtt */
 details summary::before {
     content: '▶';
     color: var(--primary-color);
@@ -2033,6 +2472,7 @@ details label {
     color: var(--primary-color);
 }
 
+/* Tartalom konténer ikonok */
 .content_container h2>img {
     margin-right: 5px;
     transform: translateY(2.5px);
@@ -2044,6 +2484,10 @@ details label {
     }
 }
 
+/**
+ * Admin gombok
+ * Nagyméretű, ikonos akciógombok.
+ */
 .admin_buttons {
     display: flex;
     gap: 0.5rem;
@@ -2086,6 +2530,9 @@ details label {
     text-align: center;
 }
 
+/**
+ * Header gomb stílusok
+ */
 .header_button {
     background: #1e3a8a;
     text-decoration: none;
@@ -2116,6 +2563,9 @@ details label {
     position: absolute;
 }
 
+/**
+ * Admin modal fejléc
+ */
 .admin_modal_header {
     display: grid;
     grid-template-columns: 175px 1fr;
@@ -2131,6 +2581,9 @@ details label {
     }
 }
 
+/**
+ * Admin gomb és konténer stílusok
+ */
 .admin_button {
     display: flex;
     align-items: center;
@@ -2156,10 +2609,15 @@ details label {
     }
 }
 
+/* Admin felhasználó modal */
 .admin_user_modal h3, #admin_page .content_container h3 {
     color: #1e3a8a;
 }
 
+/**
+ * Jelentés modal lábléc
+ * Grid elrendezésű akciógombok.
+ */
 .report_modal_footer {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
