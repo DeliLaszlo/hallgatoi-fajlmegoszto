@@ -2796,6 +2796,13 @@ document.addEventListener('DOMContentLoaded', function() {
             if(overlay) overlay.style.display = 'none';
         }
 
+        // Frissítjük a header címet a kiválasztott szoba nevével
+        const roomTitle = itemElement.textContent;
+        const activeSectionName = document.querySelector('.active-section-name');
+        const navMenuTitle = document.querySelector('.nav-menu h1');
+        if (activeSectionName) activeSectionName.textContent = roomTitle;
+        if (navMenuTitle) navMenuTitle.textContent = roomTitle;
+
         activeChatroomId = itemElement.dataset.roomId;
         startChat(activeChatroomId);
     }

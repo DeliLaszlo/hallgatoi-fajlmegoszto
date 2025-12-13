@@ -11,6 +11,26 @@ if (isset($_SESSION['last_activity']) && (time() - $_SESSION['last_activity'] > 
 } else {
     $_SESSION['last_activity'] = time();
 }
+
+// Chatszoba nevének lekérése
+$chatroomTitle = "Chatszoba";
+if (isset($_GET['room_id']) && !empty($_GET['room_id'])) {
+    require_once 'config.php';
+    try {
+        $conn = getMysqliConnection();
+        $room_id = $_GET['room_id'];
+        $stmt = $conn->prepare("SELECT title FROM chatroom WHERE room_id = ?");
+        $stmt->bind_param("s", $room_id);
+        $stmt->execute();
+        $result = $stmt->get_result();
+        if ($row = $result->fetch_assoc()) {
+            $chatroomTitle = htmlspecialchars($row['title'], ENT_QUOTES, 'UTF-8');
+        }
+        $stmt->close();
+    } catch (Exception $e) {
+        // Ha hiba történik, marad az alapértelmezett név
+    }
+}
 ?>
 
 <!DOCTYPE html>
@@ -32,9 +52,9 @@ if (isset($_SESSION['last_activity']) && (time() - $_SESSION['last_activity'] > 
     </div>
   </div>
   <header>
-    <span class="active-section-name">Chatszoba neve</span>
+    <span class="active-section-name"><?php echo $chatroomTitle; ?></span>
     <nav class="nav-menu">
-      <h1>Chatszoba neve</h1>
+      <h1><?php echo $chatroomTitle; ?></h1>
       <a href="javascript:history.back()" id="chat_back_button" class="go_back_button">
         <img src="icons/arrowback.svg" alt="Irányítópult" class="dashboard-icon">
         <span class="hideable_text">Vissza</span>

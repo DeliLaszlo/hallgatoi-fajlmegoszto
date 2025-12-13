@@ -1606,8 +1606,7 @@ form .modal_footer {
 #sidebar {
     position: relative;
     grid-area: side;
-    padding: 1rem 0.25rem;
-    padding-right: 0;
+    padding: 1rem 0;
     border-right: 4px solid var(--primary-color);
     overflow-y: auto;
     width: 100%;
@@ -1653,7 +1652,6 @@ form .modal_footer {
     padding: 0.5rem 0.5rem;
     transition: background-color 0.3s ease, color 0.3s ease;
     width: 100%;
-    margin-bottom: 10px;
     box-shadow: 0 1px 4px var(--shadow-light);
     border-left: 4px solid var(--primary-color);
     word-break: break-word;
