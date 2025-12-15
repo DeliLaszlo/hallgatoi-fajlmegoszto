@@ -403,6 +403,9 @@ document.addEventListener('DOMContentLoaded', function() {
             
             const requests = result.requests;
             
+            // Rendezés: teljesített kérelmek elöl
+            requests.sort((a, b) => (b.is_completed ? 1 : 0) - (a.is_completed ? 1 : 0));
+            
             if (requests.length === 0) {
                 requestSection.insertAdjacentHTML('beforeend',
                     '<h2 class="no_content_message">Még nincsenek kérelmeid.</h2>'
@@ -753,7 +756,7 @@ document.addEventListener('DOMContentLoaded', function() {
                         requestSection.insertAdjacentHTML('beforeend', `
                             <div class="content_container request_container">
                                 <a href="#" class="container_link upload_file_button" data-request-id="${request.request_id}" aria-label="Fájl feltöltése"></a>
-                                <button class="button small_button content_upload_button upload_file_button" aria-label="Fájl feltöltése">
+                                <button class="button small_button content_upload_button upload_file_button" data-request-id="${request.request_id}" aria-label="Fájl feltöltése">
                                     <span class="icon_text">Fájl feltöltése</span>
                                     <img src="icons/upload.svg" alt="Fájl feltöltése">
                                 </button>
@@ -1830,6 +1833,36 @@ document.addEventListener('DOMContentLoaded', function() {
             e.preventDefault();
             const reportModal = document.querySelector('.report_content_modal');
             if (reportModal) {
+                // Meghatározzuk a jelentett elem típusát és azonosítóját
+                let itemType = '';
+                let itemId = '';
+                
+                // Fájl részletei modalból (file_details_modal)
+                const fileDetailsModal = button.closest('.file_details_modal');
+                if (fileDetailsModal) {
+                    itemType = 'upload';
+                    itemId = fileDetailsModal.getAttribute('data-up-id');
+                }
+                
+                // Kérelem konténerből
+                const requestContainer = button.closest('.request_container');
+                if (requestContainer) {
+                    itemType = 'request';
+                    const requestLink = requestContainer.querySelector('[data-request-id]');
+                    itemId = requestLink ? requestLink.getAttribute('data-request-id') : '';
+                }
+                
+                // Chatszoba konténerből
+                const chatroomContainer = button.closest('.chatroom_container');
+                if (chatroomContainer) {
+                    itemType = 'chatroom';
+                    itemId = chatroomContainer.getAttribute('data-room-id');
+                }
+                
+                // Elmentjük az adatokat a modalba
+                reportModal.setAttribute('data-item-type', itemType);
+                reportModal.setAttribute('data-item-id', itemId);
+                
                 reportModal.classList.remove('hidden');
             }
         }
@@ -3094,8 +3127,12 @@ document.addEventListener('DOMContentLoaded', function() {
     if (chatComposer) {
         chatComposer.addEventListener('submit', async function(e) {
             e.preventDefault();
+            e.stopPropagation();
+            
             const text = chatText.value.trim();
-            if (!text || !activeChatroomId) return;
+            if (!text || !activeChatroomId) {
+                return false;
+            }
 
             chatText.value = ''; // Mező törlése azonnal
 
@@ -3124,7 +3161,7 @@ document.addEventListener('DOMContentLoaded', function() {
         chatText.addEventListener('keydown', function(e) {
             if (e.key === 'Enter' && !e.shiftKey) {
                 e.preventDefault();
-                chatComposer.dispatchEvent(new Event('submit'));
+                chatComposer.dispatchEvent(new Event('submit', { bubbles: true, cancelable: true }));
             }
         });
     }
@@ -3430,8 +3467,9 @@ document.addEventListener('click', async function(e) {
                         modalCloseButton.click();
                     }
                     
-                    // Eltávolítjuk a fájlkártyát az oldalról
-                    const container = document.querySelector(`.own_file_container .own_details_link[data-up-id="${upId}"]`)?.closest('.own_file_container');
+                    // Eltávolítjuk a fájlkártyát az oldalról (dashboard és subject oldalon is működik)
+                    const container = document.querySelector(`.own_details_link[data-up-id="${upId}"]`)?.closest('.uploaded_files_container') ||
+                                     document.querySelector(`.file_details_link[data-up-id="${upId}"]`)?.closest('.uploaded_files_container');
                     if (container) {
                         container.remove();
                     }
@@ -3446,7 +3484,7 @@ document.addEventListener('click', async function(e) {
                         }
                     }
                     
-                    alert('Fájl sikeresen törölve!');
+                    // alert('Fájl sikeresen törölve!');
                 } else {
                     alert('Hiba: ' + (result.error || 'Nem sikerült törölni a fájlt!'));
                 }
@@ -3722,9 +3760,9 @@ document.addEventListener('click', async function(e) {
         }
         
         // Megerősítés kérése
-        if (!confirm('Biztosan meg szeretnéd szüntetni a chatszoba követését?')) {
-            return;
-        }
+        // if (!confirm('Biztosan meg szeretnéd szüntetni a chatszoba követését?')) {
+        //     return;
+        // }
         
         try {
             showLoading('Követés megszüntetése...');
@@ -4626,6 +4664,274 @@ if (uploadFileForm) {
             hideLoading();
             console.error('Fájl feltöltési hiba:', error);
             alert('Hiba történt a fájl feltöltése során: ' + error.message);
+        }
+    });
+}
+
+// ----------------------------------------------------------------------------
+// JELENTÉS BEKÜLDÉSE
+// ----------------------------------------------------------------------------
+
+const reportContentForm = document.getElementById('reportContentForm');
+if (reportContentForm) {
+    reportContentForm.addEventListener('submit', async function(e) {
+        e.preventDefault();
+        
+        const modal = document.querySelector('.report_content_modal');
+        const itemType = modal ? modal.getAttribute('data-item-type') : '';
+        const itemId = modal ? modal.getAttribute('data-item-id') : '';
+        
+        if (!itemType || !itemId) {
+            alert('Hiba: Nem található a jelentendő elem azonosítója!');
+            return;
+        }
+        
+        const description = document.getElementById('report_description')?.value?.trim() || '';
+        
+        if (!description) {
+            alert('Kérlek add meg a jelentés okát!');
+            return;
+        }
+        
+        const formData = new FormData();
+        formData.append('item_type', itemType);
+        formData.append('item_id', itemId);
+        formData.append('report_description', description);
+        
+        try {
+            showLoading('Jelentés beküldése...');
+            
+            const response = await fetch(API.SUBMIT_REPORT, {
+                method: 'POST',
+                body: formData
+            });
+            
+            if (!response.ok) {
+                throw new Error('Nem sikerült beküldeni a jelentést.');
+            }
+            
+            const result = await response.json();
+            
+            setTimeout(() => {
+                hideLoading();
+                
+                if (result.success) {
+                    // Form reset
+                    reportContentForm.reset();
+                    
+                    // Modal adatok törlése
+                    modal.removeAttribute('data-item-type');
+                    modal.removeAttribute('data-item-id');
+                    
+                    // Modal bezárása
+                    const closeButton = modal.querySelector('.report_close_button');
+                    if (closeButton) closeButton.click();
+                    
+                    // alert('Jelentés sikeresen beküldve!');
+                } else {
+                    alert('Hiba: ' + (result.error || 'Nem sikerült beküldeni a jelentést!'));
+                }
+            }, TIMING.LOADING_LONG);
+            
+        } catch (error) {
+            hideLoading();
+            console.error('Jelentés beküldési hiba:', error);
+            alert('Hiba történt a jelentés beküldése során: ' + error.message);
+        }
+    });
+}
+
+// ----------------------------------------------------------------------------
+// ÚJ KÉRELEM LÉTREHOZÁSA
+// ----------------------------------------------------------------------------
+
+const addRequestForm = document.getElementById('add_request_form');
+if (addRequestForm) {
+    addRequestForm.addEventListener('submit', async function(e) {
+        e.preventDefault();
+        
+        // Tárgy kód lekérése az URL-ből
+        const classCode = getUrlParam('class_code');
+        
+        if (!classCode) {
+            alert('Hiba: Nem található a tárgy kód!');
+            return;
+        }
+        
+        const title = document.getElementById('request_title')?.value?.trim() || '';
+        const description = document.getElementById('request_description')?.value?.trim() || '';
+        
+        if (!title || !description) {
+            alert('Kérlek töltsd ki az összes mezőt!');
+            return;
+        }
+        
+        const formData = new FormData();
+        formData.append('class_code', classCode);
+        formData.append('request_title', title);
+        formData.append('request_description', description);
+        
+        try {
+            showLoading('Kérelem létrehozása...');
+            
+            const response = await fetch(API.ADD_REQUEST, {
+                method: 'POST',
+                body: formData
+            });
+            
+            if (!response.ok) {
+                throw new Error('Nem sikerült létrehozni a kérelmet.');
+            }
+            
+            const result = await response.json();
+            
+            setTimeout(() => {
+                hideLoading();
+                
+                if (result.success) {
+                    // Új kérelem hozzáadása a listához
+                    const requestSection = document.getElementById('subject_request_container');
+                    if (requestSection && result.request) {
+                        // Töröljük a "nincs kérelem" üzenetet ha van
+                        const noContentMsg = requestSection.querySelector('.no_content_message');
+                        if (noContentMsg) noContentMsg.remove();
+                        
+                        const request = result.request;
+                        requestSection.insertAdjacentHTML('afterbegin', `
+                            <div class="content_container request_container">
+                                <a href="#" class="container_link own_uncompleted_requests_link" data-request-id="${request.request_id}" aria-label="Kérelem megnyitása"></a>
+                                <button class="button small_button content_edit_button edit_request_button" aria-label="Szerkesztés">
+                                    <span class="icon_text">Szerkesztés</span>
+                                    <img src="icons/edit.svg" alt="Szerkesztés">
+                                </button>
+                                <button class="button small_button content_delete_button" aria-label="Törlés">
+                                    <span class="icon_text">Törlés</span>
+                                    <img src="icons/delete.svg" alt="Törlés">
+                                </button>
+                                <h2>${escapeHtml(request.request_name)}</h2>
+                                <p>${escapeHtml(request.description)}</p>
+                                <p>Én, ${escapeHtml(request.request_date)}</p>
+                            </div>
+                        `);
+                    }
+                    
+                    // Form reset
+                    addRequestForm.reset();
+                    
+                    // Modal bezárása
+                    const modal = addRequestForm.closest('.add_request_modal');
+                    if (modal) {
+                        const closeButton = modal.querySelector('.request_close_button');
+                        if (closeButton) closeButton.click();
+                    }
+                } else {
+                    alert('Hiba: ' + (result.error || 'Nem sikerült létrehozni a kérelmet!'));
+                }
+            }, TIMING.LOADING_LONG);
+            
+        } catch (error) {
+            hideLoading();
+            console.error('Kérelem létrehozási hiba:', error);
+            alert('Hiba történt a kérelem létrehozása során: ' + error.message);
+        }
+    });
+}
+
+// ----------------------------------------------------------------------------
+// ÚJ CHATSZOBA LÉTREHOZÁSA
+// ----------------------------------------------------------------------------
+
+const addChatroomForm = document.getElementById('add_chatroom_form');
+if (addChatroomForm) {
+    addChatroomForm.addEventListener('submit', async function(e) {
+        e.preventDefault();
+        
+        // Tárgy kód lekérése az URL-ből
+        const classCode = getUrlParam('class_code');
+        
+        if (!classCode) {
+            alert('Hiba: Nem található a tárgy kód!');
+            return;
+        }
+        
+        const title = document.getElementById('chatroom_title')?.value?.trim() || '';
+        const description = document.getElementById('chatroom_description')?.value?.trim() || '';
+        
+        if (!title || !description) {
+            alert('Kérlek töltsd ki az összes mezőt!');
+            return;
+        }
+        
+        const formData = new FormData();
+        formData.append('class_code', classCode);
+        formData.append('chatroom_title', title);
+        formData.append('chatroom_description', description);
+        
+        try {
+            showLoading('Chatszoba létrehozása...');
+            
+            const response = await fetch(API.ADD_CHATROOM, {
+                method: 'POST',
+                body: formData
+            });
+            
+            if (!response.ok) {
+                throw new Error('Nem sikerült létrehozni a chatszobát.');
+            }
+            
+            const result = await response.json();
+            
+            setTimeout(() => {
+                hideLoading();
+                
+                if (result.success) {
+                    // Új chatszoba hozzáadása a listához
+                    const chatroomSection = document.getElementById('subject_chatszobak');
+                    if (chatroomSection && result.chatroom) {
+                        // Töröljük a "nincs chatszoba" üzenetet ha van
+                        const noContentMsg = chatroomSection.querySelector('.no_content_message');
+                        if (noContentMsg) noContentMsg.remove();
+                        
+                        const chatroom = result.chatroom;
+                        // A hr tag után szúrjuk be
+                        const hr = chatroomSection.querySelector('hr');
+                        const insertPosition = hr || chatroomSection;
+                        insertPosition.insertAdjacentHTML('afterend', `
+                            <div class="content_container chatroom_container" data-room-id="${escapeHtml(chatroom.room_id)}">
+                                <a href="chatroom.php?room_id=${escapeHtml(chatroom.room_id)}" class="container_link chatroom_link" aria-label="Chatroom megnyitása"></a>
+                                <button class="button small_button content_edit_button edit_chatroom_button" aria-label="Szerkesztés">
+                                    <span class="icon_text">Szerkesztés</span>
+                                    <img src="icons/edit.svg" alt="Szerkesztés">
+                                </button>
+                                <button class="button small_button content_delete_button" aria-label="Törlés">
+                                    <span class="icon_text">Törlés</span>
+                                    <img src="icons/delete.svg" alt="Törlés">
+                                </button>
+                                <h2>${escapeHtml(chatroom.title)}</h2>
+                                <p>${escapeHtml(chatroom.description)}</p>
+                                <p>Én${chatroom.create_date ? ', ' + escapeHtml(chatroom.create_date) : ''}</p>
+                            </div>
+                        `);
+                    }
+                    
+                    // Form reset
+                    addChatroomForm.reset();
+                    
+                    // Modal bezárása
+                    const modal = addChatroomForm.closest('.add_chatroom_modal');
+                    if (modal) {
+                        const closeButton = modal.querySelector('.chatroom_close_button');
+                        if (closeButton) closeButton.click();
+                    }
+                } else {
+                    alert('Hiba: ' + (result.error || 'Nem sikerült létrehozni a chatszobát!'));
+                }
+            }, TIMING.LOADING_LONG);
+            
+        } catch (error) {
+            hideLoading();
+            console.error('Chatszoba létrehozási hiba:', error);
+            alert('Hiba történt a chatszoba létrehozása során: ' + error.message);
         }
     });
 }

@@ -73,7 +73,7 @@ try {
             'sender_nickname' => $row['sender_nickname'],
             'text' => $row['text'], 
             'send_time' => $row['send_time'],
-            'is_me' => ($row['sender_neptun'] === $user_neptun)
+            'is_me' => (strcasecmp($row['sender_neptun'], $user_neptun) === 0)
         ];
     }
     

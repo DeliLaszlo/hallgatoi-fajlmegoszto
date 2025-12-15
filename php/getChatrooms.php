@@ -124,7 +124,7 @@ try {
         $chatrooms = [];
         while ($row = $result->fetch_assoc()) {
             // Ellenőrizzük, hogy a felhasználó saját chatszobája-e
-            $is_own = ($row['creater_neptun'] === $user_neptun);
+            $is_own = (strtoupper($row['creater_neptun']) === strtoupper($user_neptun));
             
             // Követi-e a chatszobát (ha van room_access bejegyzés a felhasználónak ehhez a szobához)
             $is_following = !is_null($row['active']);

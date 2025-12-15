@@ -81,9 +81,9 @@ try {
         exit();
     }
     
-    // Neptun kód létezésének ellenőrzése (ha változott)
-    if ($neptun !== $currentUser['neptun_k']) {
-        $stmt = $conn->prepare("SELECT neptun_k FROM user WHERE neptun_k = :neptun");
+    // Neptun kód létezésének ellenőrzése (ha változott) - case-insensitive összehasonlítás
+    if (strtoupper($neptun) !== strtoupper($currentUser['neptun_k'])) {
+        $stmt = $conn->prepare("SELECT neptun_k FROM user WHERE UPPER(neptun_k) = UPPER(:neptun)");
         $stmt->bindParam(':neptun', $neptun);
         $stmt->execute();
         if ($stmt->fetch()) {
@@ -92,9 +92,9 @@ try {
         }
     }
     
-    // Felhasználónév létezésének ellenőrzése (csak ha változott)
-    if ($nickname !== $currentUser['nickname']) {
-        $stmt = $conn->prepare("SELECT neptun_k FROM user WHERE nickname = :nickname");
+    // Felhasználónév létezésének ellenőrzése (csak ha változott) - case-insensitive összehasonlítás
+    if (strtolower($nickname) !== strtolower($currentUser['nickname'])) {
+        $stmt = $conn->prepare("SELECT neptun_k FROM user WHERE LOWER(nickname) = LOWER(:nickname)");
         $stmt->bindParam(':nickname', $nickname);
         $stmt->execute(); 
         if ($stmt->fetch()) {
@@ -103,9 +103,9 @@ try {
         }
     }
     
-    // Email cím létezésének ellenőrzése (csak ha változott)
-    if ($email !== $currentUser['email']) {
-        $stmt = $conn->prepare("SELECT neptun_k FROM user WHERE email = :email");
+    // Email cím létezésének ellenőrzése (csak ha változott) - case-insensitive összehasonlítás
+    if (strtolower($email) !== strtolower($currentUser['email'])) {
+        $stmt = $conn->prepare("SELECT neptun_k FROM user WHERE LOWER(email) = LOWER(:email)");
         $stmt->bindParam(':email', $email);
         $stmt->execute();
         

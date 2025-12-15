@@ -97,7 +97,7 @@ if (isset($_GET['room_id']) && !empty($_GET['room_id'])) {
       <div class="chat_layout">
         <section class="chat_window">
           <div id="chat_messages" class="chat_messages" aria-live="polite"></div>
-          <form id="chat_composer" class="chat_input">
+          <form id="chat_composer" class="chat_input" action="javascript:void(0);" onsubmit="return false;">
             <textarea id="chat_text" maxlength="2000" placeholder="Írj üzenetet..." required></textarea>
             <button class="button small_button send_message_button" type="submit">
                 <img src="icons/send.svg" alt="">

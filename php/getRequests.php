@@ -111,7 +111,7 @@ try {
         $requests = [];
         while ($row = $result->fetch_assoc()) {
             // Ellenőrizzük, hogy a felhasználó saját kérelme-e
-            $is_own = ($row['requester_neptun'] === $user_neptun);
+            $is_own = (strtoupper($row['requester_neptun']) === strtoupper($user_neptun));
             
             // Teljesítettség ellenőrzése: 'T' = teljesített, egyébként várakozó
             $is_completed = ($row['status'] === 'T');
